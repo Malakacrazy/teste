@@ -313,7 +313,7 @@ def on_trigger(card, event_name, event_data):
                 if (scope.ContainsVariable(functionName))
                 {
                     dynamic function = scope.GetVariable(functionName);
-                    return function(*parameters);
+                    return function(parameters);
                 }
                 else
                 {
