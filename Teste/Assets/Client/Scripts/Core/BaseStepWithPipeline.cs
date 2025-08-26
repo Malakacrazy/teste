@@ -3,8 +3,7 @@ using UnityEngine;
 namespace L5RGame
 {
     /// <summary>
-    /// Minimal placeholder for BaseStepWithPipeline
-    /// Just enough to allow AbilityResolver to compile.
+    /// Base class for game steps that use a pipeline system
     /// </summary>
     public abstract class BaseStepWithPipeline : IGameStep
     {
@@ -15,16 +14,23 @@ namespace L5RGame
             this.game = game;
         }
 
-        // Placeholder Initialize method (to be overridden)
-        protected abstract void Initialize();
+        // Virtual Initialize method that can be overridden
+        public virtual void Initialize()
+        {
+            // Default implementation - can be overridden by derived classes
+        }
 
-        // Basic IGameStep implementation
+        // IGameStep implementation
         public virtual bool Execute()
         {
             return true;
         }
 
-        public virtual bool IsComplete => true;
+        public virtual bool IsComplete()
+        {
+            return true;
+        }
+
         public virtual bool CanCancel => false;
     }
 }

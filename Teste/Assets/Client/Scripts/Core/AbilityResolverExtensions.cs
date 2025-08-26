@@ -14,7 +14,7 @@ namespace L5RGame
             return resolver;
         }
 
-        public static AbilityResolver ResolveCardAction(this Game game, BaseCard card, Player player, object ability)
+        public static AbilityResolver ResolveCardAction(this Game game, BaseCard card, Player player, BaseAbility ability)
         {
             var context = AbilityContext.CreateCardContext(game, card, player, ability);
             return game.ResolveAbility(context);

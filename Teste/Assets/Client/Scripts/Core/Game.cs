@@ -130,6 +130,11 @@ namespace L5RGame
         public string winReason;
         public string savedGameId;
 
+        /// <summary>
+        /// Gets the game pipeline for managing game steps
+        /// </summary>
+        public GamePipeline Pipeline => pipeline;
+        
         // Network reference
         public IGameRouter router;
 
@@ -654,7 +659,7 @@ def on_trigger(card, event_name, event_data):
                 return;
             }
 
-            MenuCommands.CardMenuClick(menuItem, this, player, card);
+            MenuCommandsHelper.CardMenuClick(menuItem, this, player, card);
             CheckGameState(true);
         }
 
@@ -670,7 +675,7 @@ def on_trigger(card, event_name, event_data):
                 return;
             }
             
-            MenuCommands.RingMenuClick(menuItem, this, player, ring);
+            MenuCommandsHelper.RingMenuClick(menuItem, this, player, ring);
             CheckGameState(true);
         }
 
@@ -1608,14 +1613,7 @@ def on_trigger(card, event_name, event_data):
         public string lobbyId;
     }
 
-    [Serializable]
-    public class MenuCommand
-    {
-        public string command;
-        public string text;
-        public string arg;
-        public string method;
-    }
+    // Note: MenuCommand class moved to separate MenuCommand.cs file
 
     [Serializable]
     public class InitiateAbilityEventProps

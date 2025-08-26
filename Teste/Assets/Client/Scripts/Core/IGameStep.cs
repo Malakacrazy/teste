@@ -2,6 +2,7 @@ namespace L5RGame
 {
     public interface IGameStep
     {
-        // Placeholder interface
+        bool Execute();
+        bool IsComplete();
     }
 }

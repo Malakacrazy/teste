@@ -137,6 +137,15 @@ namespace L5RGame
         }
 
         /// <summary>
+        /// Sets the current stage of ability execution
+        /// </summary>
+        /// <param name="newStage">The stage to set</param>
+        public void SetStage(string newStage)
+        {
+            stage = newStage;
+        }
+
+        /// <summary>
         /// Initialize the ability context with the provided properties
         /// </summary>
         /// <param name="properties">Context properties</param>
@@ -599,6 +608,9 @@ namespace L5RGame
         public string title = "";
         public AbilityLimit limit;
         public List<ICost> cost;
+        public bool cannotTargetFirst = false;
+        public int max;
+        public string maxIdentifier;
 
         public BaseAbility() { }
         
@@ -611,7 +623,25 @@ namespace L5RGame
                 limit = properties["limit"] as AbilityLimit;
             if (properties.ContainsKey("cost"))
                 cost = properties["cost"] as List<ICost>;
+            if (properties.ContainsKey("cannotTargetFirst"))
+                cannotTargetFirst = (bool)(properties["cannotTargetFirst"] ?? false);
+            if (properties.ContainsKey("max"))
+                max = (int)(properties["max"] ?? 0);
+            if (properties.ContainsKey("maxIdentifier"))
+                maxIdentifier = properties["maxIdentifier"] as string;
         }
+        
+        // Placeholder methods for ability system
+        public virtual bool IsCardAbility() { return true; }
+        public virtual bool IsCardPlayed() { return false; }
+        public virtual bool IsTriggeredAbility() { return false; }
+        public virtual TargetResults ResolveTargets(AbilityContext context) { return new TargetResults(); }
+        public virtual void ResolveCosts(AbilityContext context, CostResults results) { }
+        public virtual bool HasLegalTargets(AbilityContext context) { return true; }
+        public virtual TargetResults ResolveRemainingTargets(AbilityContext context, TargetResults results) { return results; }
+        public virtual bool CheckAllTargets(AbilityContext context) { return true; }
+        public virtual void DisplayMessage(AbilityContext context) { }
+        public virtual void ExecuteHandler(AbilityContext context) { }
     }
 
     /// <summary>

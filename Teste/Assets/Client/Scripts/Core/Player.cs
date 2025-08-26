@@ -6,62 +6,11 @@ using System.Collections;
 
 namespace L5RGame
 {
-    // Constants and static classes
-    public static class Locations
-    {
-        public const string Hand = "hand";
-        public const string ConflictDeck = "conflict deck";
-        public const string DynastyDeck = "dynasty deck";
-        public const string ConflictDiscardPile = "conflict discard pile";
-        public const string DynastyDiscardPile = "dynasty discard pile";
-        public const string RemovedFromGame = "removed from game";
-        public const string PlayArea = "play area";
-        public const string ProvinceOne = "province 1";
-        public const string ProvinceTwo = "province 2";
-        public const string ProvinceThree = "province 3";
-        public const string ProvinceFour = "province 4";
-        public const string StrongholdProvince = "stronghold province";
-        public const string ProvinceDeck = "province deck";
-        public const string Provinces = "provinces";
-        public const string UnderneathStronghold = "underneath stronghold";
-        public const string BeingPlayed = "being played";
-        public const string Role = "role";
-    }
+    // Note: Constants moved to GameConstants.cs to avoid duplicates
 
-    public static class CardTypes
-    {
-        public const string Province = "province";
-        public const string Holding = "holding";
-        public const string Event = "event";
-        public const string Attachment = "attachment";
-        public const string Character = "character";
-    }
+    // Note: EffectNames moved to GameConstants.cs
 
-    public static class EffectNames
-    {
-        public const string CannotDeclareConflictsOfType = "cannotDeclareConflictsOfType";
-        public const string SetConflictDeclarationType = "setConflictDeclarationType";
-        public const string SetMaxConflicts = "setMaxConflicts";
-        public const string AlternateFatePool = "alternateFatePool";
-        public const string FateCostToTarget = "fateCostToTarget";
-        public const string ChangePlayerGloryModifier = "changePlayerGloryModifier";
-        public const string ChangePlayerSkillModifier = "changePlayerSkillModifier";
-        public const string ShowTopConflictCard = "showTopConflictCard";
-        public const string ShowTopDynastyCard = "showTopDynastyCard";
-        public const string EventsCannotBeCancelled = "eventsCannotBeCancelled";
-    }
-
-    public static class EventNames
-    {
-        public const string OnDeckShuffled = "onDeckShuffled";
-        public const string OnFateCollected = "onFateCollected";
-        public const string OnCardPlayed = "onCardPlayed";
-    }
-
-    public static class AbilityTypes
-    {
-        public const string Interrupt = "interrupt";
-    }
+    // Note: EventNames and AbilityTypes are in GameConstants.cs
 
     public static class RingEffects
     {
@@ -992,28 +941,5 @@ namespace L5RGame
         }
     }
 
-    // Static classes for constants
-    public static class PlayTypes
-    {
-        public const string PlayFromHand = "playFromHand";
-        public const string PlayFromProvince = "playFromProvince";
-    }
-
-    public static class ConflictTypes
-    {
-        public const string Military = "military";
-        public const string Political = "political";
-    }
-
-    public static class Players
-    {
-        public const string Self = "self";
-        public const string Opponent = "opponent";
-    }
-
-    public static class Decks
-    {
-        public const string ConflictDeck = "conflict deck";
-        public const string DynastyDeck = "dynasty deck";
-    }
+    // Note: PlayTypes, ConflictTypes, Players, and Decks are in GameConstants.cs
 }
