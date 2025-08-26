@@ -26,5 +26,23 @@ namespace L5RGame
         public void AddDefender(BaseCard card) { }
         public void CheckForIllegalParticipants() { }
         public object GetSummary() => null;
+        
+        public bool IsAttacking(BaseCard card)
+        {
+            // Placeholder implementation
+            return false;
+        }
+        
+        public bool IsDefending(BaseCard card)
+        {
+            // Placeholder implementation  
+            return false;
+        }
+        
+        public bool IsParticipating(BaseCard card)
+        {
+            // Placeholder implementation
+            return false;
+        }
     }
 }

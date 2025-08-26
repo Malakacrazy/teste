@@ -1,64 +1,183 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
 {
+    /// <summary>
+    /// Manages the game's execution pipeline and step processing
+    /// </summary>
     public class GamePipeline : MonoBehaviour
     {
-        private List<IGameStep> steps = new List<IGameStep>();
-        private int currentStepIndex = 0;
-
-        public void Initialize()
+        [Header("Pipeline State")]
+        public bool isProcessing = false;
+        
+        private Game game;
+        private Queue<IGameStep> steps = new Queue<IGameStep>();
+        private IGameStep currentStep = null;
+        
+        /// <summary>
+        /// Initialize the pipeline
+        /// </summary>
+        public void Initialize(Game gameInstance)
         {
-            steps.Clear();
-            currentStepIndex = 0;
+            game = gameInstance;
+            Debug.Log("🔄 Game pipeline initialized");
         }
-
-        public void Initialize(List<IGameStep> initialSteps)
+        
+        /// <summary>
+        /// Queue a step to be processed
+        /// </summary>
+        public void QueueStep(IGameStep step)
         {
-            steps = new List<IGameStep>(initialSteps);
-            currentStepIndex = 0;
-        }
-
-        public void HandleCardClicked(Player player, BaseCard card)
-        {
-            // Handle card click logic
-        }
-
-        public bool HandleRingClicked(Player player, Ring ring)
-        {
-            // Handle ring click logic
-            return false;
-        }
-
-        public bool HandleMenuCommand(Player player, string arg, string uuid, string method)
-        {
-            // Handle menu command logic
-            return false;
-        }
-
-        public T QueueStep<T>(T step) where T : IGameStep
-        {
-            steps.Add(step);
-            return step;
-        }
-
-        public void Continue()
-        {
-            // Execute current step and move to next
-            if (currentStepIndex < steps.Count)
+            if (step != null)
             {
-                var currentStep = steps[currentStepIndex];
-                if (currentStep.Execute() && currentStep.IsComplete())
+                steps.Enqueue(step);
+                
+                if (!isProcessing)
                 {
-                    currentStepIndex++;
+                    ProcessNextStep();
                 }
             }
         }
-
-        public bool IsComplete()
+        
+        /// <summary>
+        /// Continue processing the current step or move to the next one
+        /// </summary>
+        public void Continue()
         {
-            return currentStepIndex >= steps.Count;
+            if (currentStep != null)
+            {
+                currentStep.Cleanup();
+                currentStep = null;
+            }
+            
+            ProcessNextStep();
+        }
+        
+        /// <summary>
+        /// Process the next step in the queue
+        /// </summary>
+        private void ProcessNextStep()
+        {
+            if (steps.Count == 0)
+            {
+                isProcessing = false;
+                return;
+            }
+            
+            isProcessing = true;
+            currentStep = steps.Dequeue();
+            
+            try
+            {
+                currentStep.Initialize();
+                bool shouldContinue = currentStep.Continue();
+                
+                if (shouldContinue)
+                {
+                    // Step completed immediately, process next
+                    Continue();
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Error processing game step: {e.Message}");
+                Continue(); // Try to continue despite error
+            }
+        }
+        
+        /// <summary>
+        /// Handle card click events
+        /// </summary>
+        public bool HandleCardClicked(Player player, BaseCard card)
+        {
+            if (currentStep != null)
+            {
+                currentStep.OnCardClicked(player, card);
+                return true;
+            }
+            return false;
+        }
+        
+        /// <summary>
+        /// Handle ring click events
+        /// </summary>
+        public bool HandleRingClicked(Player player, Ring ring)
+        {
+            if (currentStep != null)
+            {
+                currentStep.OnRingClicked(player, ring);
+                return true;
+            }
+            return false;
+        }
+        
+        /// <summary>
+        /// Handle menu command events
+        /// </summary>
+        public bool HandleMenuCommand(Player player, string command, string uuid, string method)
+        {
+            if (currentStep != null)
+            {
+                currentStep.OnMenuCommand(player, command, uuid, uuid, method);
+                return true;
+            }
+            return false;
+        }
+        
+        /// <summary>
+        /// Clear all queued steps
+        /// </summary>
+        public void ClearSteps()
+        {
+            steps.Clear();
+            if (currentStep != null)
+            {
+                currentStep.Cleanup();
+                currentStep = null;
+            }
+            isProcessing = false;
+        }
+        
+        /// <summary>
+        /// Get the number of queued steps
+        /// </summary>
+        public int GetQueuedStepCount()
+        {
+            return steps.Count;
+        }
+        
+        /// <summary>
+        /// Check if the pipeline is currently processing
+        /// </summary>
+        public bool IsProcessing()
+        {
+            return isProcessing;
+        }
+        
+        /// <summary>
+        /// Get the current step being processed
+        /// </summary>
+        public IGameStep GetCurrentStep()
+        {
+            return currentStep;
+        }
+        
+        /// <summary>
+        /// Force the pipeline to stop processing (for emergency situations)
+        /// </summary>
+        public void ForceStop()
+        {
+            if (currentStep != null)
+            {
+                currentStep.Cleanup();
+                currentStep = null;
+            }
+            steps.Clear();
+            isProcessing = false;
+            
+            Debug.LogWarning("⚠️ Game pipeline force stopped");
         }
     }
 }

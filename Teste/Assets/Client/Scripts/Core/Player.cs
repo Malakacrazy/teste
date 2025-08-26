@@ -112,6 +112,7 @@ namespace L5RGame
         public bool showConflict = false;
         public bool showDynasty = false;
         public bool resetTimerAtEndOfRound = false;
+        public bool noTimer = false;
 
         // References
         public Player opponent;
@@ -809,6 +810,25 @@ namespace L5RGame
             deck = selectedDeck;
             // Placeholder - Deck doesn't have faction property
             // faction = selectedDeck.faction;
+        }
+        
+        public Dictionary<string, object> GetShortSummary()
+        {
+            return new Dictionary<string, object>
+            {
+                {"name", name},
+                {"id", id},
+                {"fate", fate},
+                {"honor", honor}
+            };
+        }
+        
+        public Dictionary<string, object> GetCardSelectionState(BaseCard card)
+        {
+            return new Dictionary<string, object>
+            {
+                {"selectable", false}
+            };
         }
     }
 

@@ -22,6 +22,7 @@ namespace L5RGame
         public const string OnHonorDialsRevealed = "OnHonorDialsRevealed";
         public const string OnDeckShuffled = "onDeckShuffled";
         public const string OnFateCollected = "onFateCollected";
+        public const string OnCardMoved = "onCardMoved";
     }
 
     /// <summary>
@@ -73,6 +74,7 @@ namespace L5RGame
         public const string UnderCard = "underneath";
         public const string UnderneathStronghold = "underneath stronghold";
         public const string Role = "role";
+        public const string Any = "any";
     }
 
     /// <summary>
@@ -148,6 +150,8 @@ namespace L5RGame
         public const string ForcedInterrupt = "forcedinterrupt";
         public const string Keyword = "keyword";
         public const string Persistent = "persistent";
+        public const string WouldInterrupt = "wouldinterrupt";
+        public const string CancelInterrupt = "cancelinterrupt";
     }
 
     /// <summary>
@@ -277,16 +281,29 @@ namespace L5RGame
         public const string ShowTopConflictCard = "showTopConflictCard";
         public const string ShowTopDynastyCard = "showTopDynastyCard";
         public const string EventsCannotBeCancelled = "eventsCannotBeCancelled";
+        
+        // Card ability effects
+        public const string CopyCharacter = "copyCharacter";
+        public const string GainAbility = "gainAbility";
+        public const string Blank = "blank";
+        public const string AddTrait = "addTrait";
+        public const string AddFaction = "addFaction";
+        public const string DoesNotReady = "doesNotReady";
+        public const string CanBeSeenWhenFacedown = "canBeSeenWhenFacedown";
+        public const string HideWhenFaceUp = "hideWhenFaceUp";
+        public const string TakeControl = "takeControl";
+        public const string IncreaseLimitOnAbilities = "increaseLimitOnAbilities";
+        
+        // Attachment effects
+        public const string AttachmentLimit = "attachmentLimit";
+        public const string AttachmentMyControlOnly = "attachmentMyControlOnly";
+        public const string AttachmentUniqueRestriction = "attachmentUniqueRestriction";
+        public const string AttachmentFactionRestriction = "attachmentFactionRestriction";
+        public const string AttachmentTraitRestriction = "attachmentTraitRestriction";
+        public const string CannotHaveOtherRestrictedAttachments = "cannotHaveOtherRestrictedAttachments";
     }
 
-    /// <summary>
-    /// Constants for player references
-    /// </summary>
-    public static class Players
-    {
-        public const string Self = "self";
-        public const string Opponent = "opponent";
-    }
+    // Note: Players constants are in EffectSource.cs
 
     /// <summary>
     /// Constants for deck references

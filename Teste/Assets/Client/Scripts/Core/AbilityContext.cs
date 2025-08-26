@@ -21,24 +21,7 @@ namespace L5RGame
         }
     }
 
-    public class AbilityLimit
-    {
-        public int max;
-        public string identifier;
-        public bool perRound;
-        public bool perConflict;
-        
-        public AbilityLimit() { }
-        public AbilityLimit(int maxUses, string limitIdentifier = null)
-        {
-            max = maxUses;
-            identifier = limitIdentifier;
-        }
-        
-        public bool IsAtMax(Player player) { return false; } // Placeholder
-        public void Increment(Player player) { } // Placeholder
-        public void RegisterEvents(Game game) { } // Placeholder
-    }
+    // AbilityLimit moved to separate AbilityLimit.cs file
 
     public interface ICost
     {
@@ -47,18 +30,7 @@ namespace L5RGame
         string GetCostDescription();
     }
 
-    public class EffectSource
-    {
-        public string name;
-        public object source;
-        
-        public EffectSource() { }
-        public EffectSource(string sourceName, object sourceObject = null)
-        {
-            name = sourceName;
-            source = sourceObject;
-        }
-    }
+    // EffectSource moved to separate EffectSource.cs file
 
     public static class Stages
     {
@@ -87,6 +59,7 @@ namespace L5RGame
         public List<object> events;
         public string stage;
         public object targetAbility;
+        public object eventObj;
     }
 
     /// <summary>
@@ -134,6 +107,15 @@ namespace L5RGame
             if (events == null) events = new List<object>();
             if (provincesToRefill == null) provincesToRefill = new List<ProvinceRefillData>();
             if (gameActionsResolutionChain == null) gameActionsResolutionChain = new List<GameAction>();
+        }
+        
+        /// <summary>
+        /// Constructor that accepts AbilityContextProperties
+        /// </summary>
+        public AbilityContext(AbilityContextProperties properties)
+        {
+            Awake();
+            Initialize(properties);
         }
 
         /// <summary>
@@ -541,6 +523,18 @@ namespace L5RGame
                 stage = Stages.PreTarget
             });
             return context;
+        }
+        
+        /// <summary>
+        /// Creates a general context (simplified version of CreateCardContext)
+        /// </summary>
+        /// <param name="gameInstance">Game instance</param>
+        /// <param name="sourceCard">Source card</param>
+        /// <param name="contextPlayer">Player executing the ability</param>
+        /// <returns>Ability context</returns>
+        public static AbilityContext CreateContext(Game gameInstance, BaseCard sourceCard, Player contextPlayer)
+        {
+            return CreateCardContext(gameInstance, sourceCard, contextPlayer, new BaseAbility());
         }
 
         /// <summary>

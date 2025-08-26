@@ -6,6 +6,7 @@ namespace L5RGame
 {
     public interface IGameEvent
     {
+        string Name { get; }
         void Cancel();
         bool Execute();
         bool cancelled { get; }
@@ -17,6 +18,8 @@ namespace L5RGame
         public Dictionary<string, object> parameters;
         public Func<bool> handler;
         public bool cancelled { get; private set; } = false;
+        
+        public string Name => eventName;
 
         public GameEvent(string eventName, Dictionary<string, object> parameters, Func<bool> handler)
         {

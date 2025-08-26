@@ -78,10 +78,13 @@ namespace L5RGame
     public class Game : MonoBehaviour
     {
         // Events
-        public static event System.Action<string> OnGameMessage;
-        public static event System.Action<string, string> OnGameAlert;
-        public static event System.Action<Player> OnGameWon;
-        public static event System.Action OnGameStateChanged;
+        public event System.Action<string> OnGameMessage;
+        public event System.Action<string, string> OnGameAlert;
+        public event System.Action<Player> OnGameWon;
+        public event System.Action OnGameStateChanged;
+        public event System.Action<object, string> OnEventTriggered;
+        public event System.Action<string, string> OnPhaseChanged;
+        public event System.Action<string, object> OnGameStateChangedWithData;
 
         // Core game components
         [Header("Game Components")]
@@ -363,9 +366,9 @@ def on_trigger(card, event_name, event_data):
             }
 
             effectEngine.Initialize(this);
-            gameChat.Initialize();
+            gameChat.Initialize(this);
             chatCommands.Initialize(this);
-            pipeline.Initialize();
+            pipeline.Initialize(this);
         }
 
         private Player CreatePlayer(PlayerDetails details, ClockSettings clocks)
@@ -885,7 +888,32 @@ def on_trigger(card, event_name, event_data):
             }
         }
 
-        // Prompting system
+        // Action window management
+        public ActionWindow OpenActionWindow(string windowName, string windowType, System.Action onComplete = null)
+        {
+            // Create and configure action window
+            var windowGO = new GameObject($"ActionWindow_{windowName}");
+            windowGO.transform.SetParent(transform);
+            var actionWindow = windowGO.AddComponent<ActionWindow>();
+            actionWindow.Initialize(this, windowName, windowType, onComplete);
+            
+            currentActionWindow = actionWindow;
+            
+            AddMessage("Opening {0} action window", windowName);
+            return actionWindow;
+        }
+        
+        /// <summary>
+        /// Close the current action window
+        /// </summary>
+        public void CloseActionWindow()
+        {
+            if (currentActionWindow != null)
+            {
+                currentActionWindow.Complete();
+                currentActionWindow = null;
+            }
+        }
         public void PromptWithMenu(Player player, object contextObj, MenuPromptProperties properties)
         {
             QueueStep(new MenuPrompt(this, player, contextObj, properties));
@@ -947,6 +975,55 @@ def on_trigger(card, event_name, event_data):
         public void ToggleManualMode(string playerName)
         {
             chatCommands.Manual(playerName);
+        }
+        
+        /// <summary>
+        /// Get framework context for system operations
+        /// </summary>
+        public AbilityContext GetFrameworkContext(Player player = null)
+        {
+            return AbilityContext.CreateFrameworkContext(this, player);
+        }
+        
+        /// <summary>
+        /// Apply a game action to the game state
+        /// </summary>
+        public void ApplyGameAction(AbilityContext context, Dictionary<string, object> actionData)
+        {
+            // Placeholder implementation
+            Debug.Log($"Applying game action: {string.Join(", ", actionData.Keys)}");
+        }
+        
+        /// <summary>
+        /// Emit a game event
+        /// </summary>
+        public void EmitEvent(string eventName, Dictionary<string, object> eventData)
+        {
+            OnEventTriggered?.Invoke(eventData, currentPhase);
+        }
+        
+        /// <summary>
+        /// Queue a simple step in the game pipeline
+        /// </summary>
+        public void QueueSimpleStep(System.Func<bool> step)
+        {
+            pipeline.QueueStep(new SimpleStep(this, step));
+        }
+        
+        /// <summary>
+        /// Queue a step in the game pipeline
+        /// </summary>
+        public void QueueStep(IGameStep step)
+        {
+            pipeline.QueueStep(step);
+        }
+        
+        /// <summary>
+        /// Get all rings in the game
+        /// </summary>
+        public List<Ring> GetRings()
+        {
+            return rings.Values.ToList();
         }
 
         // Game flow
@@ -1134,7 +1211,17 @@ def on_trigger(card, event_name, event_data):
 
         public AbilityContext GetFrameworkContext(Player player = null)
         {
-            return new AbilityContext { game = this, player = player };
+            var contextGO = new GameObject("FrameworkContext");
+            var context = contextGO.AddComponent<AbilityContext>();
+            context.Initialize(new AbilityContextProperties
+            {
+                game = this,
+                player = player,
+                source = new EffectSource(),
+                ability = new BaseAbility(),
+                stage = Stages.Effect
+            });
+            return context;
         }
 
         public void InitiateConflict(Player player, bool canPass, string forcedDeclaredType)
