@@ -67,34 +67,17 @@ namespace L5RGame
     {
         public static AbilityContext ContextFor(Player player, string element, bool optional)
         {
-            return new AbilityContext { source = null }; // Placeholder
+            var context = new GameObject("AbilityContext").AddComponent<AbilityContext>();
+            context.game = player.game;
+            context.player = player;
+            return context;
         }
     }
 
     // Placeholder classes for missing types
-    public class AbilityContext
-    {
-        public BaseCard source { get; set; }
-        public object ability { get; set; }
-    }
-
     public class AttachmentPrompt
     {
         public AttachmentPrompt(Game game, Player player, BaseCard card, string playingType) { }
-    }
-
-    public class EffectChoice
-    {
-        public string title { get; set; }
-        public System.Action handler { get; set; }
-    }
-
-    public class HandlerMenuPromptProperties
-    {
-        public string activePromptTitle { get; set; }
-        public string source { get; set; }
-        public List<string> choices { get; set; }
-        public List<System.Action> handlers { get; set; }
     }
 
     [System.Serializable]
@@ -225,9 +208,9 @@ namespace L5RGame
             return false;
         }
 
-        public bool CheckRestrictions(string restriction, AbilityContext context)
+        public bool CheckRestrictions(string restriction, AbilityContext context = null)
         {
-            return true;
+            return true; // Placeholder implementation
         }
 
         public void Initialize(string playerId, UserInfo userInfo, bool isOwner, Game gameInstance, ClockSettings clockSettings)
@@ -267,7 +250,7 @@ namespace L5RGame
         public void StopClock() { }
         public void ResetClock() { }
 
-        // Card searching methods with placeholder BaseCard properties
+        // Card searching methods - simplified placeholders
         public bool IsCardUuidInList(List<BaseCard> list, BaseCard card)
         {
             return list.Any(c => c.uuid == card.uuid);
@@ -280,8 +263,7 @@ namespace L5RGame
 
         public bool AreCardsSelected()
         {
-            // Placeholder - BaseCard doesn't have selected property
-            return false;
+            return false; // Placeholder
         }
 
         public List<BaseCard> RemoveCardByUuid(List<BaseCard> list, string uuid)
@@ -313,18 +295,7 @@ namespace L5RGame
         public List<BaseCard> FindCards(List<BaseCard> cardList, System.Func<BaseCard, bool> predicate)
         {
             if (cardList == null) return new List<BaseCard>();
-
-            var cardsToReturn = new List<BaseCard>();
-
-            foreach (var card in cardList)
-            {
-                if (predicate(card))
-                {
-                    cardsToReturn.Add(card);
-                }
-            }
-
-            return cardsToReturn;
+            return cardList.Where(predicate).ToList();
         }
 
         public bool AreLocationsAdjacent(string location1, string location2)
@@ -334,34 +305,32 @@ namespace L5RGame
             return index1 > -1 && index2 > -1 && Mathf.Abs(index1 - index2) == 1;
         }
 
-        // Province management with placeholder BaseCard properties
+        // Province management - placeholders
         public BaseCard GetDynastyCardInProvince(string location)
         {
             var province = GetSourceList(location);
-            return province.FirstOrDefault(); // Placeholder - BaseCard doesn't have isDynasty
+            return province.FirstOrDefault();
         }
 
         public List<BaseCard> GetDynastyCardsInProvince(string location)
         {
             var province = GetSourceList(location);
-            return province.ToList(); // Placeholder
+            return province.ToList();
         }
 
         public BaseCard GetProvinceCardInProvince(string location)
         {
             var province = GetSourceList(location);
-            return province.FirstOrDefault(); // Placeholder
+            return province.FirstOrDefault();
         }
 
         public bool AnyCardsInPlay(System.Func<BaseCard, bool> predicate)
         {
-            // Placeholder - Game.allCards is private
             return cardsInPlay.Any(predicate);
         }
 
         public List<BaseCard> FilterCardsInPlay(System.Func<BaseCard, bool> predicate)
         {
-            // Placeholder - Game.allCards is private
             return cardsInPlay.Where(predicate).ToList();
         }
 
@@ -432,8 +401,7 @@ namespace L5RGame
 
         public BaseCard GetDuplicateInPlay(BaseCard card)
         {
-            // Placeholder - BaseCard doesn't have IsUnique method
-            return null;
+            return null; // Placeholder
         }
 
         // Deck management with placeholder implementations
@@ -448,10 +416,7 @@ namespace L5RGame
 
         public void DeckRanOutOfCards(string deckType)
         {
-            var discardPile = GetSourceList(deckType + " discard pile");
             game.AddMessage("{0}'s {1} deck has run out of cards", this, deckType);
-            
-            // Placeholder implementation
         }
 
         public bool ReplaceDynastyCard(string location)
@@ -504,16 +469,12 @@ namespace L5RGame
             }
         }
 
-        // Deck preparation with placeholder implementations
-        public void PrepareDecks()
-        {
-            // Placeholder implementation
-        }
+        // Simplified placeholder methods
+        public void PrepareDecks() { }
 
         public void Initialize()
         {
             opponent = game.GetOtherPlayer(this);
-            
             PrepareDecks();
             ShuffleConflictDeck();
             ShuffleDynastyDeck();
@@ -534,10 +495,7 @@ namespace L5RGame
             return reducer;
         }
 
-        public void RemoveCostReducer(object reducer)
-        {
-            costReducers.Remove(reducer);
-        }
+        public void RemoveCostReducer(object reducer) { costReducers.Remove(reducer); }
 
         public object AddPlayableLocation(string type, Player player, string location, List<BaseCard> cards = null)
         {
@@ -546,10 +504,7 @@ namespace L5RGame
             return playableLocation;
         }
 
-        public void RemovePlayableLocation(object location)
-        {
-            playableLocations.Remove(location);
-        }
+        public void RemovePlayableLocation(object location) { playableLocations.Remove(location); }
 
         public List<object> GetAlternateFatePools(string playingType, BaseCard card, AbilityContext context)
         {
@@ -558,30 +513,19 @@ namespace L5RGame
 
         public int GetMinimumCost(string playingType, AbilityContext context, BaseCard target, bool ignoreType = false)
         {
-            return 0; // Placeholder
+            return 0;
         }
 
         public int GetReducedCost(string playingType, BaseCard card, BaseCard target, bool ignoreType = false)
         {
-            return 0; // Placeholder - BaseCard doesn't have GetCost method
-        }
-
-        public int GetAvailableAlternateFate(string playingType, AbilityContext context)
-        {
             return 0;
         }
 
-        public int GetTargetingCost(BaseCard abilitySource, object targets)
-        {
-            return 0; // Placeholder
-        }
+        public int GetAvailableAlternateFate(string playingType, AbilityContext context) { return 0; }
+        public int GetTargetingCost(BaseCard abilitySource, object targets) { return 0; }
+        public void MarkUsedReducers(string playingType, BaseCard card, BaseCard target = null) { }
 
-        public void MarkUsedReducers(string playingType, BaseCard card, BaseCard target = null)
-        {
-            // Placeholder
-        }
-
-        // Ability limit management
+        // Ability limit management - placeholders
         public void RegisterAbilityMax(string maxIdentifier, object limit)
         {
             abilityMaxByIdentifier[maxIdentifier] = limit;
@@ -592,15 +536,11 @@ namespace L5RGame
             return abilityMaxByIdentifier.ContainsKey(maxIdentifier);
         }
 
-        public void IncrementAbilityMax(string maxIdentifier)
-        {
-            // Placeholder
-        }
+        public void IncrementAbilityMax(string maxIdentifier) { }
 
         // Phase management
         public void BeginDynasty()
         {
-            // Placeholder - BaseCard doesn't have isNew property
             passedDynasty = false;
             limitedPlayed = 0;
             conflictOpportunities.military = 1;
@@ -608,54 +548,29 @@ namespace L5RGame
             conflictOpportunities.total = 2;
         }
 
-        public void CollectFate()
-        {
-            ModifyFate(GetTotalIncome());
-        }
-
-        public void ShowConflictDeck()
-        {
-            showConflict = true;
-        }
-
-        public void ShowDynastyDeck()
-        {
-            showDynasty = true;
-        }
+        public void CollectFate() { ModifyFate(GetTotalIncome()); }
+        public void ShowConflictDeck() { showConflict = true; }
+        public void ShowDynastyDeck() { showDynasty = true; }
 
         // List management methods
         public List<BaseCard> GetSourceList(string source)
         {
             switch (source)
             {
-                case Locations.Hand:
-                    return hand;
-                case Locations.ConflictDeck:
-                    return conflictDeck;
-                case Locations.DynastyDeck:
-                    return dynastyDeck;
-                case Locations.ConflictDiscardPile:
-                    return conflictDiscardPile;
-                case Locations.DynastyDiscardPile:
-                    return dynastyDiscardPile;
-                case Locations.RemovedFromGame:
-                    return removedFromGame;
-                case Locations.PlayArea:
-                    return cardsInPlay;
-                case Locations.ProvinceOne:
-                    return provinceOne;
-                case Locations.ProvinceTwo:
-                    return provinceTwo;
-                case Locations.ProvinceThree:
-                    return provinceThree;
-                case Locations.ProvinceFour:
-                    return provinceFour;
-                case Locations.StrongholdProvince:
-                    return strongholdProvince;
-                case Locations.ProvinceDeck:
-                    return provinceDeck;
-                case Locations.UnderneathStronghold:
-                    return underneathStronghold;
+                case Locations.Hand: return hand;
+                case Locations.ConflictDeck: return conflictDeck;
+                case Locations.DynastyDeck: return dynastyDeck;
+                case Locations.ConflictDiscardPile: return conflictDiscardPile;
+                case Locations.DynastyDiscardPile: return dynastyDiscardPile;
+                case Locations.RemovedFromGame: return removedFromGame;
+                case Locations.PlayArea: return cardsInPlay;
+                case Locations.ProvinceOne: return provinceOne;
+                case Locations.ProvinceTwo: return provinceTwo;
+                case Locations.ProvinceThree: return provinceThree;
+                case Locations.ProvinceFour: return provinceFour;
+                case Locations.StrongholdProvince: return strongholdProvince;
+                case Locations.ProvinceDeck: return provinceDeck;
+                case Locations.UnderneathStronghold: return underneathStronghold;
                 case Locations.Provinces:
                     var allProvinces = new List<BaseCard>();
                     allProvinces.AddRange(provinceOne);
@@ -666,9 +581,7 @@ namespace L5RGame
                     return allProvinces;
                 default:
                     if (additionalPiles.ContainsKey(source))
-                    {
                         return additionalPiles[source].cards;
-                    }
                     break;
             }
             return new List<BaseCard>();
@@ -687,58 +600,28 @@ namespace L5RGame
         {
             switch (source)
             {
-                case Locations.Hand:
-                    hand = targetList;
-                    break;
-                case Locations.ConflictDeck:
-                    conflictDeck = targetList;
-                    break;
-                case Locations.DynastyDeck:
-                    dynastyDeck = targetList;
-                    break;
-                case Locations.ConflictDiscardPile:
-                    conflictDiscardPile = targetList;
-                    break;
-                case Locations.DynastyDiscardPile:
-                    dynastyDiscardPile = targetList;
-                    break;
-                case Locations.RemovedFromGame:
-                    removedFromGame = targetList;
-                    break;
-                case Locations.PlayArea:
-                    cardsInPlay = targetList;
-                    break;
-                case Locations.ProvinceOne:
-                    provinceOne = targetList;
-                    break;
-                case Locations.ProvinceTwo:
-                    provinceTwo = targetList;
-                    break;
-                case Locations.ProvinceThree:
-                    provinceThree = targetList;
-                    break;
-                case Locations.ProvinceFour:
-                    provinceFour = targetList;
-                    break;
-                case Locations.StrongholdProvince:
-                    strongholdProvince = targetList;
-                    break;
-                case Locations.ProvinceDeck:
-                    provinceDeck = targetList;
-                    break;
-                case Locations.UnderneathStronghold:
-                    underneathStronghold = targetList;
-                    break;
+                case Locations.Hand: hand = targetList; break;
+                case Locations.ConflictDeck: conflictDeck = targetList; break;
+                case Locations.DynastyDeck: dynastyDeck = targetList; break;
+                case Locations.ConflictDiscardPile: conflictDiscardPile = targetList; break;
+                case Locations.DynastyDiscardPile: dynastyDiscardPile = targetList; break;
+                case Locations.RemovedFromGame: removedFromGame = targetList; break;
+                case Locations.PlayArea: cardsInPlay = targetList; break;
+                case Locations.ProvinceOne: provinceOne = targetList; break;
+                case Locations.ProvinceTwo: provinceTwo = targetList; break;
+                case Locations.ProvinceThree: provinceThree = targetList; break;
+                case Locations.ProvinceFour: provinceFour = targetList; break;
+                case Locations.StrongholdProvince: strongholdProvince = targetList; break;
+                case Locations.ProvinceDeck: provinceDeck = targetList; break;
+                case Locations.UnderneathStronghold: underneathStronghold = targetList; break;
                 default:
                     if (additionalPiles.ContainsKey(source))
-                    {
                         additionalPiles[source].cards = targetList;
-                    }
                     break;
             }
         }
 
-        // Card movement and manipulation - simplified placeholders
+        // Simplified card movement and UI methods
         public void Drop(string cardId, string source, string target)
         {
             var sourceList = GetSourceList(source);
@@ -754,104 +637,45 @@ namespace L5RGame
 
         public bool IsLegalLocationForCard(BaseCard card, string location)
         {
-            // Simplified placeholder implementation
             return card != null && !string.IsNullOrEmpty(location);
         }
 
-        public void PromptForAttachment(BaseCard card, string playingType)
-        {
-            // Placeholder
-        }
+        public void PromptForAttachment(BaseCard card, string playingType) { }
 
-        // Combat and conflict methods - placeholders
-        public bool IsAttackingPlayer()
-        {
-            return game.currentConflict != null; // Simplified
-        }
-
-        public bool IsDefendingPlayer()
-        {
-            return game.currentConflict != null; // Simplified
-        }
-
-        public bool IsLessHonorableThanOpponent()
-        {
-            return honor < (opponent?.honor ?? -1);
-        }
-
-        public void ResetForConflict()
-        {
-            // Placeholder
-        }
+        // Combat placeholders
+        public bool IsAttackingPlayer() { return game.currentConflict != null; }
+        public bool IsDefendingPlayer() { return game.currentConflict != null; }
+        public bool IsLessHonorableThanOpponent() { return honor < (opponent?.honor ?? -1); }
+        public void ResetForConflict() { }
 
         // Properties
         public int HonorBid => Mathf.Max(0, showBid + honorBidModifier);
-        public int GloryModifier => 0; // Placeholder
-        public int SkillModifier => 0; // Placeholder
+        public int GloryModifier => 0;
+        public int SkillModifier => 0;
 
         // Resource management
-        public void ModifyFate(int amount)
-        {
-            fate = Mathf.Max(0, fate + amount);
-        }
+        public void ModifyFate(int amount) { fate = Mathf.Max(0, fate + amount); }
+        public void ModifyHonor(int amount) { honor = Mathf.Max(0, honor + amount); }
 
-        public void ModifyHonor(int amount)
-        {
-            honor = Mathf.Max(0, honor + amount);
-        }
+        public List<Ring> GetClaimedRings() { return new List<Ring>(); }
+        public int GetGloryCount() { return GetClaimedRings().Count + GloryModifier; }
 
-        public List<Ring> GetClaimedRings()
-        {
-            // Placeholder - Game.rings is private
-            return new List<Ring>();
-        }
-
-        public int GetGloryCount()
-        {
-            // Placeholder - BaseCard doesn't have GetContributionToImperialFavor
-            return GetClaimedRings().Count + GloryModifier;
-        }
-
-        // Imperial Favor management
+        // Imperial Favor placeholders
         public void ClaimImperialFavor()
         {
             if (opponent != null)
-            {
                 opponent.LoseImperialFavor();
-            }
-
-            var handlers = new List<System.Action>
-            {
-                () => {
-                    imperialFavor = "military";
-                    game.AddMessage("{0} claims the Emperor's military favor!", this);
-                },
-                () => {
-                    imperialFavor = "political";
-                    game.AddMessage("{0} claims the Emperor's political favor!", this);
-                }
-            };
-
-            // Placeholder - HandlerMenuPromptProperties doesn't have these properties
+                
+            // Simplified implementation - just claim military for now
+            imperialFavor = "military";
+            game.AddMessage("{0} claims the Emperor's military favor!", this);
         }
 
-        public void LoseImperialFavor()
-        {
-            imperialFavor = "";
-        }
+        public void LoseImperialFavor() { imperialFavor = ""; }
 
-        // Deck selection - placeholder
-        public void SelectDeck(Deck selectedDeck)
-        {
-            deck = selectedDeck;
-            // Placeholder - Deck doesn't have these properties
-        }
-
-        // Card movement - simplified placeholder
+        // Card movement - simplified
         public void MoveCard(BaseCard card, string targetLocation, CardMoveOptions options = null)
         {
-            options = options ?? new CardMoveOptions();
-            
             RemoveCardFromPile(card);
             var targetPile = GetSourceList(targetLocation);
             targetPile?.Add(card);
@@ -859,7 +683,6 @@ namespace L5RGame
 
         public void RemoveCardFromPile(BaseCard card)
         {
-            // Remove from all possible locations
             hand.Remove(card);
             conflictDeck.Remove(card);
             dynastyDeck.Remove(card);
@@ -876,19 +699,11 @@ namespace L5RGame
             underneathStronghold.Remove(card);
         }
 
-        // Income and resources
-        public int GetTotalIncome()
-        {
-            // Placeholder - BaseCard doesn't have cardData property
-            return 7; // Default starting fate
-        }
+        // Resources and UI
+        public int GetTotalIncome() { return 7; } // Default starting fate
+        public int GetTotalHonor() { return honor; }
 
-        public int GetTotalHonor()
-        {
-            return honor;
-        }
-
-        // Selection and prompt state - placeholders
+        // Selection placeholders
         public void SetSelectedCards(List<BaseCard> cards) { }
         public void ClearSelectedCards() { }
         public void SetSelectableCards(List<BaseCard> cards) { }
@@ -898,68 +713,31 @@ namespace L5RGame
 
         public List<object> GetSummaryForCardList(List<BaseCard> list, Player activePlayer, bool hideWhenFaceup = false)
         {
-            // Placeholder - BaseCard doesn't have GetSummary method
             return list.Cast<object>().ToList();
         }
 
-        public string GetCardSelectionState(BaseCard card)
-        {
-            return "unselectable";
-        }
+        public string GetCardSelectionState(BaseCard card) { return "unselectable"; }
+        public string GetRingSelectionState(Ring ring) { return "unselectable"; }
 
-        public string GetRingSelectionState(Ring ring)
-        {
-            return "unselectable";
-        }
-
-        public object CurrentPrompt()
-        {
-            return promptState;
-        }
-
-        public void SetPrompt(object prompt)
-        {
-            promptState = prompt;
-        }
-
-        public void CancelPrompt()
-        {
-            promptState = null;
-        }
+        public object CurrentPrompt() { return promptState; }
+        public void SetPrompt(object prompt) { promptState = prompt; }
+        public void CancelPrompt() { promptState = null; }
 
         // Phase actions
-        public void PassDynasty()
-        {
-            passedDynasty = true;
-        }
-
+        public void PassDynasty() { passedDynasty = true; }
         public void SetShowBid(int bid)
-        {
-            showBid = bid;
-            game.AddMessage("{0} reveals a bid of {1}", this, bid);
-        }
+{
+    showBid = bid;
+    game.AddMessage("{0} reveals a bid of {1}", this, bid);
+}
 
         // Effect checking - placeholders
-        public bool IsTopConflictCardShown()
-        {
-            return AnyEffect(EffectNames.ShowTopConflictCard);
-        }
-
-        public bool EventsCannotBeCancelled()
-        {
-            return AnyEffect(EffectNames.EventsCannotBeCancelled);
-        }
-
-        public bool IsTopDynastyCardShown()
-        {
-            return AnyEffect(EffectNames.ShowTopDynastyCard);
-        }
+        public bool IsTopConflictCardShown() { return AnyEffect(EffectNames.ShowTopConflictCard); }
+        public bool EventsCannotBeCancelled() { return AnyEffect(EffectNames.EventsCannotBeCancelled); }
+        public bool IsTopDynastyCardShown() { return AnyEffect(EffectNames.ShowTopDynastyCard); }
 
         // Ring effects - placeholder
-        public void ResolveRingEffects(object elements, bool optional = true)
-        {
-            // Placeholder implementation
-        }
+        public void ResolveRingEffects(object elements, bool optional = true) { }
 
         // Statistics
         public PlayerStats GetStats()
@@ -973,8 +751,8 @@ namespace L5RGame
                 politicalRemaining = GetConflictOpportunities("political")
             };
         }
-        
-        // State for UI - placeholder
+
+        // State for UI - simplified
         public PlayerState GetState(Player activePlayer)
         {
             bool isActivePlayer = activePlayer == this;
@@ -1031,228 +809,211 @@ namespace L5RGame
                 state.cardPiles.dynastyDeck = GetSummaryForCardList(dynastyDeck, activePlayer);
             }
 
-            // Placeholder - BaseCard doesn't have GetSummary method
-            if (role != null)
-            {
-                state.role = role; // Simplified
-            }
-
-            if (stronghold != null)
-            {
-                state.stronghold = stronghold; // Simplified
-            }
+            if (role != null) state.role = role;
+            if (stronghold != null) state.stronghold = stronghold;
 
             if (IsTopConflictCardShown() && conflictDeck.Count > 0)
-            {
-                state.conflictDeckTopCard = conflictDeck.First(); // Simplified
-            }
+                state.conflictDeckTopCard = conflictDeck.First();
 
             if (IsTopDynastyCardShown() && dynastyDeck.Count > 0)
-            {
-                state.dynastyDeckTopCard = dynastyDeck.First(); // Simplified
-            }
+                state.dynastyDeckTopCard = dynastyDeck.First();
 
-            // Placeholder - MonoBehaviour doesn't have GetState method
-            if (clock != null)
-            {
-                state.clock = new object(); // Simplified
-            }
+            if (clock != null) state.clock = new object();
 
             state.promptState = promptStateData;
             return state;
         }
 
-                // IronPython Integration - placeholders
-                public void ExecuteCardScript(BaseCard card, string eventType, params object[] parameters)
-                {
-                    // Placeholder - BaseCard doesn't have scriptName property
-                    if (game.enablePythonScripting)
-                    {
-                        var allParams = new List<object> { card, this }.Concat(parameters).ToArray();
-                        // game.ExecuteCardScript would need to be implemented
-                    }
-                }
-
-                public void OnCardPlayed(BaseCard card)
-                {
-                    ExecuteCardScript(card, "on_card_played", new Dictionary<string, object>());
-                }
-
-                public void OnCardEnterPlay(BaseCard card)
-                {
-                    ExecuteCardScript(card, "on_enter_play");
-                }
-
-                public void OnCardLeavePlay(BaseCard card)
-                {
-                    ExecuteCardScript(card, "on_leave_play");
-                }
-
-                public void OnConflictDeclared(BaseCard card, Conflict conflict)
-                {
-                    ExecuteCardScript(card, "on_conflict", conflict);
-                }
-            }
-
-            // Supporting classes
-            [System.Serializable]
-            public class ConflictOpportunities
+        // IronPython Integration - placeholders
+        public void ExecuteCardScript(BaseCard card, string eventType, params object[] parameters)
+        {
+            if (game.enablePythonScripting)
             {
-                public int military = 1;
-                public int political = 1;
-                public int total = 2;
-            }
-
-            [System.Serializable]
-            public class ConflictProperties
-            {
-                public List<string> type;
-                public object ring;
-                public object province;
-                public BaseCard attacker;
-                public string forcedDeclaredType;
-            }
-
-            [System.Serializable]
-            public class CardMoveOptions
-            {
-                public bool bottom = false;
-                public bool facedown = false;
-            }
-
-            [System.Serializable]
-            public class AdditionalPile
-            {
-                public List<BaseCard> cards = new List<BaseCard>();
-                public AdditionalPileProperties properties;
-            }
-
-            [System.Serializable]
-            public class AdditionalPileProperties
-            {
-                public string name;
-                public bool isPrivate = true;
-            }
-
-            [System.Serializable]
-            public class PlayerStats
-            {
-                public int fate;
-                public int honor;
-                public int conflictsRemaining;
-                public int militaryRemaining;
-                public int politicalRemaining;
-            }
-
-            [System.Serializable]
-            public class PlayerState
-            {
-                public CardPiles cardPiles;
-                public bool disconnected;
-                public Faction faction;
-                public bool firstPlayer;
-                public bool hideProvinceDeck;
-                public string id;
-                public string imperialFavor;
-                public bool left;
-                public string name;
-                public int numConflictCards;
-                public int numDynastyCards;
-                public int numProvinceCards;
-                public Dictionary<string, object> optionSettings;
-                public string phase;
-                public Dictionary<string, bool> promptedActionWindows;
-                public Provinces provinces;
-                public int showBid;
-                public PlayerStats stats;
-                public Dictionary<string, object> timerSettings;
-                public List<object> strongholdProvince;
-                public UserInfo user;
-                public bool showConflictDeck = false;
-                public bool showDynastyDeck = false;
-                public List<object> conflictDeck;
-                public List<object> dynastyDeck;
-                public object role;
-                public object stronghold;
-                public object conflictDeckTopCard;
-                public object dynastyDeckTopCard;
-                public object clock;
-                public object promptState;
-            }
-
-            [System.Serializable]
-            public class CardPiles
-            {
-                public List<object> cardsInPlay;
-                public List<object> conflictDiscardPile;
-                public List<object> dynastyDiscardPile;
-                public List<object> hand;
-                public List<object> removedFromGame;
-                public List<object> provinceDeck;
-                public List<object> conflictDeck;
-                public List<object> dynastyDeck;
-            }
-
-            [System.Serializable]
-            public class Provinces
-            {
-                public List<object> one;
-                public List<object> two;
-                public List<object> three;
-                public List<object> four;
-            }
-
-            // Interfaces for cost system
-            public interface IFateSource
-            {
-                int fate { get; }
-            }
-
-            public interface ITargetCostEffect
-            {
-                string cardType { get; }
-                string targetPlayer { get; }
-                int amount { get; }
-            }
-
-            // Fake choice window for cost calculation
-            public class FakeChoiceWindow
-            {
-                private System.Action addChoiceAction;
-                
-                public FakeChoiceWindow(System.Action addChoice)
-                {
-                    addChoiceAction = addChoice;
-                }
-                
-                public void AddChoice()
-                {
-                    addChoiceAction?.Invoke();
-                }
-            }
-
-            // Static classes for constants
-            public static class PlayTypes
-            {
-                public const string PlayFromHand = "playFromHand";
-                public const string PlayFromProvince = "playFromProvince";
-            }
-
-            public static class ConflictTypes
-            {
-                public const string Military = "military";
-                public const string Political = "political";
-            }
-
-            public static class Players
-            {
-                public const string Self = "self";
-                public const string Opponent = "opponent";
-            }
-
-            public static class Decks
-            {
-                public const string ConflictDeck = "conflict deck";
-                public const string DynastyDeck = "dynasty deck";
+                var allParams = new List<object> { card, this }.Concat(parameters).ToArray();
+                // Placeholder - would need game.ExecuteCardScript implementation
             }
         }
+
+        public void OnCardPlayed(BaseCard card)
+        {
+            ExecuteCardScript(card, "on_card_played", new Dictionary<string, object>());
+        }
+
+        public void OnCardEnterPlay(BaseCard card)
+        {
+            ExecuteCardScript(card, "on_enter_play");
+        }
+
+        public void OnCardLeavePlay(BaseCard card)
+        {
+            ExecuteCardScript(card, "on_leave_play");
+        }
+
+        public void OnConflictDeclared(BaseCard card, Conflict conflict)
+        {
+            ExecuteCardScript(card, "on_conflict", conflict);
+        }
+
+        // Deck selection - placeholder
+        public void SelectDeck(Deck selectedDeck)
+        {
+            deck = selectedDeck;
+            // Placeholder - Deck doesn't have faction property
+            // faction = selectedDeck.faction;
+        }
+    }
+
+    // Supporting classes
+    [System.Serializable]
+    public class ConflictProperties
+    {
+        public List<string> type;
+        public object ring;
+        public object province;
+        public BaseCard attacker;
+        public string forcedDeclaredType;
+    }
+
+    [System.Serializable]
+    public class CardMoveOptions
+    {
+        public bool bottom = false;
+        public bool facedown = false;
+    }
+
+    [System.Serializable]
+    public class AdditionalPile
+    {
+        public List<BaseCard> cards = new List<BaseCard>();
+        public AdditionalPileProperties properties;
+    }
+
+    [System.Serializable]
+    public class AdditionalPileProperties
+    {
+        public string name;
+        public bool isPrivate = true;
+    }
+
+    [System.Serializable]
+    public class PlayerStats
+    {
+        public int fate;
+        public int honor;
+        public int conflictsRemaining;
+        public int militaryRemaining;
+        public int politicalRemaining;
+    }
+
+    [System.Serializable]
+    public class PlayerState
+    {
+        public CardPiles cardPiles;
+        public bool disconnected;
+        public Faction faction;
+        public bool firstPlayer;
+        public bool hideProvinceDeck;
+        public string id;
+        public string imperialFavor;
+        public bool left;
+        public string name;
+        public int numConflictCards;
+        public int numDynastyCards;
+        public int numProvinceCards;
+        public Dictionary<string, object> optionSettings;
+        public string phase;
+        public Dictionary<string, bool> promptedActionWindows;
+        public Provinces provinces;
+        public int showBid;
+        public PlayerStats stats;
+        public Dictionary<string, object> timerSettings;
+        public List<object> strongholdProvince;
+        public UserInfo user;
+        public bool showConflictDeck = false;
+        public bool showDynastyDeck = false;
+        public List<object> conflictDeck;
+        public List<object> dynastyDeck;
+        public object role;
+        public object stronghold;
+        public object conflictDeckTopCard;
+        public object dynastyDeckTopCard;
+        public object clock;
+        public object promptState;
+    }
+
+    [System.Serializable]
+    public class CardPiles
+    {
+        public List<object> cardsInPlay;
+        public List<object> conflictDiscardPile;
+        public List<object> dynastyDiscardPile;
+        public List<object> hand;
+        public List<object> removedFromGame;
+        public List<object> provinceDeck;
+        public List<object> conflictDeck;
+        public List<object> dynastyDeck;
+    }
+
+    [System.Serializable]
+    public class Provinces
+    {
+        public List<object> one;
+        public List<object> two;
+        public List<object> three;
+        public List<object> four;
+    }
+
+    // Interfaces for cost system
+    public interface IFateSource
+    {
+        int fate { get; }
+    }
+
+    public interface ITargetCostEffect
+    {
+        string cardType { get; }
+        string targetPlayer { get; }
+        int amount { get; }
+    }
+
+    // Fake choice window for cost calculation
+    public class FakeChoiceWindow
+    {
+        private System.Action addChoiceAction;
+        
+        public FakeChoiceWindow(System.Action addChoice)
+        {
+            addChoiceAction = addChoice;
+        }
+        
+        public void AddChoice()
+        {
+            addChoiceAction?.Invoke();
+        }
+    }
+
+    // Static classes for constants
+    public static class PlayTypes
+    {
+        public const string PlayFromHand = "playFromHand";
+        public const string PlayFromProvince = "playFromProvince";
+    }
+
+    public static class ConflictTypes
+    {
+        public const string Military = "military";
+        public const string Political = "political";
+    }
+
+    public static class Players
+    {
+        public const string Self = "self";
+        public const string Opponent = "opponent";
+    }
+
+    public static class Decks
+    {
+        public const string ConflictDeck = "conflict deck";
+        public const string DynastyDeck = "dynasty deck";
+    }
+}
