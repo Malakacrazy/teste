@@ -1,9 +1,2 @@
-using UnityEngine;
-
-namespace L5RGame
-{
-    public class HandlerMenuPromptProperties : MonoBehaviour
-    {
-        // Placeholder implementation
-    }
-}
+// This file has been consolidated into GameInterfaces.cs
+// HandlerMenuPromptProperties is now defined there to avoid duplicate class definitions

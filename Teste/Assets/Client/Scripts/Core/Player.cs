@@ -666,7 +666,7 @@ namespace L5RGame
             return list.Cast<object>().ToList();
         }
 
-        public string GetCardSelectionState(BaseCard card) { return "unselectable"; }
+
         public string GetRingSelectionState(Ring ring) { return "unselectable"; }
 
         public object CurrentPrompt() { return promptState; }
@@ -675,11 +675,11 @@ namespace L5RGame
 
         // Phase actions
         public void PassDynasty() { passedDynasty = true; }
-        public void SetShowBid(int bid)
-{
-    showBid = bid;
-    game.AddMessage("{0} reveals a bid of {1}", this, bid);
-}
+                public void SetShowBid(int bid)
+        {
+            showBid = bid;
+            game.AddMessage("{0} reveals a bid of {1}", this, bid);
+        }
 
         // Effect checking - placeholders
         public bool IsTopConflictCardShown() { return AnyEffect(EffectNames.ShowTopConflictCard); }
@@ -823,6 +823,11 @@ namespace L5RGame
             };
         }
         
+        /// <summary>
+        /// Get card selection state for a card
+        /// </summary>
+        /// <param name="card">Card to check</param>
+        /// <returns>Selection state</returns>
         public Dictionary<string, object> GetCardSelectionState(BaseCard card)
         {
             return new Dictionary<string, object>

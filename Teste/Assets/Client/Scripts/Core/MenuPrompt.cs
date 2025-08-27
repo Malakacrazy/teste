@@ -1,33 +1,59 @@
-using UnityEngine;
+using System;
+using System.Collections.Generic;
 
 namespace L5RGame
 {
-    public class MenuPrompt : MonoBehaviour, IGameStep
+    /// <summary>
+    /// Menu prompt for simple choice selection
+    /// </summary>
+    public partial class MenuPrompt : IGameStep
     {
         private Game game;
         private Player player;
         private object contextObj;
         private MenuPromptProperties properties;
-        private bool completed = false;
-
-        public MenuPrompt(Game game, Player player, object contextObj, MenuPromptProperties properties)
+        
+        public MenuPrompt(Game gameInstance, Player promptPlayer, object context, MenuPromptProperties props)
         {
-            this.game = game;
-            this.player = player;
-            this.contextObj = contextObj;
-            this.properties = properties;
+            game = gameInstance;
+            player = promptPlayer;
+            contextObj = context;
+            properties = props;
         }
-
+        
         public bool Execute()
         {
-            // Execute menu prompt logic
-            completed = true;
-            return true;
+            return Continue();
         }
-
+        
         public bool IsComplete()
         {
-            return completed;
+            return true; // Complete after one interaction
         }
+        
+        public bool Continue()
+        {
+            // Display menu prompt
+            game.AddMessage("Waiting for {0} to make a choice...", player);
+            return false; // Wait for player input
+        }
+        
+        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
+        {
+            if (properties.onSelect != null)
+            {
+                bool result = properties.onSelect(player, command);
+                if (result)
+                {
+                    // Prompt completed successfully
+                    game.pipeline.Continue();
+                }
+            }
+        }
+        
+        public void OnCardClicked(Player player, BaseCard card) { }
+        public void OnRingClicked(Player player, Ring ring) { }
+        public void Initialize() { }
+        public void Cleanup() { }
     }
 }

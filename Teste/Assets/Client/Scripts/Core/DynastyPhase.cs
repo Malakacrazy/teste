@@ -23,5 +23,36 @@ namespace L5RGame
         {
             return completed;
         }
+
+        public bool Continue()
+        {
+            return !completed;
+        }
+
+        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
+        {
+            // Handle menu commands during dynasty phase
+        }
+
+        public void OnCardClicked(Player player, BaseCard card)
+        {
+            // Handle card clicks during dynasty phase
+        }
+
+        public void OnRingClicked(Player player, Ring ring)
+        {
+            // Handle ring clicks during dynasty phase
+        }
+
+        public void Initialize()
+        {
+            // Initialize dynasty phase
+            completed = false;
+        }
+
+        public void Cleanup()
+        {
+            // Clean up dynasty phase resources
+        }
     }
 }

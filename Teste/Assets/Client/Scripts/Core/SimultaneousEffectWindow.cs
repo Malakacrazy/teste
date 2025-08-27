@@ -33,5 +33,36 @@ namespace L5RGame
         {
             return completed;
         }
+
+        public bool Continue()
+        {
+            return !completed;
+        }
+
+        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
+        {
+            // Handle menu commands during simultaneous effect window
+        }
+
+        public void OnCardClicked(Player player, BaseCard card)
+        {
+            // Handle card clicks during simultaneous effect window
+        }
+
+        public void OnRingClicked(Player player, Ring ring)
+        {
+            // Handle ring clicks during simultaneous effect window
+        }
+
+        public void Initialize()
+        {
+            // Initialize simultaneous effect window
+            completed = false;
+        }
+
+        public void Cleanup()
+        {
+            // Clean up simultaneous effect window resources
+        }
     }
 }

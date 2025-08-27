@@ -23,5 +23,36 @@ namespace L5RGame
         {
             return completed;
         }
+
+        public bool Continue()
+        {
+            return !completed;
+        }
+
+        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
+        {
+            // Handle menu commands during draw phase
+        }
+
+        public void OnCardClicked(Player player, BaseCard card)
+        {
+            // Handle card clicks during draw phase
+        }
+
+        public void OnRingClicked(Player player, Ring ring)
+        {
+            // Handle ring clicks during draw phase
+        }
+
+        public void Initialize()
+        {
+            // Initialize draw phase
+            completed = false;
+        }
+
+        public void Cleanup()
+        {
+            // Clean up draw phase resources
+        }
     }
 }

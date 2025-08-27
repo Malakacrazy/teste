@@ -14,12 +14,6 @@ namespace L5RGame
             this.game = game;
         }
 
-        // Virtual Initialize method that can be overridden
-        public virtual void Initialize()
-        {
-            // Default implementation - can be overridden by derived classes
-        }
-
         // IGameStep implementation
         public virtual bool Execute()
         {
@@ -29,6 +23,36 @@ namespace L5RGame
         public virtual bool IsComplete()
         {
             return true;
+        }
+
+        public virtual bool Continue()
+        {
+            return !IsComplete();
+        }
+
+        public virtual void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
+        {
+            // Default implementation - can be overridden by derived classes
+        }
+
+        public virtual void OnCardClicked(Player player, BaseCard card)
+        {
+            // Default implementation - can be overridden by derived classes
+        }
+
+        public virtual void OnRingClicked(Player player, Ring ring)
+        {
+            // Default implementation - can be overridden by derived classes
+        }
+
+        public virtual void Initialize()
+        {
+            // Default implementation - can be overridden by derived classes
+        }
+
+        public virtual void Cleanup()
+        {
+            // Default implementation - can be overridden by derived classes
         }
 
         public virtual bool CanCancel => false;

@@ -48,6 +48,39 @@ namespace L5RGame
             return isComplete;
         }
         
+        public bool Continue()
+        {
+            // Continue processing this action window
+            return !isComplete;
+        }
+        
+        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
+        {
+            // Handle menu commands in the action window
+        }
+        
+        public void OnCardClicked(Player player, BaseCard card)
+        {
+            // Handle card clicks in the action window
+        }
+        
+        public void OnRingClicked(Player player, Ring ring)
+        {
+            // Handle ring clicks in the action window
+        }
+        
+        public void Initialize()
+        {
+            // Initialize the action window state
+            isComplete = false;
+        }
+        
+        public void Cleanup()
+        {
+            // Clean up action window resources
+            completionCallback?.Invoke();
+        }
+        
         /// <summary>
         /// Mark this action window as complete
         /// </summary>
@@ -60,15 +93,6 @@ namespace L5RGame
                 completionCallback?.Invoke();
             }
         }
-        public bool CanCancel => true;
-        public string StepName => $"ActionWindow: {windowName}";
-
-        public void Continue() { }
-        public void CancelStep() { isComplete = true; }
-        public void QueueStep(IGameStep step) { game?.Pipeline?.QueueStep(step); }
-        public void OnCardClicked(Player player, BaseCard card) { }
-        public void OnRingClicked(Player player, Ring ring) { }
-        public void OnMenuCommand(Player player, string command, string arg1, string arg2) { }
         
         /// <summary>
         /// Mark that an action has been taken in this window

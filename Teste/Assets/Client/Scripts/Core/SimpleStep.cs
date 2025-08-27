@@ -1,27 +1,49 @@
-using UnityEngine;
 using System;
+using UnityEngine;
 
 namespace L5RGame
 {
-    public class SimpleStep : MonoBehaviour, IGameStep
+    /// <summary>
+    /// Simple step for basic game actions
+    /// </summary>
+    public class SimpleStep : IGameStep
     {
-        private Func<bool> handler;
-        private Game gameInstance;
-
-        public SimpleStep(Game game, Func<bool> stepHandler)
+        private Game game;
+        private Func<bool> stepFunction;
+        
+        public SimpleStep(Game gameInstance, Func<bool> step)
         {
-            gameInstance = game;
-            handler = stepHandler;
+            game = gameInstance;
+            stepFunction = step;
         }
-
+        
         public bool Execute()
         {
-            return handler?.Invoke() ?? false;
+            return Continue();
         }
-
+        
         public bool IsComplete()
         {
-            return true; // Simple steps complete immediately after execution
+            return true;
         }
+        
+        public bool Continue()
+        {
+            try
+            {
+                return stepFunction?.Invoke() ?? true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error in SimpleStep: {e.Message}");
+                return true; // Continue despite error
+            }
+        }
+        
+        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method) { }
+        public void OnCardClicked(Player player, BaseCard card) { }
+        public void OnRingClicked(Player player, Ring ring) { }
+        public void Initialize() { }
+        public void Cleanup() { }
     }
 }

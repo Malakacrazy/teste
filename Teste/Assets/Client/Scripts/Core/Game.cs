@@ -980,9 +980,20 @@ def on_trigger(card, event_name, event_data):
         /// <summary>
         /// Get framework context for system operations
         /// </summary>
+        /// <param name="player">Player for the context (optional)</param>
+        /// <returns>Framework ability context</returns>
         public AbilityContext GetFrameworkContext(Player player = null)
         {
             return AbilityContext.CreateFrameworkContext(this, player);
+        }
+        
+        /// <summary>
+        /// Get the local player (player associated with this client)
+        /// </summary>
+        /// <returns>Local player or null if not found</returns>
+        public Player GetLocalPlayer()
+        {
+            return GameHelper.GetLocalPlayer(this);
         }
         
         /// <summary>
@@ -1100,10 +1111,7 @@ def on_trigger(card, event_name, event_data):
             return step;
         }
 
-        public void QueueSimpleStep(System.Func<bool> handler)
-        {
-            pipeline.QueueStep(new SimpleStep(this, handler));
-        }
+
 
         public void MarkActionAsTaken()
         {
@@ -1147,13 +1155,7 @@ def on_trigger(card, event_name, event_data):
             return gameEvent;
         }
 
-        public void EmitEvent(string eventName, Dictionary<string, object> parameters = null)
-        {
-            if (parameters == null) parameters = new Dictionary<string, object>();
-            var gameEvent = GetEvent(eventName, parameters, () => true);
-            // Emit to any listeners (Unity events, etc.)
-            // Implementation depends on your event system
-        }
+
 
         public EventWindow OpenEventWindow(List<GameEvent> events)
         {
@@ -1184,45 +1186,9 @@ def on_trigger(card, event_name, event_data):
             QueueStep(new InitiateAbilityEventWindow(this, events));
         }
 
-        public List<GameEvent> ApplyGameAction(AbilityContext context, Dictionary<string, object> actions)
-        {
-            if (context == null)
-                context = GetFrameworkContext();
-                
-            var events = new List<GameEvent>();
-            
-            foreach (var actionPair in actions)
-            {
-                var gameAction = Actions.GetAction(actionPair.Key, actionPair.Value);
-                gameAction.AddEventsToArray(events, context);
-            }
-            
-            if (events.Count > 0)
-            {
-                OpenEventWindow(events);
-                QueueSimpleStep(() => {
-                    context.Refill();
-                    return true;
-                });
-            }
-            
-            return events;
-        }
 
-        public AbilityContext GetFrameworkContext(Player player = null)
-        {
-            var contextGO = new GameObject("FrameworkContext");
-            var context = contextGO.AddComponent<AbilityContext>();
-            context.Initialize(new AbilityContextProperties
-            {
-                game = this,
-                player = player,
-                source = new EffectSource(),
-                ability = new BaseAbility(),
-                stage = Stages.Effect
-            });
-            return context;
-        }
+
+
 
         public void InitiateConflict(Player player, bool canPass, string forcedDeclaredType)
         {

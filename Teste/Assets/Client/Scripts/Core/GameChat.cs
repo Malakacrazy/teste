@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using L5RGame.Extensions;
 
+
 namespace L5RGame
 {
     /// <summary>
@@ -45,6 +46,44 @@ namespace L5RGame
         #region Properties
         
         /// <summary>
+        /// List of chat messages for legacy compatibility
+        /// </summary>
+        public List<string> messages
+        {
+            get
+            {
+                return chatHistory.Select(msg => msg.Content).ToList();
+            }
+        }
+        
+        /// <summary>
+        /// Add a simple message to chat
+        /// </summary>
+        /// <param name="message">Message to add</param>
+        public void AddMessage(string message)
+        {
+            AddSystemMessage(message, SystemMessageType.Info);
+        }
+        
+        /// <summary>
+        /// Add an alert message to chat
+        /// </summary>
+        /// <param name="type">Alert type</param>
+        /// <param name="message">Alert message</param>
+        public void AddAlert(string type, string message)
+        {
+            var alertType = type.ToLower() switch
+            {
+                "error" => SystemMessageType.Error,
+                "warning" => SystemMessageType.Warning,
+                "success" => SystemMessageType.Success,
+                _ => SystemMessageType.Info
+            };
+            
+            AddSystemMessage(message, alertType);
+        }
+        
+        /// <summary>
         /// Current chat history
         /// </summary>
         public IReadOnlyList<ChatMessage> ChatHistory => chatHistory.AsReadOnly();
@@ -64,17 +103,12 @@ namespace L5RGame
         #region Initialization
         
         /// <summary>
-        /// Initialize the chat system
+        /// Initialize the chat system with game reference
         /// </summary>
-        public void Initialize()
+        /// <param name="gameInstance">Reference to the game instance</param>
+        public void Initialize(Game gameInstance)
         {
-            game = GetComponent<Game>();
-            if (game == null)
-            {
-                Debug.LogError("GameChat must be attached to Game object");
-                return;
-            }
-            
+            game = gameInstance;
             InitializeProfanityFilter();
             InitializeEmotes();
             SetupUI();
