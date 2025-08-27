@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
+using L5RGame.Extensions;
 
 namespace L5RGame
 {
@@ -105,6 +107,9 @@ namespace L5RGame
             "ancestral", "restricted", "limited", "sincerity",
             "courtesy", "pride", "covert"
         };
+        
+        private static readonly System.Func<object, bool> DefaultCardMatch = card => true;
+        private static readonly System.Func<BaseCard, AbilityContext, bool> DefaultCondition = (card, context) => true;
 
         public virtual void Initialize(CardData data, Player cardOwner)
         {
@@ -192,11 +197,15 @@ namespace L5RGame
                 if (AnyEffect(EffectNames.CopyCharacter))
                 {
                     var mostRecentEffect = GetRawEffects()
-                        .Where(effect => effect.type == EffectNames.CopyCharacter)
+                        .Where(effect => effect.GetType().GetProperty("type")?.GetValue(effect)?.ToString() == EffectNames.CopyCharacter)
                         .LastOrDefault();
                     if (mostRecentEffect != null)
                     {
-                        actions = ((dynamic)mostRecentEffect.value).GetActions(this);
+                        var effectValue = mostRecentEffect.GetType().GetProperty("value")?.GetValue(mostRecentEffect);
+                        if (effectValue != null)
+                        {
+                            actions = ((dynamic)effectValue).GetActions(this);
+                        }
                     }
                 }
 
@@ -227,16 +236,20 @@ namespace L5RGame
                 if (AnyEffect(EffectNames.CopyCharacter))
                 {
                     var mostRecentEffect = GetRawEffects()
-                        .Where(effect => effect.type == EffectNames.CopyCharacter)
+                        .Where(effect => effect.GetType().GetProperty("type")?.GetValue(effect)?.ToString() == EffectNames.CopyCharacter)
                         .LastOrDefault();
                     if (mostRecentEffect != null)
                     {
-                        reactions = ((dynamic)mostRecentEffect.value).GetReactions(this);
+                        var effectValue = mostRecentEffect.GetType().GetProperty("value")?.GetValue(mostRecentEffect);
+                        if (effectValue != null)
+                        {
+                            reactions = ((dynamic)effectValue).GetReactions(this);
+                        }
                     }
                 }
 
                 var effectReactions = GetEffects(EffectNames.GainAbility)
-                    .Where(ability => triggeredAbilityTypes.Contains(((dynamic)ability).abilityType))
+                    .Where(ability => triggeredAbilityTypes.Any(type => type == ((dynamic)ability).abilityType))
                     .Cast<TriggeredAbility>()
                     .ToList();
 
@@ -256,13 +269,35 @@ namespace L5RGame
                 if (AnyEffect(EffectNames.CopyCharacter))
                 {
                     var mostRecentEffect = GetRawEffects()
-                        .Where(effect => effect.type == EffectNames.CopyCharacter)
+                        .Where(effect => effect.GetType().GetProperty("type")?.GetValue(effect)?.ToString() == EffectNames.CopyCharacter)
                         .LastOrDefault();
                     if (mostRecentEffect != null)
                     {
-                        return gainedPersistentEffects
-                            .Concat(((dynamic)mostRecentEffect.value).GetPersistentEffects())
-                            .ToList();
+                        var effectValue = mostRecentEffect.GetType().GetProperty("value")?.GetValue(mostRecentEffect);
+                        if (effectValue != null)
+                        {
+                            var persistentEffects = ((dynamic)effectValue).GetPersistentEffects();
+                            if (persistentEffects is IEnumerable<PersistentEffect> enumerableEffects)
+                            {
+                                return gainedPersistentEffects.Concat(enumerableEffects).ToList();
+                            }
+                            else if (persistentEffects is List<PersistentEffect> listEffects)
+                            {
+                                return gainedPersistentEffects.Concat(listEffects).ToList();
+                            }
+                            else
+                            {
+                                // Fallback: try to cast as IEnumerable<object> and filter
+                                var objEnumerable = persistentEffects as System.Collections.IEnumerable;
+                                if (objEnumerable != null)
+                                {
+                                    var convertedEffects = objEnumerable.Cast<object>()
+                                        .Where(e => e is PersistentEffect)
+                                        .Cast<PersistentEffect>();
+                                    return gainedPersistentEffects.Concat(convertedEffects).ToList();
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -425,9 +460,17 @@ namespace L5RGame
 
         public void Composure(PersistentEffectProperties properties)
         {
+            // Create a condition function that checks for composure
+            Func<AbilityContext, bool> composureCondition = (context) => 
+            {
+                if (context.player != null)
+                    return ((Player)context.player).HasComposure();
+                return false;
+            };
+            
             var composureProperties = new PersistentEffectProperties
             {
-                condition = (context) => ((Player)context.player).HasComposure(),
+                condition = composureCondition,
                 effect = properties.effect,
                 match = properties.match,
                 targetController = properties.targetController,
@@ -650,15 +693,30 @@ namespace L5RGame
         public int GetModifiedLimitMax(Player player, CardAbility ability, int max)
         {
             var effects = GetRawEffects()
-                .Where(effect => effect.type == EffectNames.IncreaseLimitOnAbilities);
+                .Where(effect => effect.GetType().GetProperty("type")?.GetValue(effect)?.ToString() == EffectNames.IncreaseLimitOnAbilities);
 
             return effects.Aggregate(max, (total, effect) =>
             {
-                var value = effect.GetValue(this);
-                if ((value is bool && (bool)value) || value == ability)
+                try
                 {
-                    if (((dynamic)effect.context).player == player)
-                        return total + 1;
+                    var getValueMethod = effect.GetType().GetMethod("GetValue");
+                    var value = getValueMethod?.Invoke(effect, new object[] { this });
+                    if ((value is bool && (bool)value) || value == ability)
+                    {
+                        var contextProperty = effect.GetType().GetProperty("context");
+                        var contextValue = contextProperty?.GetValue(effect);
+                        if (contextValue != null)
+                        {
+                            var playerProperty = contextValue.GetType().GetProperty("player");
+                            var effectPlayer = playerProperty?.GetValue(contextValue) as Player;
+                            if (effectPlayer == player)
+                                return total + 1;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignore reflection errors
                 }
                 return total;
             });
@@ -824,8 +882,9 @@ namespace L5RGame
 
             foreach (var line in lines)
             {
-                var trimmedLine = line.TrimEnd('.');
-                foreach (var keyword in trimmedLine.Split(new[] { ". " }, StringSplitOptions.None))
+                    var trimmedLine = line.TrimEnd('.');
+                var keywords = trimmedLine.Split(new[] { ". " }, StringSplitOptions.None);
+                foreach (var keyword in keywords)
                 {
                     potentialKeywords.Add(keyword);
                 }
@@ -872,9 +931,10 @@ namespace L5RGame
             int militaryBonus = cardData.military_bonus;
             if (militaryBonus != 0)
             {
+                Func<BaseCard, bool> matchParent = (card) => card == parent;
                 PersistentEffect(new PersistentEffectProperties
                 {
-                    match = (card) => card == parent,
+                    match = matchParent,
                     targetController = Players.Any,
                     effect = new List<object> { Effects.AttachmentMilitarySkillModifier(militaryBonus) }
                 });
@@ -883,9 +943,10 @@ namespace L5RGame
             int politicalBonus = cardData.political_bonus;
             if (politicalBonus != 0)
             {
+                Func<BaseCard, bool> matchParent = (card) => card == parent;
                 PersistentEffect(new PersistentEffectProperties
                 {
-                    match = (card) => card == parent,
+                    match = matchParent,
                     targetController = Players.Any,
                     effect = new List<object> { Effects.AttachmentPoliticalSkillModifier(politicalBonus) }
                 });
@@ -975,8 +1036,8 @@ namespace L5RGame
                     activePromptTitle = "Choose an attachment to discard",
                     waitingPromptTitle = "Waiting for opponent to choose an attachment to discard",
                     controller = Players.Self,
-                    cardCondition = (card) => card.parent == this && card.IsRestricted(),
-                    onSelect = (player, card) =>
+                    cardCondition = new Func<BaseCard, bool>((card) => card.parent == this && card.IsRestricted()),
+                    onSelect = new Func<Player, BaseCard, bool>((player, card) =>
                     {
                         game.AddMessage("{0} discards {1} from {2} due to too many Restricted attachments",
                                        player, card, card.parent);
@@ -991,7 +1052,7 @@ namespace L5RGame
                             {"discardFromPlay", illegalAttachments}
                         });
                         return true;
-                    },
+                    }),
                     source = "Too many Restricted attachments"
                 });
             }
@@ -1032,12 +1093,34 @@ namespace L5RGame
 
         public void WhileAttached(WhileAttachedProperties properties)
         {
+            // Create condition function
+            Func<AbilityContext, bool> condition = null;
+            if (properties.condition != null)
+            {
+                condition = properties.condition as Func<AbilityContext, bool>;
+            }
+            if (condition == null)
+            {
+                condition = (context) => true;
+            }
+            
+            // Create match function that checks if card is parent
+            Func<BaseCard, bool> matchFunction;
+            if (properties.match != null)
+            {
+                var originalMatch = properties.match;
+                matchFunction = (card) => card == parent && originalMatch(card);
+            }
+            else
+            {
+                matchFunction = (card) => card == parent;
+            }
+            
             PersistentEffect(new PersistentEffectProperties
             {
-                condition = properties.condition ?? ((context) => true),
-                match = (card, context) => card == parent &&
-                                          (properties.match == null || properties.match(card, context)),
-                targetController = Players.Any,
+                condition = condition,
+                match = matchFunction,
+                targetController = "any",
                 effect = properties.effect
             });
         }
@@ -1080,12 +1163,14 @@ namespace L5RGame
 
         public List<object> GetPlayActions()
         {
+            var actions = new List<object>();
+
             if (type == CardTypes.Event)
             {
                 return GetActions().Cast<object>().ToList();
             }
 
-            var actions = abilities.playActions.Cast<object>().ToList();
+            actions = abilities.playActions.Cast<object>().ToList();
 
             if (type == CardTypes.Character)
             {
@@ -1117,7 +1202,7 @@ namespace L5RGame
 
         public void RemoveAttachment(BaseCard attachment)
         {
-            attachments = attachments.Where(card => card.uuid != attachment.uuid).ToList();
+            attachments = attachments.Where(card => card.GetInstanceID() != attachment.GetInstanceID()).ToList();
         }
 
         public void AddChildCard(BaseCard card, string location)
@@ -1189,7 +1274,7 @@ namespace L5RGame
             return new Dictionary<string, object>
             {
                 {"controller", controller.name},
-                {"name", name},
+                {"name", Name},
                 {"type", type},
                 {"id", id}
             };
@@ -1233,7 +1318,7 @@ namespace L5RGame
                 {"showPopup", showPopup},
                 {"tokens", tokens},
                 {"type", GetCardType()},
-                {"uuid", uuid},
+                {"uuid", GetInstanceID().ToString()},
                 {"selected", selected},
                 {"traits", GetTraits()},
                 {"faction", printedFaction},

@@ -91,7 +91,7 @@ namespace L5RGame
         [SerializeField] private EffectEngine effectEngine;
         [SerializeField] private GameChat gameChat;
         [SerializeField] private ChatCommands chatCommands;
-        [SerializeField] private GamePipeline pipeline;
+        [SerializeField] public GamePipeline pipeline;
         
         // Game state
         [Header("Game Settings")]
@@ -178,11 +178,11 @@ namespace L5RGame
 
         private void InitializeRings()
         {
-            rings["air"] = new Ring(this, "air", ConflictType.Military);
-            rings["earth"] = new Ring(this, "earth", ConflictType.Political);
-            rings["fire"] = new Ring(this, "fire", ConflictType.Military);
-            rings["void"] = new Ring(this, "void", ConflictType.Political);
-            rings["water"] = new Ring(this, "water", ConflictType.Military);
+            rings["air"] = new Ring(this, "air", "military");
+            rings["earth"] = new Ring(this, "earth", "political");
+            rings["fire"] = new Ring(this, "fire", "military");
+            rings["void"] = new Ring(this, "void", "political");
+            rings["water"] = new Ring(this, "water", "military");
         }
 
         private void InitializePython()
@@ -823,7 +823,11 @@ def on_trigger(card, event_name, event_data):
 
             if (!IsSpectator(player))
             {
-                if (chatCommands.ExecuteCommand(player, args[0], args))
+                // Handle chat commands with proper parameter passing
+                var commandName = args.Length > 0 ? args[0] : "";
+                var commandArgs = args.Length > 1 ? args.Skip(1).ToArray() : new string[0];
+                
+                if (chatCommands.ExecuteCommand(player, commandName, commandArgs))
                 {
                     CheckGameState(true);
                     return;
@@ -1018,7 +1022,7 @@ def on_trigger(card, event_name, event_data):
         /// </summary>
         public void QueueSimpleStep(System.Func<bool> step)
         {
-            pipeline.QueueStep(new SimpleStep(this, step));
+            pipeline.QueueStep(new SimpleStep(this, () => { step(); return true; }));
         }
         
         /// <summary>

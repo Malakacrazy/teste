@@ -563,7 +563,7 @@ namespace L5RGame
                 var chatCommands = game.GetComponent<ChatCommands>();
                 if (chatCommands != null)
                 {
-                    chatCommands.ExecuteCommand(localPlayer, input);
+                    chatCommands.ExecuteCommand(localPlayer, input, new string[0]);
                 }
             }
             else

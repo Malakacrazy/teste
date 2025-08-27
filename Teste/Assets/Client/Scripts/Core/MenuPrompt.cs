@@ -38,6 +38,7 @@ namespace L5RGame
             return false; // Wait for player input
         }
         
+        // Fix pipeline reference issue
         public void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
         {
             if (properties.onSelect != null)
@@ -46,7 +47,7 @@ namespace L5RGame
                 if (result)
                 {
                     // Prompt completed successfully
-                    game.pipeline.Continue();
+                    game.Pipeline.Continue();
                 }
             }
         }

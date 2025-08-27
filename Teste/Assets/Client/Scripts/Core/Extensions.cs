@@ -1,10 +1,29 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace L5RGame
 {
     namespace Extensions
     {
+        /// <summary>
+        /// Extension methods for arrays
+        /// </summary>
+        public static class ArrayExtensions
+        {
+            public static bool Contains<T>(this T[] array, T item)
+            {
+                if (array == null) return false;
+                
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (EqualityComparer<T>.Default.Equals(array[i], item))
+                        return true;
+                }
+                return false;
+            }
+        }
+        
         /// <summary>
         /// Extension methods for Lists
         /// </summary>
@@ -112,6 +131,14 @@ namespace L5RGame
             public static void RemoveProperty<T>(this Player player, string propertyName)
             {
                 player.SetProperty<T>(propertyName, default(T));
+            }
+            
+            /// <summary>
+            /// Remove a property from a player without specifying type
+            /// </summary>
+            public static void RemoveProperty(this Player player, string propertyName)
+            {
+                player.SetProperty<object>(propertyName, null);
             }
         }
     }

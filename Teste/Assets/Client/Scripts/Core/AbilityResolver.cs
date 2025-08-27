@@ -44,6 +44,7 @@ namespace L5RGame
         public List<GameEvent> events = new List<GameEvent>();
         public bool playCosts = true;
         public bool triggerCosts = true;
+        public bool success = false;
     }
 
     /// <summary>
@@ -56,6 +57,7 @@ namespace L5RGame
         public bool delayTargeting = false;
         public bool payCostsFirst = false;
         public Dictionary<string, object> targets = new Dictionary<string, object>();
+        public bool success = false;
     }
 
     /// <summary>
