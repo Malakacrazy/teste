@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace L5RGame
 {
@@ -18,6 +19,12 @@ namespace L5RGame
         public int max = 0;
         public string maxIdentifier;
         
+        [Header("References")]
+        public Game game;
+        public BaseCard card;
+        public EffectSource source;
+        public Dictionary<string, object> targets = new Dictionary<string, object>();
+        
         [Header("Ability Functions")]
         public Func<AbilityContext, bool> condition;
         public Func<AbilityContext, object> target;
@@ -31,7 +38,62 @@ namespace L5RGame
         
         public BaseAbility(Game game, EffectSource source, Dictionary<string, object> properties)
         {
+            this.game = game;
+            this.source = source;
             Initialize(game, source, properties);
+        }
+        
+        public BaseAbility(Game game, BaseCard card, BaseAbilityProperties properties)
+        {
+            this.game = game;
+            this.card = card;
+            this.source = card;
+            InitializeFromProperties(properties);
+        }
+        
+        public BaseAbility(Game game, BaseCard card, CardAbilityProperties properties)
+        {
+            this.game = game;
+            this.card = card;
+            this.source = card;
+            InitializeFromCardProperties(properties);
+        }
+        
+        public virtual void InitializeFromProperties(BaseAbilityProperties properties)
+        {
+            if (properties == null) return;
+            
+            // Set basic properties
+            condition = properties.condition;
+            handler = properties.handler;
+            cost = properties.cost?.Cast<ICost>().ToList() ?? new List<ICost>();
+            target = properties.target as Func<AbilityContext, object>;
+            targets = properties.targets ?? new Dictionary<string, object>();
+            abilityType = properties.abilityType ?? AbilityTypes.Action;
+            cannotTargetFirst = properties.optional;
+            limit = properties.limit;
+        }
+        
+        public virtual void InitializeFromCardProperties(CardAbilityProperties properties)
+        {
+            if (properties == null) return;
+            
+            // Set basic properties from CardAbilityProperties
+            title = properties.title;
+            condition = properties.condition;
+            handler = properties.handler;
+            cost = properties.cost?.Cast<ICost>().ToList() ?? new List<ICost>();
+            target = properties.target as Func<AbilityContext, object>;
+            targets = properties.targets ?? new Dictionary<string, object>();
+            abilityType = properties.abilityType ?? AbilityTypes.Action;
+            cannotTargetFirst = properties.cannotTargetFirst;
+            limit = properties.limit as AbilityLimit;
+        }
+        
+        public virtual List<object> GetGameActions(AbilityContext context)
+        {
+            // This should return game actions for the ability
+            return new List<object>();
         }
         
         public virtual void Initialize(Game game, EffectSource source, Dictionary<string, object> properties)
@@ -205,6 +267,4 @@ namespace L5RGame
             return $"BaseAbility[{abilityType}]: {GetTitle()}";
         }
     }
-    
-
 }

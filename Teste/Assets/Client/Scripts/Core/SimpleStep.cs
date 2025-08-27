@@ -6,49 +6,35 @@ namespace L5RGame
     /// <summary>
     /// Simple step for basic game actions
     /// </summary>
-    public partial class SimpleStep : IGameStep
+    public partial class SimpleStep : BaseStep, IGameStep
     {
-        private Game game;
         private Func<bool> stepFunction;
         
-        public bool CanCancel { get; set; } = true;
-        
-        public SimpleStep(Game gameInstance, Func<bool> step)
+        public SimpleStep(Game gameInstance, Func<bool> step) : base(gameInstance)
         {
-            game = gameInstance;
             stepFunction = step;
         }
         
-        public bool Execute()
-        {
-            return Continue();
-        }
-        
-        public bool IsComplete()
-        {
-            return true;
-        }
-        
-        public bool Continue()
+        public override bool Continue()
         {
             try
             {
-                return stepFunction?.Invoke() ?? true;
+                bool result = stepFunction?.Invoke() ?? true;
+                if (result)
+                {
+                    ForceComplete();
+                }
+                return result;
             }
             catch (Exception e)
             {
                 Debug.LogError($"Error in SimpleStep: {e.Message}");
+                ForceComplete();
                 return true; // Continue despite error
             }
         }
         
-        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method) { }
-        public void OnCardClicked(Player player, BaseCard card) { }
-        public void OnRingClicked(Player player, Ring ring) { }
-        public void Initialize() { }
-        public void Cleanup() { }
-        
-        public string GetDebugInfo()
+        public override string GetDebugInfo()
         {
             return $"SimpleStep - Function: {(stepFunction != null ? "Set" : "Null")}";
         }

@@ -1,23 +1,30 @@
-using System.Collections.Generic;
 using System;
-using UnityEngine;
+using System.Collections.Generic;
 
 namespace L5RGame
 {
-    public class InitiateCardAbilityEvent : MonoBehaviour
+    /// <summary>
+    /// Represents an initiate card ability event
+    /// </summary>
+    public class InitiateCardAbilityEvent
     {
-        public Dictionary<string, object> parameters;
-        public Func<bool> handler;
+        private Dictionary<string, object> parameters;
+        private Func<bool> handler;
 
-        public InitiateCardAbilityEvent(Dictionary<string, object> parameters, Func<bool> handler)
+        public InitiateCardAbilityEvent(Dictionary<string, object> eventParameters, Func<bool> eventHandler)
         {
-            this.parameters = parameters ?? new Dictionary<string, object>();
-            this.handler = handler;
+            parameters = eventParameters ?? new Dictionary<string, object>();
+            handler = eventHandler;
         }
 
-        public bool Execute()
+        public void Execute()
         {
-            return handler?.Invoke() ?? false;
+            handler?.Invoke();
+        }
+
+        public Dictionary<string, object> GetParameters()
+        {
+            return parameters;
         }
     }
 }

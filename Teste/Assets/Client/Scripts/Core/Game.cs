@@ -92,6 +92,8 @@ namespace L5RGame
         [SerializeField] private GameChat gameChat;
         [SerializeField] private ChatCommands chatCommands;
         [SerializeField] public GamePipeline pipeline;
+        [SerializeField] private GameActions gameActions;
+        [SerializeField] private GameCosts gameCosts;
         
         // Game state
         [Header("Game Settings")]
@@ -138,6 +140,16 @@ namespace L5RGame
         /// </summary>
         public GamePipeline Pipeline => pipeline;
         
+        /// <summary>
+        /// Gets the game actions system
+        /// </summary>
+        public GameActions actions => gameActions;
+        
+        /// <summary>
+        /// Gets the game costs system  
+        /// </summary>
+        public GameCosts costs => gameCosts;
+        
         // Network reference
         public IGameRouter router;
 
@@ -168,7 +180,17 @@ namespace L5RGame
                 chatCommands = GetComponent<ChatCommands>() ?? gameObject.AddComponent<ChatCommands>();
                 
             if (pipeline == null)
-                pipeline = GetComponent<GamePipeline>() ?? gameObject.AddComponent<GamePipeline>();
+            {
+                var pipelineGO = new GameObject("GamePipeline");
+                pipelineGO.transform.SetParent(transform);
+                pipeline = pipelineGO.AddComponent<GamePipeline>();
+            }
+            
+            if (gameActions == null)
+                gameActions = GetComponent<GameActions>() ?? gameObject.AddComponent<GameActions>();
+                
+            if (gameCosts == null)
+                gameCosts = GetComponent<GameCosts>() ?? gameObject.AddComponent<GameCosts>();
 
             createdAt = DateTime.Now;
             
@@ -473,6 +495,12 @@ def on_trigger(card, event_name, event_data):
         {
             return GetPlayers().FirstOrDefault(p => p.name != player.name);
         }
+        
+        public Player GetActivePlayer()
+        {
+            // Return the first player by default, or implement game-specific logic
+            return GetFirstPlayer() ?? GetPlayers().FirstOrDefault();
+        }
 
         // Card management
         public BaseCard FindAnyCardInPlayByUuid(string cardId)
@@ -517,10 +545,7 @@ def on_trigger(card, event_name, event_data):
             return token;
         }
 
-        // Game Actions accessor
-        public GameActions Actions => new GameActions();
 
-        // Conflict management
         public bool IsDuringConflict(params string[] types)
         {
             if (currentConflict == null)
@@ -918,7 +943,7 @@ def on_trigger(card, event_name, event_data):
                 currentActionWindow = null;
             }
         }
-        public void PromptWithMenu(Player player, object contextObj, MenuPromptProperties properties)
+        public void PromptWithMenu(Player player, object contextObj, string contextString, MenuPromptProperties properties)
         {
             QueueStep(new MenuPrompt(this, player, contextObj, properties));
         }
@@ -933,17 +958,17 @@ def on_trigger(card, event_name, event_data):
             QueueStep(new SelectCardPrompt(this, player, properties));
         }
 
-        public void PromptForRingSelect(Player player, SelectRingPromptProperties properties)
+        public void PromptForRingSelect(Player player, string title, SelectRingPromptProperties properties)
         {
             QueueStep(new SelectRingPrompt(this, player, properties));
         }
 
-        public void PromptForHonorBid(string activePromptTitle, System.Action<int> costHandler, List<int> prohibitedBids, Duel duel = null)
+        public void PromptForHonorBid(string activePromptTitle, System.Action<int> costHandler, List<int> prohibitedBids, string additionalParam, Duel duel = null)
         {
             QueueStep(new HonorBidPrompt(this, activePromptTitle, costHandler, prohibitedBids, duel));
         }
 
-        public bool MenuButton(string playerName, string arg, string uuid, string method)
+        public bool MenuButton(string playerName, string arg, string uuid, string method, string additionalParam)
         {
             var player = GetPlayerByName(playerName);
             if (player == null) return false;
@@ -997,7 +1022,8 @@ def on_trigger(card, event_name, event_data):
         /// <returns>Local player or null if not found</returns>
         public Player GetLocalPlayer()
         {
-            return GameHelper.GetLocalPlayer(this);
+            // Return the first player by default, or implement game-specific logic
+            return GetFirstPlayer() ?? GetPlayers().FirstOrDefault();
         }
         
         /// <summary>
@@ -1022,7 +1048,7 @@ def on_trigger(card, event_name, event_data):
         /// </summary>
         public void QueueSimpleStep(System.Func<bool> step)
         {
-            pipeline.QueueStep(new SimpleStep(this, () => { step(); return true; }));
+            pipeline.QueueStep(new SimpleStep(this, step));
         }
         
         /// <summary>
@@ -1030,7 +1056,10 @@ def on_trigger(card, event_name, event_data):
         /// </summary>
         public void QueueStep(IGameStep step)
         {
-            pipeline.QueueStep(step);
+            if (step is BaseStep baseStep)
+            {
+                pipeline.QueueStep(baseStep);
+            }
         }
         
         /// <summary>
@@ -1070,18 +1099,19 @@ def on_trigger(card, event_name, event_data):
             {
                 QueueSimpleStep(() => {
                     AddMessage("{0} does not have a stronghold in their decklist", playerWithNoStronghold);
-                    return false;
+                    return true;
                 });
                 Continue();
                 return;
             }
 
             // Initialize game phases
-            pipeline.Initialize(new List<IGameStep>
+            var initialSteps = new List<IGameStep>
             {
                 new SetupPhase(this),
-                new SimpleStep(this, BeginRound)
-            });
+                new SimpleStep(this, () => { BeginRound(); return true; })
+            };
+            pipeline.Initialize(initialSteps);
 
             playStarted = true;
             startedAt = DateTime.Now;
@@ -1097,21 +1127,23 @@ def on_trigger(card, event_name, event_data):
             QueueStep(new ConflictPhase(this));
             QueueStep(new FatePhase(this));
             QueueStep(new EndRoundPrompt(this));
-            QueueStep(new SimpleStep(this, RoundEnded));
-            QueueStep(new SimpleStep(this, BeginRound));
+            QueueStep(new SimpleStep(this, () => { RoundEnded(); return true; }));
+            QueueStep(new SimpleStep(this, () => { BeginRound(); return true; }));
             return true;
         }
 
-        private bool RoundEnded()
+        private void RoundEnded()
         {
             RaiseEvent(GameEvents.OnRoundEnded);
-            return true;
         }
 
         // Pipeline management
         public T QueueStep<T>(T step) where T : IGameStep
         {
-            pipeline.QueueStep(step);
+            if (step is BaseStep baseStep)
+            {
+                pipeline.QueueStep(baseStep);
+            }
             return step;
         }
 
@@ -1528,7 +1560,18 @@ def on_trigger(card, event_name, event_data):
             };
         }
 
-        // IronPython Hot Reload (Development only)
+        public void RegisterEventHandler(string eventName, TriggeredAbility ability)
+        {
+            // Register triggered ability for specific events
+            // This would be implemented with a proper event system
+            Debug.Log($"Registered {ability.title} for event {eventName}");
+        }
+
+        public void UnregisterEventHandler(string eventName, TriggeredAbility ability)
+        {
+            // Unregister triggered ability from events
+            Debug.Log($"Unregistered {ability.title} from event {eventName}");
+        }
 #if UNITY_EDITOR
         private void Update()
         {

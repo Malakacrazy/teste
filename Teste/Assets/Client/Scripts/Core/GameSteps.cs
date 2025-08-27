@@ -1,84 +1,148 @@
 using System;
+using System.Collections.Generic;
 
 namespace L5RGame
 {
     public class MenuPrompt : BaseStep, IGameStep
     {
+        private Player player;
+        private object context;
+        private MenuPromptProperties properties;
+
         public MenuPrompt(Game game) : base(game) { }
         public MenuPrompt(Game game, Player player, string title, string text) : base(game) { }
+        public MenuPrompt(Game game, Player targetPlayer, object contextObj, MenuPromptProperties props) : base(game)
+        {
+            player = targetPlayer;
+            context = contextObj;
+            properties = props;
+        }
 
         bool IGameStep.IsComplete() => IsComplete;
         bool IGameStep.CanCancel => CanCancel;
 
         public override string GetDebugInfo()
         {
-            return "MenuPrompt - Waiting for menu selection";
+            return $"MenuPrompt - Player: {player?.name} - Title: {properties?.activePromptTitle}";
         }
     }
 
     public class HonorBidPrompt : BaseStep, IGameStep
     {
+        private string activePromptTitle;
+        private System.Action<int> costHandler;
+        private List<int> prohibitedBids;
+        private Duel duel;
+
         public HonorBidPrompt(Game game) : base(game) { }
+        public HonorBidPrompt(Game game, string title, System.Action<int> handler, List<int> prohibited, Duel associatedDuel = null) : base(game)
+        {
+            activePromptTitle = title;
+            costHandler = handler;
+            prohibitedBids = prohibited ?? new List<int>();
+            duel = associatedDuel;
+        }
 
         bool IGameStep.IsComplete() => IsComplete;
         bool IGameStep.CanCancel => CanCancel;
 
         public override string GetDebugInfo()
         {
-            return "HonorBidPrompt - Waiting for honor bid";
+            return $"HonorBidPrompt - Title: {activePromptTitle} - Duel: {duel != null}";
         }
     }
 
     public class GameWonPrompt : BaseStep, IGameStep
     {
+        private Player winner;
+
         public GameWonPrompt(Game game) : base(game) { }
+        public GameWonPrompt(Game game, Player winnerPlayer) : base(game)
+        {
+            winner = winnerPlayer;
+        }
 
         bool IGameStep.IsComplete() => IsComplete;
         bool IGameStep.CanCancel => CanCancel;
 
         public override string GetDebugInfo()
         {
-            return "GameWonPrompt - Game ended";
+            return $"GameWonPrompt - Winner: {winner?.name ?? "Unknown"}";
         }
     }
 
-    public class InitiateAbilityEventWindow : BaseStepWithPipeline, IGameStep
+    public class InitiateAbilityEventWindow : BaseStep, IGameStep
     {
+        private List<InitiateCardAbilityEvent> events;
+
         public InitiateAbilityEventWindow(Game game) : base(game) { }
+        public InitiateAbilityEventWindow(Game game, List<InitiateCardAbilityEvent> abilityEvents) : base(game)
+        {
+            events = abilityEvents ?? new List<InitiateCardAbilityEvent>();
+        }
 
         bool IGameStep.IsComplete() => IsComplete;
         bool IGameStep.CanCancel => CanCancel;
 
+        public override bool Continue()
+        {
+            // Process all events and complete
+            if (events != null)
+            {
+                foreach (var eventObj in events)
+                {
+                    eventObj.Execute();
+                }
+            }
+            return true;
+        }
+
         public override string GetDebugInfo()
         {
-            return "InitiateAbilityEventWindow - Processing ability events";
+            return $"InitiateAbilityEventWindow - Events: {events?.Count ?? 0}";
         }
     }
 
     public class HandlerMenuPrompt : BaseStep, IGameStep
     {
+        private Player player;
+        private HandlerMenuPromptProperties properties;
+
         public HandlerMenuPrompt(Game game) : base(game) { }
         public HandlerMenuPrompt(Game game, Player player, object properties) : base(game) { }
+        public HandlerMenuPrompt(Game game, Player targetPlayer, HandlerMenuPromptProperties props) : base(game)
+        {
+            player = targetPlayer;
+            properties = props;
+        }
 
         bool IGameStep.IsComplete() => IsComplete;
         bool IGameStep.CanCancel => CanCancel;
 
         public override string GetDebugInfo()
         {
-            return "HandlerMenuPrompt - Handler menu selection";
+            return $"HandlerMenuPrompt - Player: {player?.name} - Title: {properties?.activePromptTitle}";
         }
     }
 
     public class SelectRingPrompt : BaseStep, IGameStep
     {
+        private Player player;
+        private SelectRingPromptProperties properties;
+
         public SelectRingPrompt(Game game) : base(game) { }
+        public SelectRingPrompt(Game game, Player targetPlayer, SelectRingPromptProperties props) : base(game)
+        {
+            player = targetPlayer;
+            properties = props;
+        }
 
         bool IGameStep.IsComplete() => IsComplete;
         bool IGameStep.CanCancel => CanCancel;
 
         public override string GetDebugInfo()
         {
-            return "SelectRingPrompt - Ring selection";
+            return $"SelectRingPrompt - Player: {player?.name} - Title: {properties?.activePromptTitle}";
         }
     }
 
@@ -95,30 +159,55 @@ namespace L5RGame
         }
     }
 
-    public class SimultaneousEffectWindow : BaseStepWithPipeline, IGameStep
+    public class SimultaneousEffectWindow : BaseStep, IGameStep
     {
+        private List<EffectChoice> choices = new List<EffectChoice>();
+
         public SimultaneousEffectWindow(Game game) : base(game) { }
+
+        public void AddChoice(EffectChoice choice)
+        {
+            choices.Add(choice);
+        }
+
+        public override bool Continue()
+        {
+            // Process all choices and complete
+            foreach (var choice in choices)
+            {
+                choice.Execute();
+            }
+            return true;
+        }
 
         bool IGameStep.IsComplete() => IsComplete;
         bool IGameStep.CanCancel => CanCancel;
 
         public override string GetDebugInfo()
         {
-            return "SimultaneousEffectWindow - Processing simultaneous effects";
+            return $"SimultaneousEffectWindow - Choices: {choices.Count}";
         }
     }
 
     public class SelectCardPrompt : BaseStep, IGameStep
     {
+        private Player player;
+        private SelectCardPromptProperties properties;
+
         public SelectCardPrompt(Game game) : base(game) { }
         public SelectCardPrompt(Game game, Player player, object properties) : base(game) { }
+        public SelectCardPrompt(Game game, Player targetPlayer, SelectCardPromptProperties props) : base(game)
+        {
+            player = targetPlayer;
+            properties = props;
+        }
 
         bool IGameStep.IsComplete() => IsComplete;
         bool IGameStep.CanCancel => CanCancel;
 
         public override string GetDebugInfo()
         {
-            return "SelectCardPrompt - Card selection";
+            return $"SelectCardPrompt - Player: {player?.name} - Title: {properties?.activePromptTitle}";
         }
     }
 }

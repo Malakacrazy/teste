@@ -146,17 +146,7 @@ namespace L5RGame
         }
     }
     
-    /// <summary>
-    /// Constants for effect durations
-    /// </summary>
-    public static class Durations
-    {
-        public const string Persistent = "persistent";
-        public const string UntilEndOfPhase = "untilEndOfPhase";
-        public const string UntilEndOfRound = "untilEndOfRound";
-        public const string UntilEndOfConflict = "untilEndOfConflict";
-        public const string Custom = "custom";
-    }
+
     
     /// <summary>
     /// Static class for creating common effects
@@ -209,14 +199,5 @@ namespace L5RGame
         }
     }
     
-    /// <summary>
-    /// Constants for player targeting
-    /// </summary>
-    public static class Players
-    {
-        public const string Self = "self";
-        public const string Opponent = "opponent";
-        public const string Any = "any";
-        public const string Current = "current";
-    }
+
 }

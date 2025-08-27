@@ -8,7 +8,7 @@ namespace L5RGame
     /// <summary>
     /// Game pipeline for managing sequences of game steps
     /// </summary>
-    public class GamePipeline
+    public class GamePipeline : MonoBehaviour
     {
         private Queue<BaseStep> steps = new Queue<BaseStep>();
         private BaseStep currentStep;
@@ -161,6 +161,33 @@ namespace L5RGame
         
         #endregion
         
+        #region Initialize
+        
+        /// <summary>
+        /// Initialize the pipeline
+        /// </summary>
+        public void Initialize(Game game)
+        {
+            // Initialize with game reference
+        }
+        
+        /// <summary>
+        /// Initialize the pipeline with steps
+        /// </summary>
+        public void Initialize(List<IGameStep> initialSteps)
+        {
+            Clear();
+            foreach (var step in initialSteps)
+            {
+                if (step is BaseStep baseStep)
+                {
+                    QueueStep(baseStep);
+                }
+            }
+        }
+        
+        #endregion
+        
         #region User Interaction Delegation
         
         /// <summary>
@@ -174,17 +201,27 @@ namespace L5RGame
         /// <summary>
         /// Handle ring click by delegating to current step
         /// </summary>
-        public void HandleRingClicked(Player player, Ring ring)
+        public bool HandleRingClicked(Player player, Ring ring)
         {
             currentStep?.OnRingClicked(player, ring);
+            return true;
         }
         
         /// <summary>
         /// Handle menu command by delegating to current step
         /// </summary>
-        public void HandleMenuCommand(Player player, string command, string arg, string uuid, string method)
+        public bool HandleMenuCommand(Player player, string command, string arg, string uuid, string method)
         {
             currentStep?.OnMenuCommand(player, command, arg, uuid, method);
+            return true;
+        }
+
+        /// <summary>
+        /// Handle menu command overload
+        /// </summary>
+        public bool HandleMenuCommand(Player player, string arg, string uuid, string method)
+        {
+            return HandleMenuCommand(player, "", arg, uuid, method);
         }
         
         /// <summary>

@@ -1,32 +1,76 @@
 using System;
+using UnityEngine;
 
 namespace L5RGame
 {
     /// <summary>
     /// Action window step
     /// </summary>
-    public class ActionWindow : BaseStepWithPipeline, IGameStep
+    public class ActionWindow : MonoBehaviour, IGameStep
     {
         private Player currentPlayer;
+        private Game game;
+        private string windowName;
+        private string windowType;
+        private System.Action onComplete;
+        private bool isComplete = false;
+        private bool actionTaken = false;
 
-        public ActionWindow(Game game, Player player = null) : base(game)
+        public ActionWindow() { }
+
+        public ActionWindow(Game game, Player player = null)
         {
+            this.game = game;
             currentPlayer = player;
         }
-
-        protected override void InitializePipeline()
+        
+        public void Initialize(Game gameInstance, string name, string type, System.Action onCompleteCallback)
         {
-            base.InitializePipeline();
-            // Add action processing steps here
+            game = gameInstance;
+            windowName = name;
+            windowType = type;
+            onComplete = onCompleteCallback;
+            isComplete = false;
+            actionTaken = false;
         }
 
-        bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
+        public bool Execute()
+        {
+            return Continue();
+        }
+        
+        public bool Continue()
+        {
+            return isComplete;
+        }
+        
+        public bool IsComplete() => isComplete;
+        public bool CanCancel => true;
 
-        public override string GetDebugInfo()
+        public void Complete()
+        {
+            if (!isComplete)
+            {
+                isComplete = true;
+                onComplete?.Invoke();
+            }
+        }
+        
+        public void MarkActionAsTaken()
+        {
+            actionTaken = true;
+        }
+        
+        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method) { }
+        public void OnCardClicked(Player player, BaseCard card) { }
+        public void OnRingClicked(Player player, Ring ring) { }
+        public void Initialize() { }
+        public void Cleanup() { }
+
+        public string GetDebugInfo()
         {
             var playerInfo = currentPlayer != null ? $" ({currentPlayer.name})" : "";
-            return $"ActionWindow{playerInfo} - Waiting for actions";
+            return $"ActionWindow{playerInfo} - {windowName} ({windowType}) - Action taken: {actionTaken}";
         }
     }
 }

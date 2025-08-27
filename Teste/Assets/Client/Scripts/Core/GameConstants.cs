@@ -3,7 +3,7 @@ namespace L5RGame
     /// <summary>
     /// Constants for event names throughout the game
     /// </summary>
-    public static class EventNames
+    public static partial class EventNames
     {
         public const string Unnamed = "Unnamed";
         public const string OnCardAbilityInitiated = "OnCardAbilityInitiated";
@@ -14,7 +14,6 @@ namespace L5RGame
         public const string OnAttachmentPlayed = "OnAttachmentPlayed";
         public const string OnEventPlayed = "OnEventPlayed";
         public const string OnConflictInitiated = "OnConflictInitiated";
-        public const string OnConflictDeclared = "OnConflictDeclared";
         public const string OnConflictEnded = "OnConflictEnded";
         public const string OnPhaseStarted = "OnPhaseStarted";
         public const string OnPhaseEnded = "OnPhaseEnded";
@@ -269,7 +268,7 @@ namespace L5RGame
     /// <summary>
     /// Constants for effect names
     /// </summary>
-    public static class EffectNames
+    public static partial class EffectNames
     {
         public const string CannotDeclareConflictsOfType = "cannotDeclareConflictsOfType";
         public const string SetConflictDeclarationType = "setConflictDeclarationType";
@@ -301,9 +300,34 @@ namespace L5RGame
         public const string AttachmentFactionRestriction = "attachmentFactionRestriction";
         public const string AttachmentTraitRestriction = "attachmentTraitRestriction";
         public const string CannotHaveOtherRestrictedAttachments = "cannotHaveOtherRestrictedAttachments";
+        
+        // Cost effects
+        public const string AdditionalTriggerCost = "additionalTriggerCost";
+        public const string AdditionalPlayCost = "additionalPlayCost";
     }
 
-    // Note: Players constants are in EffectSource.cs
+    /// <summary>
+    /// Constants for player targeting
+    /// </summary>
+    public static class Players
+    {
+        public const string Self = "self";
+        public const string Opponent = "opponent";
+        public const string Any = "any";
+        public const string Current = "current";
+    }
+
+    /// <summary>
+    /// Constants for effect durations
+    /// </summary>
+    public static class Durations
+    {
+        public const string Persistent = "persistent";
+        public const string UntilEndOfPhase = "untilEndOfPhase";
+        public const string UntilEndOfRound = "untilEndOfRound";
+        public const string UntilEndOfConflict = "untilEndOfConflict";
+        public const string Custom = "custom";
+    }
 
     /// <summary>
     /// Constants for deck references
