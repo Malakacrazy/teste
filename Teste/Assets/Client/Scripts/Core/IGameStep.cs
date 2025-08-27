@@ -8,10 +8,12 @@ namespace L5RGame
         bool Execute();
         bool IsComplete();
         bool Continue();
+        bool CanCancel { get; }
         void OnMenuCommand(Player player, string command, string arg, string uuid, string method);
         void OnCardClicked(Player player, BaseCard card);
         void OnRingClicked(Player player, Ring ring);
         void Initialize();
         void Cleanup();
+        string GetDebugInfo();
     }
 }

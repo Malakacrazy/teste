@@ -1,58 +1,17 @@
-using UnityEngine;
+using System;
 
 namespace L5RGame
 {
-    public class DynastyPhase : MonoBehaviour, IGameStep
+    public class DynastyPhase : BaseStepWithPipeline, IGameStep
     {
-        private Game game;
-        private bool completed = false;
+        public DynastyPhase(Game game) : base(game) { }
 
-        public DynastyPhase(Game game)
-        {
-            this.game = game;
-        }
+        bool IGameStep.IsComplete() => IsComplete;
+        bool IGameStep.CanCancel => CanCancel;
 
-        public bool Execute()
+        public override string GetDebugInfo()
         {
-            // Execute dynasty phase logic
-            completed = true;
-            return true;
-        }
-
-        public bool IsComplete()
-        {
-            return completed;
-        }
-
-        public bool Continue()
-        {
-            return !completed;
-        }
-
-        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
-        {
-            // Handle menu commands during dynasty phase
-        }
-
-        public void OnCardClicked(Player player, BaseCard card)
-        {
-            // Handle card clicks during dynasty phase
-        }
-
-        public void OnRingClicked(Player player, Ring ring)
-        {
-            // Handle ring clicks during dynasty phase
-        }
-
-        public void Initialize()
-        {
-            // Initialize dynasty phase
-            completed = false;
-        }
-
-        public void Cleanup()
-        {
-            // Clean up dynasty phase resources
+            return "DynastyPhase - Dynasty actions";
         }
     }
 }

@@ -6,10 +6,12 @@ namespace L5RGame
     /// <summary>
     /// Simple step for basic game actions
     /// </summary>
-    public class SimpleStep : IGameStep
+    public partial class SimpleStep : IGameStep
     {
         private Game game;
         private Func<bool> stepFunction;
+        
+        public bool CanCancel { get; set; } = true;
         
         public SimpleStep(Game gameInstance, Func<bool> step)
         {
@@ -45,5 +47,10 @@ namespace L5RGame
         public void OnRingClicked(Player player, Ring ring) { }
         public void Initialize() { }
         public void Cleanup() { }
+        
+        public string GetDebugInfo()
+        {
+            return $"SimpleStep - Function: {(stepFunction != null ? "Set" : "Null")}";
+        }
     }
 }

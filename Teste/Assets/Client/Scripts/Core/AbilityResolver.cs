@@ -109,7 +109,7 @@ namespace L5RGame
             Initialize();
         }
 
-        public override void Initialize()
+        public new void Initialize()
         {
             // Simplified initialization - no complex pipeline for now
         }
@@ -129,7 +129,7 @@ namespace L5RGame
             return completed;
         }
 
-        public override bool IsComplete()
+        public new bool IsComplete()
         {
             return completed;
         }

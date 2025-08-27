@@ -1,68 +1,37 @@
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace L5RGame
 {
-    public class EventWindow : MonoBehaviour, IGameStep
+    /// <summary>
+    /// Event window step
+    /// </summary>
+    public class EventWindow : BaseStepWithPipeline, IGameStep
     {
-        private Game game;
-        private List<GameEvent> events;
-        private bool completed = false;
-
-        public EventWindow(Game game, List<GameEvent> events)
+        protected List<GameEvent> events;
+        
+        public EventWindow(Game game) : base(game)
         {
-            this.game = game;
+        }
+        
+        public EventWindow(Game game, List<GameEvent> events) : base(game)
+        {
             this.events = events ?? new List<GameEvent>();
         }
 
-        public bool Execute()
+        protected override void InitializePipeline()
         {
-            // Execute all events in the window
-            foreach (var evt in events)
-            {
-                if (!evt.cancelled)
-                {
-                    evt.Execute();
-                }
-            }
-            completed = true;
-            return true;
+            base.InitializePipeline();
+            // Add event processing steps here
         }
 
-        public bool IsComplete()
-        {
-            return completed;
-        }
+        bool IGameStep.IsComplete() => IsComplete;
+        bool IGameStep.CanCancel => CanCancel;
 
-        public bool Continue()
+        public override string GetDebugInfo()
         {
-            return !completed;
-        }
-
-        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
-        {
-            // Handle menu commands during event window
-        }
-
-        public void OnCardClicked(Player player, BaseCard card)
-        {
-            // Handle card clicks during event window
-        }
-
-        public void OnRingClicked(Player player, Ring ring)
-        {
-            // Handle ring clicks during event window
-        }
-
-        public void Initialize()
-        {
-            // Initialize event window
-            completed = false;
-        }
-
-        public void Cleanup()
-        {
-            // Clean up event window resources
+            var eventCount = events?.Count ?? 0;
+            return $"EventWindow - Processing {eventCount} events";
         }
     }
 }

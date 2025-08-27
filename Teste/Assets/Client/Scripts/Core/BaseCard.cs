@@ -882,7 +882,7 @@ namespace L5RGame
 
             foreach (var line in lines)
             {
-                    var trimmedLine = line.TrimEnd('.');
+                var trimmedLine = line.TrimEnd('.');
                 var keywords = trimmedLine.Split(new[] { ". " }, StringSplitOptions.None);
                 foreach (var keyword in keywords)
                 {
@@ -958,8 +958,8 @@ namespace L5RGame
         {
             if (hasCustomScript && !string.IsNullOrEmpty(scriptName))
             {
-                var allParams = new List<object> { this }.Concat(parameters).ToArray();
-                game.ExecuteCardScript(scriptName, eventType, allParams);
+                var allParams = new List<object> { this }.Concat(parameters ?? new object[0]).ToArray();
+                game?.ExecuteCardScript(scriptName, eventType, allParams);
             }
         }
 
@@ -1095,7 +1095,7 @@ namespace L5RGame
         {
             // Create condition function
             Func<AbilityContext, bool> condition = null;
-            if (properties.condition != null)
+            if (properties?.condition != null)
             {
                 condition = properties.condition as Func<AbilityContext, bool>;
             }
@@ -1105,11 +1105,18 @@ namespace L5RGame
             }
             
             // Create match function that checks if card is parent
-            Func<BaseCard, bool> matchFunction;
-            if (properties.match != null)
+            Func<BaseCard, bool> matchFunction = null;
+            if (properties?.match != null)
             {
-                var originalMatch = properties.match;
-                matchFunction = (card) => card == parent && originalMatch(card);
+                var originalMatch = properties.match as Func<BaseCard, bool>;
+                if (originalMatch != null)
+                {
+                    matchFunction = (card) => card == parent && originalMatch(card);
+                }
+                else
+                {
+                    matchFunction = (card) => card == parent;
+                }
             }
             else
             {
@@ -1121,7 +1128,7 @@ namespace L5RGame
                 condition = condition,
                 match = matchFunction,
                 targetController = "any",
-                effect = properties.effect
+                effect = properties?.effect
             });
         }
 
@@ -1339,15 +1346,20 @@ namespace L5RGame
         protected virtual void OnDestroy()
         {
             // Clean up any remaining effects
-            RemoveLastingEffects();
+            try
+            {
+                RemoveLastingEffects();
+            }
+            catch
+            {
+                // Ignore cleanup errors during destruction
+            }
 
             // Clear references
-            attachments.Clear();
-            childCards.Clear();
+            attachments?.Clear();
+            childCards?.Clear();
 
-            Debug.Log($"🃏 Card {printedName} destroyed");
+            Debug.Log($"🃏 Card {printedName ?? "Unknown"} destroyed");
         }
     }
-
-
 }

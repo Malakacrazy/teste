@@ -3,55 +3,26 @@ using System;
 namespace L5RGame
 {
     /// <summary>
-    /// End round prompt for cleanup
+    /// Prompt for ending the round
     /// </summary>
-    public partial class EndRoundPrompt : IGameStep
+    public class EndRoundPrompt : BaseStep, IGameStep
     {
-        private Game game;
-        private Player player;
-        
-        public EndRoundPrompt(Game gameInstance, Player promptPlayer = null) 
+        public EndRoundPrompt(Game game) : base(game)
         {
-            game = gameInstance;
-            player = promptPlayer;
         }
-        
-        public bool Execute()
+
+        public override bool Continue()
         {
-            return Continue();
-        }
-        
-        public bool IsComplete()
-        {
-            return true; // Complete immediately after cleanup
-        }
-        
-        public bool Continue()
-        {
-            game.AddMessage("End of round - performing cleanup...");
-            
-            // Reset player states
-            foreach (var gamePlayer in game.GetPlayers())
-            {
-                gamePlayer.passedDynasty = false;
-                gamePlayer.limitedPlayed = 0;
-                gamePlayer.conflictOpportunities.Reset();
-            }
-            
-            // Reset rings
-            foreach (var ring in game.GetRings())
-            {
-                ring.ResetRing();
-            }
-            
-            game.roundNumber++;
+            // Simple implementation - just complete
             return true;
         }
-        
-        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method) { }
-        public void OnCardClicked(Player player, BaseCard card) { }
-        public void OnRingClicked(Player player, Ring ring) { }
-        public void Initialize() { }
-        public void Cleanup() { }
+
+        bool IGameStep.IsComplete() => IsComplete;
+        bool IGameStep.CanCancel => CanCancel;
+
+        public override string GetDebugInfo()
+        {
+            return "EndRoundPrompt - Waiting for round end";
+        }
     }
 }

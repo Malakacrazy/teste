@@ -1,58 +1,33 @@
-using UnityEngine;
+using System;
 
 namespace L5RGame
 {
-    public class ConflictPhase : MonoBehaviour, IGameStep
+    /// <summary>
+    /// Conflict phase step
+    /// </summary>
+    public class ConflictPhase : BaseStepWithPipeline, IGameStep
     {
-        private Game game;
-        private bool completed = false;
-
-        public ConflictPhase(Game game)
+        public ConflictPhase(Game game) : base(game)
         {
-            this.game = game;
         }
 
-        public bool Execute()
+        protected override void InitializePipeline()
         {
-            // Execute conflict phase logic
-            completed = true;
-            return true;
+            base.InitializePipeline();
+            // Add conflict-specific steps here
         }
 
-        public bool IsComplete()
-        {
-            return completed;
-        }
+        bool IGameStep.IsComplete() => IsComplete;
+        bool IGameStep.CanCancel => CanCancel;
 
-        public bool Continue()
+        public override string GetDebugInfo()
         {
-            return !completed;
+            return $"ConflictPhase - {GetCompletionPercentage():F0}% complete";
         }
-
-        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
+        
+        private float GetCompletionPercentage()
         {
-            // Handle menu commands during conflict phase
-        }
-
-        public void OnCardClicked(Player player, BaseCard card)
-        {
-            // Handle card clicks during conflict phase
-        }
-
-        public void OnRingClicked(Player player, Ring ring)
-        {
-            // Handle ring clicks during conflict phase
-        }
-
-        public void Initialize()
-        {
-            // Initialize conflict phase
-            completed = false;
-        }
-
-        public void Cleanup()
-        {
-            // Clean up conflict phase resources
+            return PipelineProgress * 100f;
         }
     }
 }
