@@ -27,6 +27,7 @@ namespace L5RGame
         public int strength;
         public int influencePool;
         public int influenceCost;
+        public int honor;
         public string side;
         public string pack_id;
     }

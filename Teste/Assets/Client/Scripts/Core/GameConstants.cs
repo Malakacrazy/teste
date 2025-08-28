@@ -7,7 +7,7 @@ namespace L5RGame
     /// <summary>
     /// Character card that can participate in conflicts
     /// </summary>
-    public class DrawCard : BaseCard
+    public partial class DrawCard : BaseCard
     {
         [UnityEngine.Header("Character Stats")]
         public int militarySkill = 0;
@@ -106,7 +106,7 @@ namespace L5RGame
     /// <summary>
     /// Province card that can be attacked
     /// </summary>
-    public class ProvinceCard : BaseCard
+    public partial class ProvinceCard : BaseCard
     {
         [UnityEngine.Header("Province Properties")]
         public int strength = 3;
