@@ -2,11 +2,9 @@ using System;
 
 namespace L5RGame
 {
-    public class DrawPhase : BaseStepWithPipeline, IGameStep
+    public class DrawPhase : GamePhase
     {
-        public DrawPhase(Game game) : base(game) { }
-
-        bool IGameStep.IsComplete() => IsComplete;
+        public DrawPhase(Game game) : base(game, GamePhases.Draw) { }
 
         public override string GetDebugInfo()
         {

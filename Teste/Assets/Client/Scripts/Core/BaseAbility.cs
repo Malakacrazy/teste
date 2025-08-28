@@ -204,6 +204,11 @@ namespace L5RGame
             }
         }
         
+        public virtual void Execute(AbilityContext context)
+        {
+            ExecuteHandler(context);
+        }
+        
         public virtual void ExecuteHandler(AbilityContext context) 
         {
             try

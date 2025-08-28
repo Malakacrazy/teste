@@ -13,6 +13,7 @@ namespace L5RGame
         public string element;
         public string conflictType;
         public bool claimed = false;
+        public bool contested = false;
         public Player claimedBy;
         public List<BaseCard> attachments = new List<BaseCard>();
         public int fate = 0;

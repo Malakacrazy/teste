@@ -2,11 +2,9 @@ using System;
 
 namespace L5RGame
 {
-    public class DynastyPhase : BaseStepWithPipeline, IGameStep
+    public class DynastyPhase : GamePhase
     {
-        public DynastyPhase(Game game) : base(game) { }
-
-        bool IGameStep.IsComplete() => IsComplete;
+        public DynastyPhase(Game game) : base(game, GamePhases.Dynasty) { }
 
         public override string GetDebugInfo()
         {

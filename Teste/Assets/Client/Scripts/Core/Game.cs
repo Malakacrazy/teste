@@ -542,7 +542,8 @@ def on_trigger(card, event_name, event_data):
             var tokenGO = new GameObject($"Token_{card.name}");
             tokenGO.transform.SetParent(transform);
             var token = tokenGO.AddComponent<BaseCard>();
-            token.Initialize(card);
+            // token.Initialize(card.cardData, card.owner); // Fixed - will need proper initialization method
+            token.CopyFrom(card); // Use copy method instead
             allCards.Add(token);
             return token;
         }
@@ -965,6 +966,22 @@ def on_trigger(card, event_name, event_data):
             QueueStep(new SelectRingPrompt(this, player, properties));
         }
 
+        public void PromptForRingSelect(Player player, Dictionary<string, object> properties)
+        {
+            Debug.Log($"Prompting {player.name} for ring selection");
+        }
+
+        public void OpenActionWindow(string windowName, Player player)
+        {
+            var actionWindow = OpenActionWindow(windowName, "playerAction");
+            // Set the current player for the window
+        }
+
+        public void PromptWithMenu(Player player, object contextObj, Dictionary<string, object> properties)
+        {
+            Debug.Log($"Prompting {player.name} with menu");
+        }
+
         public void PromptForHonorBid(string activePromptTitle, System.Action<int> costHandler, List<int> prohibitedBids, string additionalParam, Duel duel = null)
         {
             QueueStep(new HonorBidPrompt(this, activePromptTitle, costHandler, prohibitedBids, duel));
@@ -1029,6 +1046,56 @@ def on_trigger(card, event_name, event_data):
         }
         
         /// <summary>
+        /// Prompt for action with timeout
+        /// </summary>
+        public void PromptForAction(Player player, object prompt)
+        {
+            Debug.Log($"Prompting {player.name} for action");
+        }
+        
+        /// <summary>
+        /// Prompt for conflict declaration
+        /// </summary>
+        public void PromptForConflictDeclaration(Player player, Dictionary<string, object> properties)
+        {
+            Debug.Log($"Prompting {player.name} for conflict declaration");
+        }
+        
+        /// <summary>
+        /// Execute phase script
+        /// </summary>
+        public void ExecutePhaseScript(string scriptName, string methodName, params object[] parameters)
+        {
+            Debug.Log($"Executing phase script: {scriptName}.{methodName}");
+        }
+        
+        /// <summary>
+        /// Get imperial favor holder
+        /// </summary>
+        public Player GetImperialFavorHolder()
+        {
+            return GetPlayers().FirstOrDefault(p => !string.IsNullOrEmpty(p.imperialFavor));
+        }
+        
+        /// <summary>
+        /// Set imperial favor holder
+        /// </summary>
+        public void SetImperialFavorHolder(Player player)
+        {
+            // Remove favor from all players
+            foreach (var p in GetPlayers())
+            {
+                p.imperialFavor = "";
+            }
+            
+            // Give favor to specified player
+            if (player != null)
+            {
+                player.imperialFavor = "military"; // Default type
+            }
+        }
+        
+        /// <summary>
         /// Apply a game action to the game state
         /// </summary>
         public void ApplyGameAction(AbilityContext context, Dictionary<string, object> actionData)
@@ -1084,7 +1151,7 @@ def on_trigger(card, event_name, event_data):
             Player playerWithNoStronghold = null;
             foreach (var player in GetPlayers())
             {
-                player.Initialize();
+                player.InitializeForGame();
                 if (player.stronghold == null)
                 {
                     playerWithNoStronghold = player;
@@ -1126,7 +1193,7 @@ def on_trigger(card, event_name, event_data):
             RaiseEvent(GameEvents.OnBeginRound);
             QueueStep(new DynastyPhase(this));
             QueueStep(new DrawPhase(this));
-            QueueStep(new ConflictPhase(this));
+            QueueStep(new ConflictPhaseManager(this));
             QueueStep(new FatePhase(this));
             QueueStep(new EndRoundPrompt(this));
             QueueStep(new SimpleStep(this, () => { RoundEnded(); return true; }));
@@ -1198,6 +1265,12 @@ def on_trigger(card, event_name, event_data):
         public EventWindow OpenEventWindow(List<GameEvent> events)
         {
             return QueueStep(new EventWindow(this, events));
+        }
+
+        public EventWindow OpenEventWindow(List<object> events)
+        {
+            var gameEvents = events.Cast<GameEvent>().ToList();
+            return QueueStep(new EventWindow(this, gameEvents));
         }
 
         public ThenEventWindow OpenThenEventWindow(List<GameEvent> events)
@@ -1625,6 +1698,21 @@ def on_trigger(card, event_name, event_data):
     {
         public const string OnBeginRound = "onBeginRound";
         public const string OnRoundEnded = "onRoundEnded";
+    }
+
+    public static partial class EventNames
+    {
+        public const string Unnamed = "unnamed";
+        public const string OnCardAbilityInitiated = "onCardAbilityInitiated";
+        public const string OnCardPlayed = "onCardPlayed";
+        public const string OnCardAbilityTriggered = "onCardAbilityTriggered";
+        public const string OnDefendersDeclared = "onDefendersDeclared";
+        public const string OnConflictFinished = "onConflictFinished";
+        public const string AfterConflict = "afterConflict";
+        public const string OnCovertResolved = "onCovertResolved";
+        public const string OnClaimRing = "onClaimRing";
+        public const string OnReturnHome = "onReturnHome";
+        public const string OnParticipantsReturnHome = "onParticipantsReturnHome";
     }
 
     public enum ConflictType

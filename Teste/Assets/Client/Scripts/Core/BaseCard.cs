@@ -74,7 +74,10 @@ namespace L5RGame
         public string printedFaction;
         public string location;
         public bool bowed = false;
+        public bool isBowed => bowed;
         public bool ready = true;
+        public bool isBroken = false;
+        public bool covert = false;
 
         [Header("Card Type Flags")]
         public bool isProvince = false;
@@ -215,6 +218,51 @@ namespace L5RGame
         public virtual int GetStrength()
         {
             return cardData.strength;
+        }
+
+        /// <summary>
+        /// Get military skill for characters
+        /// </summary>
+        /// <returns>Military skill</returns>
+        public virtual int GetMilitarySkill()
+        {
+            return cardData.military;
+        }
+
+        /// <summary>
+        /// Get political skill for characters
+        /// </summary>
+        /// <returns>Political skill</returns>
+        public virtual int GetPoliticalSkill()
+        {
+            return cardData.political;
+        }
+
+        /// <summary>
+        /// Check if this character can be attacked
+        /// </summary>
+        /// <returns>True if can be attacked</returns>
+        public virtual bool CanBeAttacked()
+        {
+            return type == CardTypes.Character && IsInPlay() && !bowed;
+        }
+
+        /// <summary>
+        /// Check if this character can declare as attacker
+        /// </summary>
+        /// <returns>True if can declare as attacker</returns>
+        public virtual bool CanDeclareAsAttacker()
+        {
+            return type == CardTypes.Character && IsInPlay() && !bowed && ready;
+        }
+
+        /// <summary>
+        /// Get contribution to imperial favor for this card
+        /// </summary>
+        /// <returns>Glory contribution</returns>
+        public virtual int GetContributionToImperialFavor()
+        {
+            return cardData.glory;
         }
 
         /// <summary>
@@ -398,6 +446,46 @@ namespace L5RGame
         public virtual bool CheckRestrictions(string actionType, AbilityContext context)
         {
             return !HasRestriction(actionType, context);
+        }
+
+        /// <summary>
+        /// Sum all effects of a given type on this card
+        /// </summary>
+        /// <param name="effectName">Name of the effect type</param>
+        /// <returns>Sum of all matching effects</returns>
+        public virtual int SumEffects(string effectName)
+        {
+            // Placeholder - would integrate with effect engine
+            return 0;
+        }
+
+        /// <summary>
+        /// Check if any effect of a type exists on this card
+        /// </summary>
+        /// <param name="effectName">Name of the effect type</param>
+        /// <returns>True if any matching effect exists</returns>
+        public virtual bool AnyEffect(string effectName)
+        {
+            return HasEffect(effectName);
+        }
+
+        /// <summary>
+        /// Copy properties from another card (for tokens)
+        /// </summary>
+        /// <param name="template">Card to copy from</param>
+        public virtual void CopyFrom(BaseCard template)
+        {
+            if (template == null) return;
+            
+            printedName = template.printedName;
+            printedType = template.printedType;
+            type = template.type;
+            traits = new List<string>(template.traits);
+            printedFaction = template.printedFaction;
+            owner = template.owner;
+            controller = template.controller;
+            game = template.game;
+            cardData = template.cardData;
         }
 
         /// <summary>

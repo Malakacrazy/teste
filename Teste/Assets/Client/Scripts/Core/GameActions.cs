@@ -8,6 +8,46 @@ namespace L5RGame
         public void Initialize(Game game) { }
         
         public GameAction GetAction(string actionName, object value) => new GameAction();
+
+        /// <summary>
+        /// Take fate from ring
+        /// </summary>
+        public TakeFateFromRingAction TakeFateFromRing(Player player, Ring ring, int amount)
+        {
+            return new TakeFateFromRingAction { player = player, ring = ring, amount = amount };
+        }
+
+        /// <summary>
+        /// Reveal cards
+        /// </summary>
+        public RevealAction Reveal(List<BaseCard> cards)
+        {
+            return new RevealAction { cards = cards };
+        }
+
+        /// <summary>
+        /// Bow cards
+        /// </summary>
+        public BowAction Bow(List<BaseCard> cards)
+        {
+            return new BowAction { cards = cards };
+        }
+
+        /// <summary>
+        /// Player loses honor
+        /// </summary>
+        public LoseHonorAction LoseHonor(Player player, int amount)
+        {
+            return new LoseHonorAction { player = player, amount = amount };
+        }
+
+        /// <summary>
+        /// Resolve conflict ring
+        /// </summary>
+        public ResolveConflictRingAction ResolveConflictRing(Ring ring, Player player)
+        {
+            return new ResolveConflictRingAction { ring = ring, player = player };
+        }
         
         /// <summary>
         /// Creates a duel action
@@ -173,6 +213,93 @@ namespace L5RGame
             if (targetPlayer != null)
             {
                 targetPlayer.fate += amount;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Action to take fate from ring
+    /// </summary>
+    public class TakeFateFromRingAction : GameAction
+    {
+        public Player player;
+        public Ring ring;
+        public int amount;
+
+        public override void Execute(AbilityContext context)
+        {
+            if (player != null && ring != null && ring.fate >= amount)
+            {
+                ring.fate -= amount;
+                player.fate += amount;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Action to reveal cards
+    /// </summary>
+    public class RevealAction : GameAction
+    {
+        public List<BaseCard> cards;
+
+        public override void Execute(AbilityContext context)
+        {
+            foreach (var card in cards ?? new List<BaseCard>())
+            {
+                card.facedown = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Action to bow cards
+    /// </summary>
+    public class BowAction : GameAction
+    {
+        public List<BaseCard> cards;
+
+        public override void Execute(AbilityContext context)
+        {
+            foreach (var card in cards ?? new List<BaseCard>())
+            {
+                card.bowed = true;
+                card.ready = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Action for player to lose honor
+    /// </summary>
+    public class LoseHonorAction : GameAction
+    {
+        public Player player;
+        public int amount;
+
+        public override void Execute(AbilityContext context)
+        {
+            if (player != null)
+            {
+                player.honor -= amount;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Action to resolve conflict ring effects
+    /// </summary>
+    public class ResolveConflictRingAction : GameAction
+    {
+        public Ring ring;
+        public Player player;
+
+        public override void Execute(AbilityContext context)
+        {
+            if (ring != null && player != null)
+            {
+                // Placeholder for ring effect resolution
+                Debug.Log($"Resolving {ring.element} ring for {player.name}");
             }
         }
     }

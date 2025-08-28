@@ -64,6 +64,17 @@ namespace L5RGame
         {
             return new ReturnToHandCost(target);
         }
+
+        /// <summary>
+        /// Pay fate directly from player
+        /// </summary>
+        public void PayFate(Player player, int amount)
+        {
+            if (player != null && player.fate >= amount)
+            {
+                player.fate -= amount;
+            }
+        }
     }
     
     /// <summary>

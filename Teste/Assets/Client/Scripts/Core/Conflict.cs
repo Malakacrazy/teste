@@ -32,6 +32,7 @@ namespace L5RGame
         public BaseCard conflictProvince;
         public bool conflictPassed = false;
         public bool conflictTypeSwitched = false;
+        public bool declared = false;
         public bool conflictUnopposed = false;
         public bool winnerGoesStraightToNextConflict = false;
         public bool winnerDetermined = false;
@@ -386,7 +387,7 @@ namespace L5RGame
         /// </summary>
         /// <param name="effectName">Effect name</param>
         /// <returns>List of effects</returns>
-        private List<object> GetEffects(string effectName)
+        public List<object> GetEffects(string effectName)
         {
             // Placeholder implementation - would integrate with effect engine
             return new List<object>();
@@ -438,6 +439,50 @@ namespace L5RGame
             
             Debug.Log("⚔️ Conflict destroyed");
         }
+
+        /// <summary>
+        /// Reset all cards in the conflict
+        /// </summary>
+        public void ResetCards()
+        {
+            foreach (var card in attackers)
+            {
+                card.ready = true;
+                card.bowed = false;
+            }
+            foreach (var card in defenders)
+            {
+                card.ready = true;
+                card.bowed = false;
+            }
+        }
+
+        /// <summary>
+        /// Pass the conflict without declaring
+        /// </summary>
+        public void PassConflict()
+        {
+            conflictPassed = true;
+            Debug.Log("Conflict passed");
+        }
+
+        /// <summary>
+        /// Declare the conflict
+        /// </summary>
+        public void DeclareConflict()
+        {
+            declared = true;
+            Debug.Log("Conflict declared");
+        }
+
+        /// <summary>
+        /// Check if attacker is the winner
+        /// </summary>
+        public bool IsAttackerTheWinner()
+        {
+            return winner == attackingPlayer;
+        }
+
     }
 
     /// <summary>

@@ -835,6 +835,51 @@ namespace L5RGame
                 {"selectable", false}
             };
         }
+
+        /// <summary>
+        /// Get all characters in play for this player
+        /// </summary>
+        public List<BaseCard> GetCharactersInPlay()
+        {
+            return game.FindAnyCardsInPlay(card => card.controller == this && card.GetCardType() == CardTypes.Character);
+        }
+
+        /// <summary>
+        /// Reset conflict opportunities for this player
+        /// </summary>
+        public void ResetConflictOpportunities()
+        {
+            conflictOpportunities.Reset();
+        }
+
+        /// <summary>
+        /// Use a conflict opportunity
+        /// </summary>
+        public void UseConflictOpportunity(string conflictType)
+        {
+            if (conflictType == "military")
+                conflictOpportunities.military++;
+            else if (conflictType == "political")
+                conflictOpportunities.political++;
+            
+            conflictOpportunities.total++;
+        }
+
+        /// <summary>
+        /// Sum all effects of a specific type on this player
+        /// </summary>
+        public int SumEffects(string effectName)
+        {
+            return 0; // Placeholder
+        }
+
+        /// <summary>
+        /// Initialize player for game start
+        /// </summary>
+        public void InitializeForGame()
+        {
+            Initialize();
+        }
     }
 
     // Supporting classes
@@ -965,6 +1010,7 @@ namespace L5RGame
             addChoiceAction?.Invoke();
         }
     }
+
 
     // Note: PlayTypes, ConflictTypes, Players, and Decks are in GameConstants.cs
 }

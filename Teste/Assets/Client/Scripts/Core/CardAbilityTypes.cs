@@ -11,6 +11,8 @@ namespace L5RGame
     [System.Serializable]
     public class BaseAbilityProperties
     {
+        public string title;
+        public string printedAbility;
         public Func<AbilityContext, bool> condition;
         public System.Action<AbilityContext> handler;
         public List<object> cost = new List<object>();

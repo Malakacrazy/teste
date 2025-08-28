@@ -83,6 +83,7 @@ namespace L5RGame
         public string select;
         public Ring ring;
         public StatusToken token;
+        public object eventObj;
 
         [Header("Game State")]
         public List<ProvinceRefillData> provincesToRefill = new List<ProvinceRefillData>();
@@ -140,6 +141,7 @@ namespace L5RGame
             events = properties.events ?? new List<object>();
             stage = properties.stage ?? Stages.Effect;
             targetAbility = properties.targetAbility;
+            eventObj = properties.eventObj;
 
             // Determine play type from player's playable locations (placeholder implementation)
             playType = "playFromHand"; // Simplified for now
@@ -496,6 +498,18 @@ namespace L5RGame
             });
             return context;
         }
+        
+        /// <summary>
+        /// Copy resolved context values
+        /// </summary>
+        private void CopyResolvedContext(AbilityContext source, AbilityContext target)
+        {
+            target.target = source.target;
+            target.select = source.select;
+            target.ring = source.ring;
+            target.token = source.token;
+            target.eventObj = source.eventObj;
+        }
 
         /// <summary>
         /// Creates a context for card ability execution
@@ -518,6 +532,18 @@ namespace L5RGame
                 stage = Stages.PreTarget
             });
             return context;
+        }
+        
+        /// <summary>
+        /// Creates a context for card ability execution (simplified overload)
+        /// </summary>
+        /// <param name="gameInstance">Game instance</param>
+        /// <param name="sourceCard">Source card</param>
+        /// <param name="contextPlayer">Player executing the ability</param>
+        /// <returns>Card ability context</returns>
+        public static AbilityContext CreateCardContext(Game gameInstance, BaseCard sourceCard, Player contextPlayer)
+        {
+            return CreateCardContext(gameInstance, sourceCard, contextPlayer, new BaseAbility());
         }
         
         /// <summary>

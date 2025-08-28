@@ -6,7 +6,7 @@ namespace L5RGame
     /// <summary>
     /// Action window step
     /// </summary>
-    public class ActionWindow : MonoBehaviour, IGameStep
+    public partial class ActionWindow : MonoBehaviour, IGameStep
     {
         private Player currentPlayer;
         private Game game;

@@ -657,11 +657,14 @@ namespace L5RGame
     public class MockGameEvent : IGameEvent
     {
         public string Name { get; set; }
+        public string EventName => Name;
+        public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
         public BaseCard Card { get; set; }
         public Ring Ring { get; set; }
         public string Phase { get; set; }
         public AbilityContext Context { get; set; }
         public bool cancelled { get; set; }
+        public bool IsCancelled => cancelled;
         
         public void Cancel()
         {
