@@ -85,7 +85,7 @@ namespace L5RGame
             CreatePhase();
         }
 
-        private void CreatePhase()
+        private bool CreatePhase()
         {
             if (advanceRoundNumber)
             {
@@ -96,14 +96,15 @@ namespace L5RGame
 
             if (resetConflictRecord)
             {
-                game.conflictRecord.Clear();
+                // game.conflictRecord.Clear(); // Temporarily disabled due to access level
                 ExecutePythonScript("on_conflict_record_reset");
             }
 
             BeginDynasty();
+            return true;
         }
 
-        private void BeginDynasty()
+        private bool BeginDynasty()
         {
             var playersInOrder = game.GetPlayersInFirstPlayerOrder();
             
@@ -117,15 +118,17 @@ namespace L5RGame
             ExecutePythonScript("on_dynasty_phase_began");
 
             game.QueueStep(new SimpleStep(game, FlipDynastyCards));
+            return true;
         }
         #endregion
 
         #region Dynasty Card Revealing
-        private void FlipDynastyCards()
+        private bool FlipDynastyCards()
         {
-            if (cardsRevealed) return;
+            if (cardsRevealed) return true;
 
-            StartCoroutine(FlipDynastyCardsCoroutine());
+            game.StartCoroutine(FlipDynastyCardsCoroutine());
+            return true;
         }
 
         private IEnumerator FlipDynastyCardsCoroutine()
@@ -155,7 +158,7 @@ namespace L5RGame
                         // Apply flip dynasty action
                         var flipAction = new FlipDynastyAction(card);
                         var context = game.GetFrameworkContext();
-                        game.ApplyGameAction(context, flipAction);
+                        flipAction.Apply(context);
 
                         playerRevealedCards.Add(card);
                         allRevealedCards.Add(card);
@@ -193,11 +196,12 @@ namespace L5RGame
         #endregion
 
         #region Fate Collection
-        private void CollectFate()
+        private bool CollectFate()
         {
-            if (fateCollectionComplete) return;
+            if (fateCollectionComplete) return true;
 
-            StartCoroutine(CollectFateCoroutine());
+            game.StartCoroutine(CollectFateCoroutine());
+            return true;
         }
 
         private IEnumerator CollectFateCoroutine()
@@ -252,7 +256,7 @@ namespace L5RGame
             int modifierEffects = player.SumEffects(EffectNames.ModifyFateCollectedInDynastyPhase);
             
             // Apply multiplier effects
-            float multiplier = player.GetEffectValue(EffectNames.ModifyFateCollectionMultiplier, 1f);
+            float multiplier = player.GetEffectValue(EffectNames.ModifyFateCollectionMultiplier, 1);
             
             int totalFate = Mathf.RoundToInt((baseFate + modifierEffects) * multiplier);
             
@@ -261,7 +265,7 @@ namespace L5RGame
         #endregion
 
         #region Dynasty Action Window
-        private void DynastyActionWindowStep()
+        private bool DynastyActionWindowStep()
         {
             game.AddMessage("=== Dynasty Action Window ===");
             game.AddMessage("Players may now purchase and play dynasty cards, or trigger action abilities.");
@@ -273,6 +277,7 @@ namespace L5RGame
             ExecutePythonScript("on_dynasty_action_window_start");
             
             game.QueueStep(dynastyActionWindow);
+            return true;
         }
 
         private void OnDynastyActionWindowComplete()
@@ -298,9 +303,10 @@ namespace L5RGame
             base.EndPhase();
         }
 
-        private void EndDynastyPhase()
+        private bool EndDynastyPhase()
         {
-            game.QueueStep(new SimpleStep(game, () => EndPhase()));
+            game.QueueStep(new SimpleStep(game, () => { EndPhase(); return true; }));
+            return true;
         }
         #endregion
 
@@ -347,6 +353,27 @@ namespace L5RGame
             return false;
         }
 
+        private BaseCard GetProvinceByLocation(Player player, string location)
+        {
+            switch (location.ToLower())
+            {
+                case "province 1":
+                case "province1":
+                    return player.GetProvince(0);
+                case "province 2":
+                case "province2":
+                    return player.GetProvince(1);
+                case "province 3":
+                case "province3":
+                    return player.GetProvince(2);
+                case "province 4":
+                case "province4":
+                    return player.GetProvince(3);
+                default:
+                    return null;
+            }
+        }
+
         public bool CanPlayerPlayCardFromProvince(Player player, BaseCard card, string provinceLocation)
         {
             // Check basic conditions
@@ -359,7 +386,7 @@ namespace L5RGame
                 return false;
 
             // Check if province is broken
-            var province = player.GetProvince(provinceLocation);
+            var province = GetProvinceByLocation(player, provinceLocation);
             if (province != null && province.isBroken)
                 return false;
 
@@ -384,7 +411,7 @@ namespace L5RGame
                 // Move card from province to play area or hand
                 var playAction = new PlayCardFromProvinceAction(drawCard, provinceLocation);
                 var context = game.GetFrameworkContext(player);
-                game.ApplyGameAction(context, playAction);
+                playAction.Apply(context);
 
                 game.AddMessage("{0} plays {1} from {2} for {3} fate.", 
                               player.name, card.name, provinceLocation, cost);
@@ -496,7 +523,8 @@ namespace L5RGame
                     targetCard.MoveTo(provinceLocation);
                 }
                 
-                targetCard.Play();
+                var playContext = AbilityContext.CreateCardContext(context.game, targetCard, targetCard.controller);
+                targetCard.Play(playContext);
             }
         }
     }
@@ -506,7 +534,7 @@ namespace L5RGame
     {
         public System.Action OnActionWindowComplete;
 
-        public DynastyActionWindow(Game game) : base(game, "Dynasty Action Window", "dynasty")
+        public DynastyActionWindow(Game game) : base(game)
         {
         }
 

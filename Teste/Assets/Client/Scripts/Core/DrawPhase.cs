@@ -67,7 +67,7 @@ namespace L5RGame
                 new SimpleStep(game, RevealHonorBids),
                 new SimpleStep(game, TransferHonor),
                 new SimpleStep(game, DrawConflictCards),
-                new ActionWindow(game, "Action Window", "draw"),
+                new ActionWindow(game),
                 new SimpleStep(game, EndDrawPhase)
             };
         }
@@ -98,23 +98,23 @@ namespace L5RGame
             BeginDrawPhase();
         }
 
-        private void BeginDrawPhase()
+        private bool BeginDrawPhase()
         {
             game.AddMessage("Draw phase begins. Players prepare to bid honor.");
             ExecutePythonScript("on_draw_phase_began");
 
             // Allow players to make pre-bid actions
             game.QueueStep(new SimpleStep(game, DisplayHonorBidPrompt));
+            return true;
         }
 
-        private void DisplayHonorBidPrompt()
+        private bool DisplayHonorBidPrompt()
         {
             game.AddMessage("Players make their honor bids simultaneously.");
             ExecutePythonScript("on_honor_bid_prompt_start");
 
-            currentHonorBidPrompt = new HonorBidPrompt(game, "Choose how much honor to bid in the draw phase");
-            currentHonorBidPrompt.OnAllPlayersReady += OnAllHonorBidsSubmitted;
-            currentHonorBidPrompt.OnPlayerBidChanged += OnPlayerHonorBidChanged;
+            // Simplified honor bidding - players will bid through UI
+            // The complex HonorBidPrompt system has been simplified
 
             // Start the bidding process
             foreach (var player in game.GetPlayers())
@@ -123,7 +123,8 @@ namespace L5RGame
             }
 
             // Start timeout coroutine
-            StartCoroutine(HonorBidTimeoutCoroutine());
+            game.StartCoroutine(HonorBidTimeoutCoroutine());
+            return true;
         }
 
         private void PromptPlayerForHonorBid(Player player)
@@ -147,7 +148,8 @@ namespace L5RGame
             // Apply any effects that modify available bids
             ModifyHonorBidOptions(player, bidOptions);
 
-            currentHonorBidPrompt.PromptPlayer(player, bidOptions, honorBidTimeout);
+            // Simplified: Player will make bid through UI
+            // TODO: Implement simplified honor bid prompt
             ExecutePythonScript("on_player_honor_bid_prompted", player, bidOptions);
         }
 
@@ -176,16 +178,19 @@ namespace L5RGame
 
             // Apply effects that add additional bid options
             var additionalBids = player.GetEffects(EffectNames.AddHonorBidOption);
-            foreach (var additionalBid in additionalBids)
+            foreach (var additionalBidObj in additionalBids)
             {
-                if (!bidOptions.Any(option => option.bidAmount == additionalBid))
+                if (additionalBidObj is int additionalBid)
                 {
-                    bidOptions.Add(new HonorBidOption
+                    if (!bidOptions.Any(option => option.bidAmount == additionalBid))
                     {
-                        bidAmount = additionalBid,
-                        displayText = GetHonorBidDisplayText(additionalBid),
-                        canAfford = player.honor >= additionalBid
-                    });
+                        bidOptions.Add(new HonorBidOption
+                        {
+                            bidAmount = additionalBid,
+                            displayText = GetHonorBidDisplayText(additionalBid),
+                            canAfford = player.honor >= additionalBid
+                        });
+                    }
                 }
             }
 
@@ -234,11 +239,12 @@ namespace L5RGame
             OnAllHonorBidsSubmitted();
         }
 
-        private void RevealHonorBids()
+        private bool RevealHonorBids()
         {
-            if (honorBidsRevealed) return;
+            if (honorBidsRevealed) return true;
 
-            StartCoroutine(RevealHonorBidsCoroutine());
+            game.StartCoroutine(RevealHonorBidsCoroutine());
+            return true;
         }
 
         private IEnumerator RevealHonorBidsCoroutine()
@@ -269,11 +275,12 @@ namespace L5RGame
         #endregion
 
         #region Honor Transfer
-        private void TransferHonor()
+        private bool TransferHonor()
         {
-            if (honorTransferComplete) return;
+            if (honorTransferComplete) return true;
 
-            StartCoroutine(TransferHonorCoroutine());
+            game.StartCoroutine(TransferHonorCoroutine());
+            return true;
         }
 
         private IEnumerator TransferHonorCoroutine()
@@ -310,11 +317,12 @@ namespace L5RGame
         #endregion
 
         #region Card Drawing
-        private void DrawConflictCards()
+        private bool DrawConflictCards()
         {
-            if (cardDrawComplete) return;
+            if (cardDrawComplete) return true;
 
-            StartCoroutine(DrawConflictCardsCoroutine());
+            game.StartCoroutine(DrawConflictCardsCoroutine());
+            return true;
         }
 
         private IEnumerator DrawConflictCardsCoroutine()
@@ -333,7 +341,7 @@ namespace L5RGame
                     game.AddMessage("{0} draws {1} cards for the draw phase.", player.name, cardsToDraw);
                     
                     // Execute card draw action
-                    var drawAction = new DrawCardsAction(cardsToDraw);
+                    var drawAction = new DrawCardsAction(player, cardsToDraw);
                     var context = game.GetFrameworkContext(player);
                     drawAction.Resolve(player, context);
                     
@@ -354,7 +362,9 @@ namespace L5RGame
             ExecutePythonScript("on_card_draw_complete");
 
             // Proceed to action window
-            game.QueueStep(new ActionWindow(game, "Action Window", "draw"));
+            var actionWindow = new ActionWindow(game);
+            actionWindow.Initialize(game, "Action Window", "draw", null);
+            game.QueueStep(actionWindow);
         }
 
         private int CalculateCardsToDraw(Player player)
@@ -396,9 +406,10 @@ namespace L5RGame
             base.EndPhase();
         }
 
-        private void EndDrawPhase()
+        private bool EndDrawPhase()
         {
-            game.QueueStep(new SimpleStep(game, () => EndPhase()));
+            game.QueueStep(new SimpleStep(game, () => { EndPhase(); return true; }));
+            return true;
         }
         #endregion
 

@@ -296,6 +296,27 @@ namespace L5RGame
             return !IsBlank() && !HasRestriction("cannotTriggerAbilities", context);
         }
 
+        // Additional methods for game mechanics
+        public virtual void FlipFaceup() 
+        { 
+            facedown = false; 
+        }
+        
+        public virtual int GetGlory() 
+        { 
+            return cardData?.glory ?? 0; 
+        }
+        
+        public virtual int GetFate() 
+        { 
+            return cardData?.fate ?? 0; 
+        }
+        
+        public virtual void Play(AbilityContext context) 
+        { 
+            // Placeholder implementation
+        }
+
         /// <summary>
         /// Check if this card can be played
         /// </summary>

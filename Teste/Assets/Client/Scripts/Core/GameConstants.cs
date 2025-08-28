@@ -307,6 +307,12 @@ namespace L5RGame
         public const string RestrictNumberOfDefenders = "restrictNumberOfDefenders";
         public const string AttachmentLimit = "attachmentLimit";
         public const string AttachmentMyControlOnly = "attachmentMyControlOnly";
+        public const string RestrictHonorBid = "restrictHonorBid";
+        public const string AddHonorBidOption = "addHonorBidOption";
+        public const string ModifyCardsDrawnInDrawPhase = "modifyCardsDrawnInDrawPhase";
+        public const string MaxCardsDrawnInDrawPhase = "maxCardsDrawnInDrawPhase";
+        public const string ModifyFateCollectedInDynastyPhase = "modifyFateCollectedInDynastyPhase";
+        public const string ModifyFateCollectionMultiplier = "modifyFateCollectionMultiplier";
         public const string AttachmentUniqueRestriction = "attachmentUniqueRestriction";
         public const string AttachmentFactionRestriction = "attachmentFactionRestriction";
         public const string AttachmentTraitRestriction = "attachmentTraitRestriction";

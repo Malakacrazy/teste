@@ -97,6 +97,7 @@ namespace L5RGame
         public bool actionPhasePriority = false;
         public int honorBidModifier = 0;
         public int showBid = 0;
+        public int honorBid = 0;
         public ConflictOpportunities conflictOpportunities = new ConflictOpportunities();
         public string imperialFavor = "";
 
@@ -606,6 +607,26 @@ namespace L5RGame
         // Resource management
         public void ModifyFate(int amount) { fate = Mathf.Max(0, fate + amount); }
         public void ModifyHonor(int amount) { honor = Mathf.Max(0, honor + amount); }
+        public void LoseHonor(int amount) { honor = Mathf.Max(0, honor - amount); }
+        public void SpendFate(int amount) { fate = Mathf.Max(0, fate - amount); }
+        
+        public int GetEffectValue(string effectName, int defaultValue)
+        {
+            // Placeholder implementation
+            return defaultValue;
+        }
+        
+        public BaseCard GetProvince(int index)
+        {
+            switch (index)
+            {
+                case 0: return provinceOne.FirstOrDefault();
+                case 1: return provinceTwo.FirstOrDefault();
+                case 2: return provinceThree.FirstOrDefault();
+                case 3: return provinceFour.FirstOrDefault();
+                default: return null;
+            }
+        }
 
         public List<Ring> GetClaimedRings() { return new List<Ring>(); }
         public int GetGloryCount() { return GetClaimedRings().Count + GloryModifier; }

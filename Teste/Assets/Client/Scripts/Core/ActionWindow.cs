@@ -8,13 +8,13 @@ namespace L5RGame
     /// </summary>
     public partial class ActionWindow : MonoBehaviour, IGameStep
     {
-        private Player currentPlayer;
-        private Game game;
-        private string windowName;
-        private string windowType;
-        private System.Action onComplete;
-        private bool isComplete = false;
-        private bool actionTaken = false;
+        protected Player currentPlayer;
+        protected Game game;
+        protected string windowName;
+        protected string windowType;
+        protected System.Action onComplete;
+        protected bool isComplete = false;
+        protected bool actionTaken = false;
 
         public ActionWindow() { }
 

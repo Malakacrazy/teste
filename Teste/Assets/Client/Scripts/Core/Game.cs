@@ -946,6 +946,15 @@ def on_trigger(card, event_name, event_data):
                 currentActionWindow = null;
             }
         }
+
+        /// <summary>
+        /// Open dynasty-specific action window
+        /// </summary>
+        public void OpenDynastyActionWindow(System.Action onComplete = null)
+        {
+            var actionWindow = OpenActionWindow("Dynasty Action Window", "dynasty", onComplete);
+            // Dynasty-specific setup can be done here if needed
+        }
         public void PromptWithMenu(Player player, object contextObj, string contextString, MenuPromptProperties properties)
         {
             QueueStep(new MenuPrompt(this, player, contextObj, properties));
