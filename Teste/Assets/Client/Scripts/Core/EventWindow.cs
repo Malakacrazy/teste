@@ -26,7 +26,6 @@ namespace L5RGame
         }
 
         bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
 
         public override string GetDebugInfo()
         {

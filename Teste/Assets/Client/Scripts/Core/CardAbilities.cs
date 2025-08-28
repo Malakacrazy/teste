@@ -26,6 +26,8 @@ namespace L5RGame
         public object messageArgs;
         public string effect;
         public object effectArgs;
+        public string when; // For triggered abilities
+        public string effectName; // For persistent effects
     }
 
     /// <summary>

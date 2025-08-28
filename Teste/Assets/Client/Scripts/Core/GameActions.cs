@@ -5,6 +5,8 @@ namespace L5RGame
 {
     public class GameActions : MonoBehaviour
     {
+        public void Initialize(Game game) { }
+        
         public GameAction GetAction(string actionName, object value) => new GameAction();
         
         /// <summary>

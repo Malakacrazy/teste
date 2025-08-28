@@ -7,7 +7,6 @@ namespace L5RGame
         public DrawPhase(Game game) : base(game) { }
 
         bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
 
         public override string GetDebugInfo()
         {

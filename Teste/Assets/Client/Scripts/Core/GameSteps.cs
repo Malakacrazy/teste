@@ -18,12 +18,14 @@ namespace L5RGame
             properties = props;
         }
 
-        bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
+        public override bool Continue()
+        {
+            return false; // Wait for player input
+        }
 
         public override string GetDebugInfo()
         {
-            return $"MenuPrompt - Player: {player?.name} - Title: {properties?.activePromptTitle}";
+            return $"MenuPrompt - Player: {player?.name}";
         }
     }
 
@@ -43,8 +45,10 @@ namespace L5RGame
             duel = associatedDuel;
         }
 
-        bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
+        public override bool Continue()
+        {
+            return false; // Wait for player input
+        }
 
         public override string GetDebugInfo()
         {
@@ -62,8 +66,10 @@ namespace L5RGame
             winner = winnerPlayer;
         }
 
-        bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
+        public override bool Continue()
+        {
+            return true; // Immediately complete
+        }
 
         public override string GetDebugInfo()
         {
@@ -80,9 +86,6 @@ namespace L5RGame
         {
             events = abilityEvents ?? new List<InitiateCardAbilityEvent>();
         }
-
-        bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
 
         public override bool Continue()
         {
@@ -116,12 +119,14 @@ namespace L5RGame
             properties = props;
         }
 
-        bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
+        public override bool Continue()
+        {
+            return false; // Wait for player input
+        }
 
         public override string GetDebugInfo()
         {
-            return $"HandlerMenuPrompt - Player: {player?.name} - Title: {properties?.activePromptTitle}";
+            return $"HandlerMenuPrompt - Player: {player?.name}";
         }
     }
 
@@ -137,21 +142,20 @@ namespace L5RGame
             properties = props;
         }
 
-        bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
+        public override bool Continue()
+        {
+            return false; // Wait for player input
+        }
 
         public override string GetDebugInfo()
         {
-            return $"SelectRingPrompt - Player: {player?.name} - Title: {properties?.activePromptTitle}";
+            return $"SelectRingPrompt - Player: {player?.name}";
         }
     }
 
     public class SetupPhase : BaseStepWithPipeline, IGameStep
     {
         public SetupPhase(Game game) : base(game) { }
-
-        bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
 
         public override string GetDebugInfo()
         {
@@ -180,9 +184,6 @@ namespace L5RGame
             return true;
         }
 
-        bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
-
         public override string GetDebugInfo()
         {
             return $"SimultaneousEffectWindow - Choices: {choices.Count}";
@@ -202,12 +203,14 @@ namespace L5RGame
             properties = props;
         }
 
-        bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
+        public override bool Continue()
+        {
+            return false; // Wait for player input
+        }
 
         public override string GetDebugInfo()
         {
-            return $"SelectCardPrompt - Player: {player?.name} - Title: {properties?.activePromptTitle}";
+            return $"SelectCardPrompt - Player: {player?.name}";
         }
     }
 }

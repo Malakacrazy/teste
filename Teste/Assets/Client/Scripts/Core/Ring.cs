@@ -15,6 +15,7 @@ namespace L5RGame
         public bool claimed = false;
         public Player claimedBy;
         public List<BaseCard> attachments = new List<BaseCard>();
+        public int fate = 0;
         
         public Ring() { }
         
@@ -47,6 +48,24 @@ namespace L5RGame
         public bool IsContested()
         {
             return false; // Placeholder
+        }
+        
+        public List<string> GetElements()
+        {
+            // For basic rings, just return the single element
+            // Override in derived classes for rings with multiple elements
+            return new List<string> { element };
+        }
+        
+        public void SetContested()
+        {
+            // Mark ring as contested
+            // Implementation would depend on ring state system
+        }
+        
+        public void RemoveFate()
+        {
+            fate = 0;
         }
         
         public List<BaseCard> GetAttachments()

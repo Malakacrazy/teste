@@ -24,7 +24,7 @@ namespace L5RGame
     /// <summary>
     /// Card action ability
     /// </summary>
-    public class CardAction : CardAbility
+    public partial class CardAction : CardAbility
     {
         public CardAction(Game game, BaseCard card, ActionProperties properties) 
             : base(game, card, ConvertToCardAbilityProperties(properties))
@@ -58,7 +58,7 @@ namespace L5RGame
     /// <summary>
     /// Triggered ability (reactions, interrupts, etc.)
     /// </summary>
-    public class TriggeredAbility : CardAbility
+    public partial class TriggeredAbility : CardAbility
     {
         public List<string> when = new List<string>();
         public List<string> location = new List<string>();

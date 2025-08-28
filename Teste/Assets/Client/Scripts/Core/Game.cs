@@ -88,7 +88,7 @@ namespace L5RGame
 
         // Core game components
         [Header("Game Components")]
-        [SerializeField] private EffectEngine effectEngine;
+        [SerializeField] public EffectEngine effectEngine;
         [SerializeField] private GameChat gameChat;
         [SerializeField] private ChatCommands chatCommands;
         [SerializeField] public GamePipeline pipeline;
@@ -388,6 +388,8 @@ def on_trigger(card, event_name, event_data):
             }
 
             effectEngine.Initialize(this);
+            gameActions.Initialize(this);
+            gameCosts.Initialize(this);
             gameChat.Initialize(this);
             chatCommands.Initialize(this);
             pipeline.Initialize(this);
@@ -573,7 +575,7 @@ def on_trigger(card, event_name, event_data):
             
             conflict.attackingPlayer.conflictOpportunities.total--;
             
-            if (conflict.conflictPassed || conflict.forcedDeclaredType)
+            if (conflict.conflictPassed || !string.IsNullOrEmpty(conflict.forcedDeclaredType))
             {
                 conflict.attackingPlayer.conflictOpportunities.military = Mathf.Max(
                     conflict.attackingPlayer.conflictOpportunities.military,
@@ -852,7 +854,7 @@ def on_trigger(card, event_name, event_data):
                 var commandName = args.Length > 0 ? args[0] : "";
                 var commandArgs = args.Length > 1 ? args.Skip(1).ToArray() : new string[0];
                 
-                if (chatCommands.ExecuteCommand(player, commandName, commandArgs))
+                if (chatCommands.ExecuteCommand(player as Player, commandName, commandArgs))
                 {
                     CheckGameState(true);
                     return;

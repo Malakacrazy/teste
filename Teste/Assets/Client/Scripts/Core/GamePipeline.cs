@@ -117,7 +117,7 @@ namespace L5RGame
                 }
                 
                 // Execute current step
-                bool stepCompleted = currentStep.Execute();
+                bool stepCompleted = currentStep.Continue();
                 
                 if (stepCompleted)
                 {

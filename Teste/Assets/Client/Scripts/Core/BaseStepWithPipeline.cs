@@ -17,60 +17,60 @@ namespace L5RGame
         [SerializeField] protected GamePipeline pipeline;
         [SerializeField] protected bool autoInitializePipeline = true;
         [SerializeField] protected bool debugPipelineSteps = false;
-        
+
         // Pipeline state
         protected bool pipelineInitialized = false;
         protected int completedSteps = 0;
         protected int totalSteps = 0;
-        
+
         // Events specific to pipeline steps
         public event Action<BaseStepWithPipeline, BaseStep> OnSubStepStarted;
         public event Action<BaseStepWithPipeline, BaseStep> OnSubStepCompleted;
         public event Action<BaseStepWithPipeline, BaseStep, Exception> OnSubStepError;
-        
+
         #region Properties
-        
+
         /// <summary>
         /// The internal pipeline managing sub-steps
         /// </summary>
         public GamePipeline Pipeline => pipeline;
-        
+
         /// <summary>
         /// Number of steps in the pipeline
         /// </summary>
         public int PipelineLength => pipeline?.Length ?? 0;
-        
+
         /// <summary>
         /// Whether the pipeline is empty (and thus complete)
         /// </summary>
         public override bool IsComplete => pipeline?.Length == 0;
-        
+
         /// <summary>
         /// Current sub-step being executed
         /// </summary>
         public BaseStep CurrentSubStep => pipeline?.CurrentStep;
-        
+
         /// <summary>
         /// Progress through the pipeline (0.0 to 1.0)
         /// </summary>
-        public float PipelineProgress 
-        { 
-            get 
-            { 
+        public float PipelineProgress
+        {
+            get
+            {
                 if (totalSteps == 0) return 1.0f;
                 return (float)completedSteps / totalSteps;
-            } 
+            }
         }
-        
+
         /// <summary>
         /// Whether the pipeline has been initialized
         /// </summary>
         public bool IsPipelineInitialized => pipelineInitialized;
-        
+
         #endregion
-        
+
         #region Constructors
-        
+
         /// <summary>
         /// Constructor for BaseStepWithPipeline
         /// </summary>
@@ -79,7 +79,7 @@ namespace L5RGame
         {
             InitializePipelineSystem();
         }
-        
+
         /// <summary>
         /// Constructor with custom step name
         /// </summary>
@@ -89,30 +89,30 @@ namespace L5RGame
         {
             InitializePipelineSystem();
         }
-        
+
         #endregion
-        
+
         #region Pipeline System Initialization
-        
+
         /// <summary>
         /// Initialize the pipeline system
         /// </summary>
         private void InitializePipelineSystem()
         {
             pipeline = new GamePipeline();
-            
+
             // Subscribe to pipeline events
             pipeline.OnStepStarted += OnPipelineStepStarted;
             pipeline.OnStepCompleted += OnPipelineStepCompleted;
             pipeline.OnStepError += OnPipelineStepError;
             pipeline.OnPipelineCompleted += OnPipelineCompleted;
-            
+
             if (autoInitializePipeline)
             {
                 InitializePipeline();
             }
         }
-        
+
         /// <summary>
         /// Initialize the pipeline with steps. Override in derived classes.
         /// </summary>
@@ -121,7 +121,7 @@ namespace L5RGame
             // Override in derived classes to set up the pipeline
             pipelineInitialized = true;
         }
-        
+
         /// <summary>
         /// Force pipeline initialization if not done automatically
         /// </summary>
@@ -133,11 +133,11 @@ namespace L5RGame
                 totalSteps = PipelineLength;
             }
         }
-        
+
         #endregion
-        
+
         #region Step Execution Override
-        
+
         /// <summary>
         /// Execute this step by processing the internal pipeline
         /// </summary>
@@ -152,22 +152,22 @@ namespace L5RGame
                     EnsurePipelineInitialized();
                     totalSteps = PipelineLength;
                 }
-                
+
                 // Check for timeout
                 if (HasTimedOut)
                 {
                     HandleTimeout();
                     return true;
                 }
-                
+
                 // Process pipeline
                 bool completed = Continue();
-                
+
                 if (completed)
                 {
                     CompleteStep();
                 }
-                
+
                 return completed;
             }
             catch (Exception ex)
@@ -176,7 +176,7 @@ namespace L5RGame
                 return true;
             }
         }
-        
+
         /// <summary>
         /// Continue pipeline execution
         /// </summary>
@@ -186,28 +186,28 @@ namespace L5RGame
             try
             {
                 EnsurePipelineInitialized();
-                
+
                 if (debugPipelineSteps && pipeline.CurrentStep != null)
                 {
                     LogStep($"Processing sub-step: {pipeline.CurrentStep.GetDebugInfo()}");
                 }
-                
+
                 return pipeline.Continue();
             }
             catch (Exception ex)
             {
                 LogError($"Pipeline execution error: {ex.Message}");
                 game.ReportError(ex);
-                
+
                 // Try to continue despite the error
                 return IsComplete;
             }
         }
-        
+
         #endregion
-        
+
         #region Pipeline Management
-        
+
         /// <summary>
         /// Queue a step in the pipeline
         /// </summary>
@@ -219,21 +219,21 @@ namespace L5RGame
                 LogWarning("Attempted to queue null step");
                 return;
             }
-            
+
             pipeline.QueueStep(step);
-            
+
             if (debugPipelineSteps)
             {
                 LogStep($"Queued sub-step: {step.GetDebugInfo()}");
             }
-            
+
             // Update total steps if we're tracking progress
             if (hasStarted)
             {
                 totalSteps = PipelineLength;
             }
         }
-        
+
         /// <summary>
         /// Queue multiple steps at once
         /// </summary>
@@ -245,7 +245,7 @@ namespace L5RGame
                 QueueStep(step);
             }
         }
-        
+
         /// <summary>
         /// Queue multiple steps from collection
         /// </summary>
@@ -257,7 +257,7 @@ namespace L5RGame
                 QueueStep(step);
             }
         }
-        
+
         /// <summary>
         /// Insert step at the front of the pipeline
         /// </summary>
@@ -269,20 +269,20 @@ namespace L5RGame
                 LogWarning("Attempted to insert null step");
                 return;
             }
-            
+
             pipeline.InsertStep(step);
-            
+
             if (debugPipelineSteps)
             {
                 LogStep($"Inserted sub-step: {step.GetDebugInfo()}");
             }
-            
+
             if (hasStarted)
             {
                 totalSteps = PipelineLength;
             }
         }
-        
+
         /// <summary>
         /// Cancel the current step in the pipeline
         /// </summary>
@@ -294,7 +294,7 @@ namespace L5RGame
                 pipeline.CancelStep();
             }
         }
-        
+
         /// <summary>
         /// Cancel all remaining steps in the pipeline
         /// </summary>
@@ -303,7 +303,7 @@ namespace L5RGame
             LogStep("Cancelling entire pipeline");
             pipeline.Clear();
         }
-        
+
         /// <summary>
         /// Skip the current step and move to the next
         /// </summary>
@@ -315,11 +315,11 @@ namespace L5RGame
                 pipeline.SkipCurrentStep();
             }
         }
-        
+
         #endregion
-        
+
         #region User Interaction Delegation
-        
+
         /// <summary>
         /// Handle card clicks by delegating to the pipeline
         /// </summary>
@@ -330,9 +330,9 @@ namespace L5RGame
             try
             {
                 EnsurePipelineInitialized();
-                
+
                 pipeline.HandleCardClicked(player, card);
-                
+
                 if (debugPipelineSteps)
                 {
                     LogStep($"Card click handled by sub-step: {card.name}");
@@ -344,7 +344,7 @@ namespace L5RGame
                 game.ReportError(ex);
             }
         }
-        
+
         /// <summary>
         /// Handle ring clicks by delegating to the pipeline
         /// </summary>
@@ -355,9 +355,9 @@ namespace L5RGame
             try
             {
                 EnsurePipelineInitialized();
-                
+
                 pipeline.HandleRingClicked(player, ring);
-                
+
                 if (debugPipelineSteps)
                 {
                     LogStep($"Ring click handled by sub-step: {ring.element}");
@@ -369,7 +369,7 @@ namespace L5RGame
                 game.ReportError(ex);
             }
         }
-        
+
         /// <summary>
         /// Handle menu commands by delegating to the pipeline
         /// </summary>
@@ -383,9 +383,9 @@ namespace L5RGame
             try
             {
                 EnsurePipelineInitialized();
-                
+
                 pipeline.HandleMenuCommand(player, command, new object[] { arg, uuid, method });
-                
+
                 if (debugPipelineSteps)
                 {
                     LogStep($"Menu command handled by sub-step: {command}");
@@ -397,7 +397,7 @@ namespace L5RGame
                 game.ReportError(ex);
             }
         }
-        
+
         /// <summary>
         /// Handle province click events. Override in derived classes if needed.
         /// </summary>
@@ -408,9 +408,9 @@ namespace L5RGame
             try
             {
                 EnsurePipelineInitialized();
-                
+
                 pipeline.HandleProvinceClicked(player, province);
-                
+
                 if (debugPipelineSteps)
                 {
                     LogStep($"Province click handled by sub-step: {province.name}");
@@ -422,7 +422,7 @@ namespace L5RGame
                 game.ReportError(ex);
             }
         }
-        
+
         /// <summary>
         /// Handle button click events. Override in derived classes if needed.
         /// </summary>
@@ -434,9 +434,9 @@ namespace L5RGame
             try
             {
                 EnsurePipelineInitialized();
-                
+
                 pipeline.HandleButtonClicked(player, buttonId, args);
-                
+
                 if (debugPipelineSteps)
                 {
                     LogStep($"Button click handled by sub-step: {buttonId}");
@@ -448,11 +448,11 @@ namespace L5RGame
                 game.ReportError(ex);
             }
         }
-        
+
         #endregion
-        
+
         #region Pipeline Event Handlers
-        
+
         /// <summary>
         /// Called when a sub-step starts
         /// </summary>
@@ -463,10 +463,10 @@ namespace L5RGame
             {
                 LogStep($"Sub-step started: {step.GetDebugInfo()}");
             }
-            
+
             OnSubStepStarted?.Invoke(this, step);
         }
-        
+
         /// <summary>
         /// Called when a sub-step completes
         /// </summary>
@@ -474,15 +474,15 @@ namespace L5RGame
         private void OnPipelineStepCompleted(BaseStep step)
         {
             completedSteps++;
-            
+
             if (debugPipelineSteps)
             {
                 LogStep($"Sub-step completed: {step.GetDebugInfo()} ({completedSteps}/{totalSteps})");
             }
-            
+
             OnSubStepCompleted?.Invoke(this, step);
         }
-        
+
         /// <summary>
         /// Called when a sub-step encounters an error
         /// </summary>
@@ -493,7 +493,7 @@ namespace L5RGame
             LogError($"Sub-step error in {step.GetDebugInfo()}: {exception.Message}");
             OnSubStepError?.Invoke(this, step, exception);
         }
-        
+
         /// <summary>
         /// Called when the entire pipeline completes
         /// </summary>
@@ -504,11 +504,11 @@ namespace L5RGame
                 LogStep("Pipeline completed");
             }
         }
-        
+
         #endregion
-        
+
         #region Cancellation Override
-        
+
         /// <summary>
         /// Cancel this step and its pipeline
         /// </summary>
@@ -517,19 +517,19 @@ namespace L5RGame
         {
             if (!CanCancel || IsComplete)
                 return false;
-            
+
             try
             {
                 // Cancel current pipeline step
                 CancelCurrentStep();
-                
+
                 // Clear remaining pipeline
                 CancelPipeline();
-                
+
                 // Mark as complete
                 isComplete = true;
                 LogStep("Pipeline step cancelled");
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -538,11 +538,11 @@ namespace L5RGame
                 return false;
             }
         }
-        
+
         #endregion
-        
+
         #region Reset Override
-        
+
         /// <summary>
         /// Reset this step and reinitialize the pipeline
         /// </summary>
@@ -551,27 +551,27 @@ namespace L5RGame
             // Reset step state
             isComplete = false;
             hasStarted = false;
-            
+
             // Reset pipeline state
             completedSteps = 0;
             totalSteps = 0;
             pipelineInitialized = false;
-            
+
             // Clear and reinitialize pipeline
             pipeline.Clear();
-            
+
             if (autoInitializePipeline)
             {
                 InitializePipeline();
             }
-            
+
             LogStep("Pipeline step reset");
         }
-        
+
         #endregion
-        
+
         #region Debug and Utility
-        
+
         /// <summary>
         /// Get debug information including pipeline state
         /// </summary>
@@ -579,11 +579,11 @@ namespace L5RGame
         public override string GetDebugInfo()
         {
             var baseInfo = base.GetDebugInfo();
-            
+
             if (PipelineLength > 0)
             {
                 baseInfo += $" (Pipeline: {completedSteps}/{totalSteps})";
-                
+
                 if (CurrentSubStep != null)
                 {
                     baseInfo += $" [Current: {CurrentSubStep.StepName}]";
@@ -593,10 +593,10 @@ namespace L5RGame
             {
                 baseInfo += " (Pipeline: Empty)";
             }
-            
+
             return baseInfo;
         }
-        
+
         /// <summary>
         /// Get detailed debug information including pipeline contents
         /// </summary>
@@ -604,18 +604,18 @@ namespace L5RGame
         public virtual string GetDetailedPipelineDebugInfo()
         {
             var info = GetDebugInfo();
-            
+
             info += "\nPipeline Information:\n";
             info += $"  Initialized: {pipelineInitialized}\n";
             info += $"  Length: {PipelineLength}\n";
             info += $"  Progress: {PipelineProgress:P1}\n";
             info += $"  Completed Steps: {completedSteps}/{totalSteps}\n";
-            
+
             if (CurrentSubStep != null)
             {
                 info += $"  Current Step: {CurrentSubStep.GetDebugInfo()}\n";
             }
-            
+
             // List remaining steps
             var remainingSteps = pipeline.GetRemainingSteps();
             if (remainingSteps.Any())
@@ -625,16 +625,16 @@ namespace L5RGame
                 {
                     info += $"    - {step.GetDebugInfo()}\n";
                 }
-                
+
                 if (remainingSteps.Count() > 5)
                 {
                     info += $"    ... and {remainingSteps.Count() - 5} more\n";
                 }
             }
-            
+
             return info;
         }
-        
+
         /// <summary>
         /// Enable or disable pipeline debug logging
         /// </summary>
@@ -643,10 +643,10 @@ namespace L5RGame
         {
             debugPipelineSteps = enabled;
         }
-        
+
         #endregion
     }
-    
+
     /// <summary>
     /// Extension methods for BaseStepWithPipeline
     /// </summary>
@@ -659,7 +659,7 @@ namespace L5RGame
         {
             return step.PipelineLength > 0;
         }
-        
+
         /// <summary>
         /// Get pipeline completion percentage
         /// </summary>
@@ -667,7 +667,7 @@ namespace L5RGame
         {
             return step.PipelineProgress * 100f;
         }
-        
+
         /// <summary>
         /// Check if pipeline is currently processing a step
         /// </summary>
@@ -675,7 +675,7 @@ namespace L5RGame
         {
             return step.CurrentSubStep != null && step.CurrentSubStep.HasStarted && !step.CurrentSubStep.IsComplete;
         }
-        
+
         /// <summary>
         /// Get remaining step count
         /// </summary>

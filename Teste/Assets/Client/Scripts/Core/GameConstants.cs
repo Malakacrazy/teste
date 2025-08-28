@@ -304,6 +304,17 @@ namespace L5RGame
         // Cost effects
         public const string AdditionalTriggerCost = "additionalTriggerCost";
         public const string AdditionalPlayCost = "additionalPlayCost";
+        
+        // Additional effect names from Conflict.cs
+        public const string RestrictNumberOfDefenders = "restrictNumberOfDefenders";
+        public const string ForceConflictUnopposed = "forceConflictUnopposed";
+        public const string ModifyConflictElementsToResolve = "modifyConflictElementsToResolve";
+        public const string AdditionalCharactersInConflict = "additionalCharactersInConflict";
+        public const string AdditionalCardPlayed = "additionalCardPlayed";
+        public const string ContributeToConflict = "contributeToConflict";
+        public const string SetConflictTotalSkill = "setConflictTotalSkill";
+        public const string ChangeConflictSkillFunction = "changeConflictSkillFunction";
+        public const string CannotContribute = "cannotContribute";
     }
 
     /// <summary>

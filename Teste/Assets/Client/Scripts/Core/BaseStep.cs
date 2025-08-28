@@ -83,7 +83,6 @@ namespace L5RGame
         }
         
         bool IGameStep.IsComplete() => IsComplete;
-        bool IGameStep.CanCancel => CanCancel;
         
         public virtual void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
         {

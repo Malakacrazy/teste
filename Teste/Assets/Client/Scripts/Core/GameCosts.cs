@@ -8,6 +8,7 @@ namespace L5RGame
     /// </summary>
     public class GameCosts : MonoBehaviour
     {
+        public void Initialize(Game game) { }
         /// <summary>
         /// Creates a reduceable fate cost
         /// </summary>
