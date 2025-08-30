@@ -23,6 +23,9 @@ namespace L5RGame
     public class DynastyPhase : GamePhase
     {
         [Header("Dynasty Phase Settings")]
+        
+        // Phase step management
+        protected List<IGameStep> steps;
         public float cardRevealDelay = 0.5f;
         public float fateCollectionDelay = 1f;
         public bool enableRevealAnimation = true;
@@ -69,7 +72,7 @@ namespace L5RGame
         #endregion
 
         #region Phase Creation and Start
-        public override void StartPhase()
+        protected override bool StartPhase()
         {
             base.StartPhase();
             
@@ -83,6 +86,7 @@ namespace L5RGame
             this.fateCollectionComplete = false;
 
             CreatePhase();
+            return true;
         }
 
         private bool CreatePhase()
@@ -288,7 +292,7 @@ namespace L5RGame
         #endregion
 
         #region Phase Management
-        public override void EndPhase()
+        protected override bool EndPhase()
         {
             ExecutePythonScript("on_dynasty_phase_end");
             game.AddMessage("=== Dynasty Phase Ends ===");
@@ -301,6 +305,7 @@ namespace L5RGame
             }
 
             base.EndPhase();
+            return true;
         }
 
         private bool EndDynastyPhase()
@@ -422,7 +427,7 @@ namespace L5RGame
         #endregion
 
         #region IronPython Integration
-        protected override void ExecutePythonScript(string methodName, params object[] parameters)
+        protected virtual void ExecutePythonScript(string methodName, params object[] parameters)
         {
             try
             {
@@ -479,7 +484,7 @@ namespace L5RGame
     }
 
     #region Supporting Classes
-    public class FlipDynastyAction
+    public partial class FlipDynastyAction
     {
         public BaseCard targetCard;
 

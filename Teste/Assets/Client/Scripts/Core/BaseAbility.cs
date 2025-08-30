@@ -228,6 +228,16 @@ namespace L5RGame
             }
         }
         
+        /// <summary>
+        /// Get the reduced cost for this ability in the given context
+        /// </summary>
+        public virtual int GetReducedCost(AbilityContext context)
+        {
+            // Base implementation returns 0 - abilities can override this
+            // TODO: Implement proper cost reduction logic based on cost reducers and game state
+            return 0;
+        }
+        
         public virtual bool CanExecute(AbilityContext context)
         {
             if (condition != null)

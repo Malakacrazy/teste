@@ -1,13 +1,121 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace L5RGame
 {
+    /// <summary>
+    /// Base class for actions that target players
+    /// </summary>
+    public abstract class PlayerAction : GameAction
+    {
+        public Player target;
+        
+        protected PlayerAction() : base()
+        {
+        }
+        
+        public PlayerAction(Player targetPlayer) : base()
+        {
+            target = targetPlayer;
+        }
+        
+        protected PlayerAction(PlayerActionProperties properties) : base(ConvertPlayerProperties(properties))
+        {
+            if (properties?.PlayerTarget != null)
+            {
+                target = properties.PlayerTarget;
+            }
+        }
+        
+        protected PlayerAction(Func<AbilityContext, PlayerActionProperties> factory) : base((context) => ConvertPlayerProperties(factory(context)))
+        {
+            // Target will be set when the factory is called during execution
+        }
+        
+        private static GameAction.GameActionProperties ConvertPlayerProperties(PlayerActionProperties properties)
+        {
+            if (properties == null) return null;
+            return new GameAction.GameActionProperties(properties.Target, properties.CannotBeCancelled, properties.Optional);
+        }
+    }
+
+    /// <summary>
+    /// Base class for actions that target rings
+    /// </summary>
+    public abstract class RingAction : GameAction
+    {
+        public Ring target;
+        
+        protected RingAction() : base()
+        {
+        }
+        
+        public RingAction(Ring targetRing) : base()
+        {
+            target = targetRing;
+        }
+        
+        protected RingAction(GameAction.GameActionProperties properties) : base(properties)
+        {
+            // Target ring will be extracted from properties.target
+            if (properties?.target?.Count > 0 && properties.target[0] is Ring ring)
+            {
+                target = ring;
+            }
+        }
+        
+        protected RingAction(Func<AbilityContext, GameAction.GameActionProperties> factory) : base(factory)
+        {
+            // Target will be set when the factory is called during execution
+        }
+    }
+
+    /// <summary>
+    /// Base class for actions that work with tokens
+    /// </summary>
+    public abstract class TokenAction : GameAction
+    {
+        public BaseCard target;
+        public string tokenType;
+        public int amount;
+        
+        protected TokenAction() : base()
+        {
+        }
+        
+        public TokenAction(BaseCard targetCard, string token, int tokenAmount) : base()
+        {
+            target = targetCard;
+            tokenType = token;
+            amount = tokenAmount;
+        }
+        
+        protected TokenAction(L5RGame.GameActionProperties properties) : base(ConvertTokenProperties(properties))
+        {
+            // Extract token parameters from properties if available
+            if (properties?.Target?.Count > 0 && properties.Target[0] is BaseCard card)
+            {
+                target = card;
+            }
+        }
+        
+        protected TokenAction(Func<AbilityContext, L5RGame.GameActionProperties> factory) : base((context) => ConvertTokenProperties(factory(context)))
+        {
+            // Properties will be set when the factory is called during execution
+        }
+        
+        private static GameAction.GameActionProperties ConvertTokenProperties(L5RGame.GameActionProperties properties)
+        {
+            if (properties == null) return null;
+            return new GameAction.GameActionProperties(properties.Target, properties.CannotBeCancelled, properties.Optional);
+        }
+    }
     public class GameActions : MonoBehaviour
     {
         public void Initialize(Game game) { }
         
-        public GameAction GetAction(string actionName, object value) => new GameAction();
+        public GameAction GetAction(string actionName, object value) => null; // Cannot instantiate abstract GameAction
 
         /// <summary>
         /// Take fate from ring
@@ -93,13 +201,13 @@ namespace L5RGame
     public partial class GameAction
     {
         public void AddEventsToArray(List<GameEvent> events, AbilityContext context) { }
-        public void Resolve(Player player, object context) { } // Added missing method
+        public void ResolveWithPlayer(Player player, object context) { } // Renamed to avoid ambiguity
     }
     
     /// <summary>
     /// Duel action for character duels
     /// </summary>
-    public class DuelAction : GameAction
+    public partial class DuelAction : CardGameAction
     {
         public Dictionary<string, object> properties;
         
@@ -124,7 +232,7 @@ namespace L5RGame
     /// <summary>
     /// Move card action
     /// </summary>
-    public class MoveCardAction : GameAction
+    public partial class MoveCardAction : CardGameAction
     {
         public BaseCard card;
         public string targetLocation;
@@ -172,12 +280,12 @@ namespace L5RGame
     /// <summary>
     /// Gain honor action
     /// </summary>
-    public class GainHonorAction : GameAction
+    public partial class GainHonorAction : PlayerAction
     {
         public Player targetPlayer;
         public int amount;
         
-        public GainHonorAction(Player player, int honorAmount)
+        public GainHonorAction(Player player, int honorAmount) : base(player)
         {
             targetPlayer = player;
             amount = honorAmount;
@@ -196,12 +304,12 @@ namespace L5RGame
     /// <summary>
     /// Gain fate action
     /// </summary>
-    public class GainFateAction : GameAction
+    public partial class GainFateAction : PlayerAction
     {
         public Player targetPlayer;
         public int amount;
         
-        public GainFateAction(Player player, int fateAmount)
+        public GainFateAction(Player player, int fateAmount) : base(player)
         {
             targetPlayer = player;
             amount = fateAmount;
@@ -239,7 +347,7 @@ namespace L5RGame
     /// <summary>
     /// Action to reveal cards
     /// </summary>
-    public class RevealAction : GameAction
+    public partial class RevealAction : CardGameAction
     {
         public List<BaseCard> cards;
 
@@ -255,7 +363,7 @@ namespace L5RGame
     /// <summary>
     /// Action to bow cards
     /// </summary>
-    public class BowAction : GameAction
+    public partial class BowAction : CardGameAction
     {
         public List<BaseCard> cards;
 
@@ -272,10 +380,17 @@ namespace L5RGame
     /// <summary>
     /// Action for player to lose honor
     /// </summary>
-    public class LoseHonorAction : GameAction
+    public partial class LoseHonorAction : PlayerAction
     {
         public Player player;
         public int amount;
+
+        public LoseHonorAction(Player targetPlayer, int honorAmount) : base(targetPlayer)
+        {
+            player = targetPlayer;
+            amount = honorAmount;
+            actionType = "loseHonor";
+        }
 
         public override void Execute(AbilityContext context)
         {
@@ -289,10 +404,17 @@ namespace L5RGame
     /// <summary>
     /// Action to resolve conflict ring effects
     /// </summary>
-    public class ResolveConflictRingAction : GameAction
+    public partial class ResolveConflictRingAction : RingAction
     {
         public Ring ring;
         public Player player;
+
+        public ResolveConflictRingAction(Ring conflictRing, Player resolvingPlayer) : base(conflictRing)
+        {
+            ring = conflictRing;
+            player = resolvingPlayer;
+            actionType = "resolveRing";
+        }
 
         public override void Execute(AbilityContext context)
         {

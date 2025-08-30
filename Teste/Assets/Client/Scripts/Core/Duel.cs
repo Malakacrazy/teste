@@ -621,7 +621,7 @@ namespace L5RGame
         public static Duel InitiateDuel(this BaseCard challenger, BaseCard target, string duelType, 
                                        System.Func<BaseCard, int> customStatistic = null)
         {
-            var duelGO = new GameObject($"Duel_{challenger.name}_vs_{target.name}");
+            var duelGO = new UnityEngine.GameObject($"Duel_{challenger.name}_vs_{target.name}");
             duelGO.transform.SetParent(challenger.game.transform);
             
             var duel = duelGO.AddComponent<Duel>();
@@ -647,7 +647,7 @@ namespace L5RGame
                                        System.Func<BaseCard, int> customStatistic = null)
         {
             string targetNames = string.Join("_", targets.Select(t => t.name));
-            var duelGO = new GameObject($"Duel_{challenger.name}_vs_{targetNames}");
+            var duelGO = new UnityEngine.GameObject($"Duel_{challenger.name}_vs_{targetNames}");
             duelGO.transform.SetParent(challenger.game.transform);
             
             var duel = duelGO.AddComponent<Duel>();

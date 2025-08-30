@@ -24,7 +24,7 @@ namespace L5RGame
         [SerializeField] private float messageThrottleRate = 1.0f; // seconds between messages
         
         [Header("UI References")]
-        [SerializeField] private GameObject chatPanel;
+        [SerializeField] private UnityEngine.GameObject chatPanel;
         [SerializeField] private UnityEngine.UI.ScrollRect chatScrollView;
         [SerializeField] private UnityEngine.UI.InputField chatInputField;
         [SerializeField] private Transform chatMessageParent;
@@ -607,7 +607,7 @@ namespace L5RGame
         {
             // In a full implementation, this would check a mute list
             // For now, return false (no one is muted)
-            return player.HasProperty("muted") && player.GetProperty<bool>("muted");
+            return player.HasProperty("muted") && (bool)(player.GetProperty("muted") ?? false);
         }
         
         /// <summary>

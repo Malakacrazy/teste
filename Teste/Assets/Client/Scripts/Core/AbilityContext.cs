@@ -91,6 +91,16 @@ namespace L5RGame
         public Player choosingPlayerOverride = null;
         public List<GameAction> gameActionsResolutionChain = new List<GameAction>();
         public string playType;
+        
+        // Property aliases with capital letters for API compatibility
+        public Player Player => player;
+        public BaseAbility Ability => ability;
+        public object Source => source;
+        public Dictionary<string, object> Targets => targets;
+        public Dictionary<string, object> Rings => rings;
+        public Dictionary<string, object> Selects => selects;
+        public Dictionary<string, object> Tokens => tokens;
+        public object Resolver => source; // Placeholder - source acts as resolver
 
         public void Awake()
         {
@@ -154,7 +164,7 @@ namespace L5RGame
         /// <returns>New AbilityContext with modified properties</returns>
         public AbilityContext Copy(Dictionary<string, object> newProps = null)
         {
-            var copyGO = new GameObject("AbilityContext_Copy");
+            var copyGO = new UnityEngine.GameObject("AbilityContext_Copy");
             var copy = copyGO.AddComponent<AbilityContext>();
             
             copy.Initialize(GetProps());
@@ -486,7 +496,7 @@ namespace L5RGame
         /// <returns>Framework ability context</returns>
         public static AbilityContext CreateFrameworkContext(Game gameInstance, Player contextPlayer = null)
         {
-            var contextGO = new GameObject("FrameworkContext");
+            var contextGO = new UnityEngine.GameObject("FrameworkContext");
             var context = contextGO.AddComponent<AbilityContext>();
             context.Initialize(new AbilityContextProperties
             {
@@ -521,7 +531,7 @@ namespace L5RGame
         /// <returns>Card ability context</returns>
         public static AbilityContext CreateCardContext(Game gameInstance, BaseCard sourceCard, Player contextPlayer, BaseAbility cardAbility)
         {
-            var contextGO = new GameObject("CardContext");
+            var contextGO = new UnityEngine.GameObject("CardContext");
             var context = contextGO.AddComponent<AbilityContext>();
             context.Initialize(new AbilityContextProperties
             {
@@ -567,7 +577,7 @@ namespace L5RGame
         /// <returns>Ring effect context</returns>
         public static AbilityContext CreateRingContext(Game gameInstance, Ring sourceRing, Player contextPlayer)
         {
-            var contextGO = new GameObject("RingContext");
+            var contextGO = new UnityEngine.GameObject("RingContext");
             var context = contextGO.AddComponent<AbilityContext>();
             context.Initialize(new AbilityContextProperties
             {

@@ -306,7 +306,7 @@ namespace L5RGame
                         { "card", context.source },
                         { "context", context }
                     },
-                    () => { if (context.GetTarget("target") is BaseCard card) card.covert = true; return true; }
+                    () => { if (context.GetTarget("target") is BaseCard card) card.covert = true; }
                 );
                 events.Add(initiateEvent);
             }
@@ -844,15 +844,13 @@ namespace L5RGame
     /// <summary>
     /// Prompt for selecting defenders
     /// </summary>
-    public class SelectDefendersPrompt : IGameStep
+    public class SelectDefendersPrompt : BaseStep
     {
-        private Game game;
         private Player player;
         private Conflict conflict;
 
-        public SelectDefendersPrompt(Game game, Player player, Conflict conflict)
+        public SelectDefendersPrompt(Game game, Player player, Conflict conflict) : base(game)
         {
-            this.game = game;
             this.player = player;
             this.conflict = conflict;
         }

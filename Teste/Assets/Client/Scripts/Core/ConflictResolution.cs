@@ -12,15 +12,18 @@ namespace L5RGame
     /// Works in conjunction with ConflictFlow for the complete conflict pipeline.
     /// </summary>
     [System.Serializable]
-    public class ConflictResolution : IGameStep
+    public class ConflictResolution : BaseStep
     {
         [Header("Resolution Configuration")]
         [SerializeField] private bool enableDetailedLogging = true;
         [SerializeField] private bool allowManualOverride = false;
         
         // Dependencies
-        private Game game;
         public Conflict conflict;
+        
+        public ConflictResolution(Game gameInstance) : base(gameInstance)
+        {
+        }
         
         // Resolution state
         private int finalAttackerSkill;
@@ -52,9 +55,8 @@ namespace L5RGame
         
         #region Constructors
         
-        public ConflictResolution(Game game, Conflict conflict)
+        public ConflictResolution(Game game, Conflict conflict) : base(game)
         {
-            this.game = game ?? throw new ArgumentNullException(nameof(game));
             this.conflict = conflict ?? throw new ArgumentNullException(nameof(conflict));
             
             Initialize();

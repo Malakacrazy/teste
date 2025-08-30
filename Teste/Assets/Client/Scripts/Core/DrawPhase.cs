@@ -25,6 +25,9 @@ namespace L5RGame
     public class DrawPhase : GamePhase
     {
         [Header("Draw Phase Settings")]
+        
+        // Phase step management  
+        protected List<IGameStep> steps;
         public float honorBidTimeout = 30f;
         public float honorRevealDelay = 2f;
         public float cardDrawDelay = 1f;
@@ -74,7 +77,7 @@ namespace L5RGame
         #endregion
 
         #region Phase Execution
-        public override void StartPhase()
+        protected override bool StartPhase()
         {
             base.StartPhase();
             
@@ -96,6 +99,7 @@ namespace L5RGame
             }
 
             BeginDrawPhase();
+            return true;
         }
 
         private bool BeginDrawPhase()
@@ -391,7 +395,7 @@ namespace L5RGame
         #endregion
 
         #region Phase Management
-        public override void EndPhase()
+        protected override bool EndPhase()
         {
             ExecutePythonScript("on_draw_phase_end");
             game.AddMessage("=== Draw Phase Ends ===");
@@ -404,6 +408,7 @@ namespace L5RGame
             }
 
             base.EndPhase();
+            return true;
         }
 
         private bool EndDrawPhase()
@@ -455,7 +460,7 @@ namespace L5RGame
         #endregion
 
         #region IronPython Integration
-        protected override void ExecutePythonScript(string methodName, params object[] parameters)
+        protected virtual void ExecutePythonScript(string methodName, params object[] parameters)
         {
             try
             {

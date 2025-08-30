@@ -100,7 +100,7 @@ namespace L5RGame
         /// <returns>New deck instance</returns>
         public static Deck Create(DeckData deckData)
         {
-            var deckGO = new GameObject($"Deck_{deckData.name}");
+            var deckGO = new UnityEngine.GameObject($"Deck_{deckData.name}");
             var deck = deckGO.AddComponent<Deck>();
             deck.Initialize(deckData);
             return deck;
@@ -230,7 +230,7 @@ namespace L5RGame
             System.Type cardClass = GetCardClass(cardData.id) ?? typeof(T);
 
             // Create GameObject for the card
-            var cardGO = new GameObject($"{cardData.name}_{Guid.NewGuid().ToString("N")[..8]}");
+            var cardGO = new UnityEngine.GameObject($"{cardData.name}_{Guid.NewGuid().ToString("N")[..8]}");
             cardGO.transform.SetParent(player.transform);
 
             // Add the appropriate card component

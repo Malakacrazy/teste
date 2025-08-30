@@ -241,6 +241,7 @@ namespace L5RGame
     /// </summary>
     public static class Locations
     {
+        public const string Any = "any";
         public const string Hand = "hand";
         public const string PlayArea = "play area";
         public const string DynastyDiscardPile = "dynasty discard pile";
@@ -288,7 +289,7 @@ namespace L5RGame
         public const string Role = CardTypesConstants.Role;
     }
 
-    public static class EffectNames
+    public static partial class EffectNames
     {
         public const string ModifyMilitarySkill = EffectNamesConstants.ModifyMilitarySkill;
         public const string ModifyPoliticalSkill = EffectNamesConstants.ModifyPoliticalSkill;

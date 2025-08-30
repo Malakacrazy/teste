@@ -6,198 +6,470 @@ using UnityEngine;
 namespace L5RGame
 {
     /// <summary>
-    /// Base class for objects that can be sources of effects (cards, rings, etc.)
+    /// Base class inherited by Ring and BaseCard that provides effect management capabilities.
+    /// Also represents Framework effects that are not tied to specific game objects.
     /// </summary>
     public class EffectSource : MonoBehaviour
     {
         [Header("Effect Source")]
-        public string uuid;
-        public string name;
-        public Game game;
-        
-        protected List<object> effects = new List<object>();
-        protected List<object> lastingEffects = new List<object>();
+        public List<object> activeEffects = new List<object>();
+        protected Game game;
         
         /// <summary>
-        /// Initialize the effect source
+        /// Initialize the EffectSource
         /// </summary>
-        public virtual void Initialize(Game gameInstance, string sourceName)
+        /// <param name="gameInstance">The game instance</param>
+        /// <param name="sourceName">Name of the effect source (defaults to "Framework effect")</param>
+        public virtual void Initialize(Game gameInstance, string sourceName = "Framework effect")
         {
             game = gameInstance;
             name = sourceName;
-            uuid = System.Guid.NewGuid().ToString();
+            activeEffects = new List<object>();
         }
-        
+
         /// <summary>
-        /// Check restrictions for this effect source
+        /// Applies an immediate effect which lasts until the end of the current duel.
         /// </summary>
-        public virtual bool CheckRestrictions(string actionType, AbilityContext context)
+        /// <param name="propertyFactory">Function that creates effect properties using AbilityDsl</param>
+        public void UntilEndOfDuel(System.Func<AbilityDsl, EffectProperties> propertyFactory)
         {
-            // Base implementation - can be overridden
-            return true;
+            var properties = propertyFactory(new AbilityDsl());
+            properties.duration = Durations.UntilEndOfDuel;
+            properties.location = Locations.Any;
+            AddEffectToEngine(properties);
         }
-        
+
         /// <summary>
-        /// Get effects of a specific type
+        /// Applies an immediate effect which lasts until the end of the current conflict.
         /// </summary>
-        public List<object> GetEffects(string effectName)
+        /// <param name="propertyFactory">Function that creates effect properties using AbilityDsl</param>
+        public void UntilEndOfConflict(System.Func<AbilityDsl, EffectProperties> propertyFactory)
         {
-            return effects.Where(effect => GetEffectType(effect) == effectName).ToList();
+            var properties = propertyFactory(new AbilityDsl());
+            properties.duration = Durations.UntilEndOfConflict;
+            properties.location = Locations.Any;
+            AddEffectToEngine(properties);
         }
-        
+
         /// <summary>
-        /// Get raw effects list
+        /// Applies an immediate effect which lasts until the end of the phase.
         /// </summary>
-        public List<object> GetRawEffects()
+        /// <param name="propertyFactory">Function that creates effect properties using AbilityDsl</param>
+        public void UntilEndOfPhase(System.Func<AbilityDsl, EffectProperties> propertyFactory)
         {
-            return effects.ToList();
+            var properties = propertyFactory(new AbilityDsl());
+            properties.duration = Durations.UntilEndOfPhase;
+            properties.location = Locations.Any;
+            AddEffectToEngine(properties);
         }
-        
+
         /// <summary>
-        /// Check if any effect of a specific type exists
+        /// Applies an immediate effect which lasts until the end of the round.
         /// </summary>
-        public bool AnyEffect(string effectName)
+        /// <param name="propertyFactory">Function that creates effect properties using AbilityDsl</param>
+        public void UntilEndOfRound(System.Func<AbilityDsl, EffectProperties> propertyFactory)
         {
-            return effects.Any(effect => GetEffectType(effect) == effectName);
+            var properties = propertyFactory(new AbilityDsl());
+            properties.duration = Durations.UntilEndOfRound;
+            properties.location = Locations.Any;
+            AddEffectToEngine(properties);
         }
-        
+
         /// <summary>
-        /// Get the most recent effect of a specific type
+        /// Applies an immediate effect which lasts until the current player passes priority.
         /// </summary>
-        public object MostRecentEffect(string effectName)
+        /// <param name="propertyFactory">Function that creates effect properties using AbilityDsl</param>
+        public void UntilPassPriority(System.Func<AbilityDsl, EffectProperties> propertyFactory)
         {
-            return effects.LastOrDefault(effect => GetEffectType(effect) == effectName);
+            var properties = propertyFactory(new AbilityDsl());
+            properties.duration = Durations.UntilPassPriority;
+            properties.location = Locations.Any;
+            AddEffectToEngine(properties);
         }
-        
+
         /// <summary>
-        /// Add an effect to the game engine
+        /// Applies an immediate effect which lasts until the opponent passes priority.
         /// </summary>
-        public object AddEffectToEngine(object effect)
+        /// <param name="propertyFactory">Function that creates effect properties using AbilityDsl</param>
+        public void UntilOpponentPassPriority(System.Func<AbilityDsl, EffectProperties> propertyFactory)
         {
-            // Placeholder - would integrate with EffectEngine
-            effects.Add(effect);
-            return effect;
+            var properties = propertyFactory(new AbilityDsl());
+            properties.duration = Durations.UntilOpponentPassPriority;
+            properties.location = Locations.Any;
+            AddEffectToEngine(properties);
         }
-        
+
         /// <summary>
-        /// Remove an effect from the game engine
+        /// Applies an immediate effect which lasts until the next time any player passes priority.
         /// </summary>
-        public void RemoveEffectFromEngine(object effectReference)
+        /// <param name="propertyFactory">Function that creates effect properties using AbilityDsl</param>
+        public void UntilNextPassPriority(System.Func<AbilityDsl, EffectProperties> propertyFactory)
         {
-            if (effectReference != null)
+            var properties = propertyFactory(new AbilityDsl());
+            properties.duration = Durations.UntilNextPassPriority;
+            properties.location = Locations.Any;
+            AddEffectToEngine(properties);
+        }
+
+        /// <summary>
+        /// Applies a lasting effect which lasts until an event contained in the
+        /// 'until' property for the effect has occurred.
+        /// </summary>
+        /// <param name="propertyFactory">Function that creates effect properties using AbilityDsl</param>
+        public void LastingEffect(System.Func<AbilityDsl, EffectProperties> propertyFactory)
+        {
+            var properties = propertyFactory(new AbilityDsl());
+            properties.duration = Durations.Custom;
+            properties.location = Locations.Any;
+            AddEffectToEngine(properties);
+        }
+
+        /// <summary>
+        /// Adds a persistent/lasting/delayed effect to the effect engine.
+        /// </summary>
+        /// <param name="properties">Properties for the effect</param>
+        /// <returns>List of effect references that were added</returns>
+        public List<object> AddEffectToEngine(EffectProperties properties)
+        {
+            var effect = properties.effect;
+            var effectProperties = ClonePropertiesWithoutEffect(properties);
+            
+            List<object> addedEffects;
+
+            if (effect is List<object> effectList)
             {
-                effects.Remove(effectReference);
+                // Handle multiple effects
+                addedEffects = effectList.Select(factory =>
+                {
+                    var effectInstance = CreateEffectInstance(factory, effectProperties);
+                    return (object)game.effectEngine.Add(effectInstance as GameEffect);
+                }).ToList();
+            }
+            else
+            {
+                // Handle single effect
+                var effectInstance = CreateEffectInstance(effect, effectProperties);
+                addedEffects = new List<object> { game.effectEngine.Add(effectInstance as GameEffect) };
+            }
+
+            // Track active effects for cleanup
+            activeEffects.AddRange(addedEffects);
+            
+            return addedEffects;
+        }
+
+        /// <summary>
+        /// Creates an effect instance from a factory function or direct effect
+        /// </summary>
+        /// <param name="factory">Effect factory or direct effect</param>
+        /// <param name="properties">Effect properties</param>
+        /// <returns>Effect instance</returns>
+        private object CreateEffectInstance(object factory, EffectProperties properties)
+        {
+            if (factory is System.Func<Game, EffectSource, EffectProperties, object> effectFactory)
+            {
+                return effectFactory(game, this, properties);
+            }
+            else if (factory is IEffectFactory factoryInterface)
+            {
+                return factoryInterface.Create(game, this, properties);
+            }
+            else
+            {
+                // Direct effect object
+                return factory;
             }
         }
-        
+
         /// <summary>
-        /// Remove all lasting effects
+        /// Clones effect properties without the effect field
+        /// </summary>
+        /// <param name="original">Original properties</param>
+        /// <returns>Cloned properties without effect</returns>
+        private EffectProperties ClonePropertiesWithoutEffect(EffectProperties original)
+        {
+            return new EffectProperties
+            {
+                duration = original.duration,
+                location = original.location,
+                condition = original.condition,
+                match = original.match,
+                targetController = original.targetController,
+                until = original.until,
+                multipleTrigger = original.multipleTrigger,
+                when = original.when
+                // Note: effect is intentionally omitted
+            };
+        }
+
+        /// <summary>
+        /// Removes specific effects from the effect engine.
+        /// </summary>
+        /// <param name="effectArray">Array of effects to remove</param>
+        public void RemoveEffectFromEngine(List<object> effectArray)
+        {
+            if (effectArray == null || effectArray.Count == 0) return;
+
+            game.effectEngine.UnapplyAndRemove(effect => effectArray.Contains(effect));
+            
+            // Remove from our active effects tracking
+            foreach (var effect in effectArray)
+            {
+                activeEffects.Remove(effect);
+            }
+        }
+
+        /// <summary>
+        /// Removes all lasting effects originating from this source.
         /// </summary>
         public void RemoveLastingEffects()
         {
-            foreach (var effect in lastingEffects.ToList())
+            game.effectEngine.RemoveLastingEffects(this);
+            
+            // Clear our tracking list since all effects from this source are removed
+            activeEffects.Clear();
+        }
+
+        /// <summary>
+        /// Gets all active effects from this source
+        /// </summary>
+        /// <returns>List of active effects</returns>
+        public List<object> GetActiveEffects()
+        {
+            return activeEffects.ToList();
+        }
+
+        /// <summary>
+        /// Removes a specific effect from tracking (called by effect engine)
+        /// </summary>
+        /// <param name="effect">Effect to stop tracking</param>
+        public void StopTrackingEffect(object effect)
+        {
+            activeEffects.Remove(effect);
+        }
+
+        /// <summary>
+        /// Checks if this source has any active effects
+        /// </summary>
+        /// <returns>True if there are active effects</returns>
+        public bool HasActiveEffects()
+        {
+            return activeEffects.Count > 0;
+        }
+
+        /// <summary>
+        /// Gets the number of active effects from this source
+        /// </summary>
+        /// <returns>Number of active effects</returns>
+        public int GetActiveEffectCount()
+        {
+            return activeEffects.Count;
+        }
+
+        /// <summary>
+        /// Creates a temporary effect that lasts for a specific number of rounds
+        /// </summary>
+        /// <param name="rounds">Number of rounds the effect should last</param>
+        /// <param name="propertyFactory">Function that creates effect properties</param>
+        public void ForRounds(int rounds, System.Func<AbilityDsl, EffectProperties> propertyFactory)
+        {
+            var properties = propertyFactory(new AbilityDsl());
+            properties.duration = Durations.Custom;
+            properties.location = Locations.Any;
+            
+            // Add until condition for specific number of rounds
+            int currentRound = game.roundNumber;
+            properties.until = new Dictionary<string, object>
             {
-                RemoveEffectFromEngine(effect);
+                {EventNames.OnRoundEnded, (System.Func<Dictionary<string, object>, bool>)(eventData =>
+                {
+                    return game.roundNumber >= currentRound + rounds;
+                })}
+            };
+            
+            AddEffectToEngine(properties);
+        }
+
+        /// <summary>
+        /// Creates an effect that lasts until a specific condition is met
+        /// </summary>
+        /// <param name="condition">Condition function that returns true when effect should end</param>
+        /// <param name="propertyFactory">Function that creates effect properties</param>
+        public void UntilCondition(System.Func<bool> condition, System.Func<AbilityDsl, EffectProperties> propertyFactory)
+        {
+            var properties = propertyFactory(new AbilityDsl());
+            properties.duration = Durations.Custom;
+            properties.location = Locations.Any;
+            
+            // Check condition on each game state change
+            properties.until = new Dictionary<string, object>
+            {
+                {EventNames.OnGameStateChanged, (System.Func<Dictionary<string, object>, bool>)(eventData => condition())}
+            };
+            
+            AddEffectToEngine(properties);
+        }
+
+        /// <summary>
+        /// Cleanup when the effect source is destroyed
+        /// </summary>
+        protected virtual void OnDestroy()
+        {
+            RemoveLastingEffects();
+        }
+
+        /// <summary>
+        /// Debug method to log all active effects from this source
+        /// </summary>
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        public void DebugLogActiveEffects()
+        {
+            Debug.Log($"🔮 {name} has {activeEffects.Count} active effects:");
+            for (int i = 0; i < activeEffects.Count; i++)
+            {
+                Debug.Log($"  {i + 1}. {activeEffects[i]?.GetType().Name ?? "null"}");
             }
-            lastingEffects.Clear();
-        }
-        
-        /// <summary>
-        /// Get the type of an effect (placeholder implementation)
-        /// </summary>
-        protected virtual string GetEffectType(object effect)
-        {
-            // Placeholder - would examine effect structure
-            var effectType = effect?.GetType().Name;
-            return effectType ?? "Unknown";
-        }
-        
-        /// <summary>
-        /// Get short summary for UI controls
-        /// </summary>
-        public virtual Dictionary<string, object> GetShortSummaryForControls(Player activePlayer)
-        {
-            return new Dictionary<string, object>
-            {
-                {"uuid", uuid},
-                {"name", name},
-                {"type", GetType().Name}
-            };
-        }
-        
-        /// <summary>
-        /// Get short summary
-        /// </summary>
-        public virtual Dictionary<string, object> GetShortSummary()
-        {
-            return new Dictionary<string, object>
-            {
-                {"name", name},
-                {"uuid", uuid}
-            };
-        }
-        
-        /// <summary>
-        /// Has keyword check (for cards that have keywords)
-        /// </summary>
-        public virtual bool HasKeyword(string keyword)
-        {
-            return false; // Override in BaseCard
         }
     }
-    
 
-    
     /// <summary>
-    /// Static class for creating common effects
+    /// Properties for creating effects
     /// </summary>
-    public static class Effects
+    [System.Serializable]
+    public class EffectProperties
     {
-        public static object AddKeyword(string keyword)
-        {
-            return new { type = "addKeyword", keyword = keyword };
-        }
-        
-        public static object AttachmentLimit(int limit)
-        {
-            return new { type = EffectNames.AttachmentLimit, limit = limit };
-        }
-        
-        public static object AttachmentMyControlOnly()
-        {
-            return new { type = EffectNames.AttachmentMyControlOnly };
-        }
-        
-        public static object AttachmentUniqueRestriction()
-        {
-            return new { type = EffectNames.AttachmentUniqueRestriction };
-        }
-        
-        public static object AttachmentFactionRestriction(List<string> factions)
-        {
-            return new { type = EffectNames.AttachmentFactionRestriction, factions = factions };
-        }
-        
-        public static object AttachmentTraitRestriction(List<string> traits)
-        {
-            return new { type = EffectNames.AttachmentTraitRestriction, traits = traits };
-        }
-        
-        public static object AttachmentRestrictTraitAmount(Dictionary<string, int> traitLimits)
-        {
-            return new { type = "attachmentRestrictTraitAmount", traitLimits = traitLimits };
-        }
-        
-        public static object AttachmentMilitarySkillModifier(int bonus)
-        {
-            return new { type = "attachmentMilitarySkillModifier", bonus = bonus };
-        }
-        
-        public static object AttachmentPoliticalSkillModifier(int bonus)
-        {
-            return new { type = "attachmentPoliticalSkillModifier", bonus = bonus };
-        }
+        public string duration = Durations.Persistent;
+        public string location = Locations.Any;
+        public object effect;
+        public object condition;
+        public object match;
+        public string targetController = Players.Any;
+        public Dictionary<string, object> until;
+        public bool multipleTrigger = false;
+        public object when;
     }
-    
 
+    /// <summary>
+    /// Interface for effect factories
+    /// </summary>
+    public interface IEffectFactory
+    {
+        object Create(Game game, EffectSource source, EffectProperties properties);
+    }
+
+    /// <summary>
+    /// AbilityDsl class for creating effects (simplified version)
+    /// </summary>
+    public class AbilityDsl
+    {
+        public EffectDsl effects => new EffectDsl();
+        public LimitDsl limit => new LimitDsl();
+        public CostDsl costs => new CostDsl();
+        public TargetDsl targets => new TargetDsl();
+    }
+
+    /// <summary>
+    /// Effect creation helpers
+    /// </summary>
+    public class EffectDsl
+    {
+        public object ModifySkill(int amount) => new SkillModifierEffect(amount);
+        public object ModifyHonor(int amount) => new HonorModifierEffect(amount);
+        public object ModifyFate(int amount) => new FateModifierEffect(amount);
+        public object AddTrait(string trait) => new AddTraitEffect(trait);
+        public object RemoveTrait(string trait) => new RemoveTraitEffect(trait);
+        public object AddFaction(string faction) => new AddFactionEffect(faction);
+        public object Blank() => new BlankEffect();
+        public object CannotParticipateInConflicts() => new CannotParticipateEffect();
+        public object CannotBeDeclaredAsAttacker() => new CannotAttackEffect();
+        public object CannotBeDeclaredAsDefender() => new CannotDefendEffect();
+    }
+
+    /// <summary>
+    /// Limit creation helpers
+    /// </summary>
+    public class LimitDsl
+    {
+        public object PerRound(int times) => new PerRoundLimit(times);
+        public object PerPhase(int times) => new PerPhaseLimit(times);
+        public object PerConflict(int times) => new PerConflictLimit(times);
+        public object Unlimited() => new UnlimitedLimit();
+    }
+
+    /// <summary>
+    /// Cost creation helpers
+    /// </summary>
+    public class CostDsl
+    {
+        public object Fate(int amount) => new FateCost(amount);
+        public object Honor(int amount) => new HonorCost(amount);
+        public object Bow() => new BowCost();
+        public object Sacrifice() => new SacrificeCost();
+    }
+
+    /// <summary>
+    /// Target creation helpers
+    /// </summary>
+    public class TargetDsl
+    {
+        public object Self() => new SelfTarget();
+        public object Character() => new CharacterTarget();
+        public object Attachment() => new AttachmentTarget();
+        public object Ring() => new RingTarget();
+    }
+
+    // Effect implementation classes (simplified)
+    public class SkillModifierEffect { public int Amount { get; } public SkillModifierEffect(int amount) { Amount = amount; } }
+    public class HonorModifierEffect { public int Amount { get; } public HonorModifierEffect(int amount) { Amount = amount; } }
+    public class FateModifierEffect { public int Amount { get; } public FateModifierEffect(int amount) { Amount = amount; } }
+    public class AddTraitEffect { public string Trait { get; } public AddTraitEffect(string trait) { Trait = trait; } }
+    public class RemoveTraitEffect { public string Trait { get; } public RemoveTraitEffect(string trait) { Trait = trait; } }
+    public class AddFactionEffect { public string Faction { get; } public AddFactionEffect(string faction) { Faction = faction; } }
+    public class BlankEffect { }
+    public class CannotParticipateEffect { }
+    public class CannotAttackEffect { }
+    public class CannotDefendEffect { }
+
+    // Limit implementation classes
+    public class PerRoundLimit { public int Times { get; } public PerRoundLimit(int times) { Times = times; } }
+    public class PerPhaseLimit { public int Times { get; } public PerPhaseLimit(int times) { Times = times; } }
+    public class PerConflictLimit { public int Times { get; } public PerConflictLimit(int times) { Times = times; } }
+    public class UnlimitedLimit { }
+
+    // Cost implementation classes - removed FateCost and HonorCost duplicates (using GameCosts.cs versions)
+    public class BowCost { }
+    public class SacrificeCost { }
+
+    // Target implementation classes
+    public class SelfTarget { }
+    public class CharacterTarget { }
+    public class AttachmentTarget { }
+    public class RingTarget { }
+
+    /// <summary>
+    /// Additional duration constants for EffectSource
+    /// </summary>
+    public static partial class Durations
+    {
+        public const string Persistent = "persistent";
+        public const string UntilEndOfConflict = "untilEndOfConflict";
+        public const string UntilEndOfPhase = "untilEndOfPhase";
+        public const string UntilEndOfRound = "untilEndOfRound";
+        public const string UntilEndOfDuel = "untilEndOfDuel";
+        public const string UntilPassPriority = "untilPassPriority";
+        public const string UntilOpponentPassPriority = "untilOpponentPassPriority";
+        public const string UntilNextPassPriority = "untilNextPassPriority";
+        public const string Custom = "custom";
+    }
+
+    /// <summary>
+    /// Additional event names for EffectSource
+    /// </summary>
+    public static partial class EventNames
+    {
+        public const string OnGameStateChanged = "onGameStateChanged";
+        public const string OnRoundEnded = "onRoundEnded";
+        public const string OnPassPriority = "onPassPriority";
+        public const string OnDuelEnded = "onDuelEnded";
+    }
 }

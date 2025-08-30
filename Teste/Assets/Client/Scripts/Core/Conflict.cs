@@ -410,7 +410,7 @@ namespace L5RGame
         /// <returns>Dummy defending player</returns>
         private Player CreateSinglePlayerDefender()
         {
-            var dummyGO = new GameObject("DummyPlayer");
+            var dummyGO = new UnityEngine.GameObject("DummyPlayer");
             dummyGO.transform.SetParent(game.transform);
             var dummy = dummyGO.AddComponent<Player>();
             
@@ -481,6 +481,26 @@ namespace L5RGame
         public bool IsAttackerTheWinner()
         {
             return winner == attackingPlayer;
+        }
+
+        /// <summary>
+        /// Check if a player is the attacker in this conflict
+        /// </summary>
+        /// <param name="player">Player to check</param>
+        /// <returns>True if player is attacker</returns>
+        public bool IsAttacker(Player player)
+        {
+            return attackingPlayer == player;
+        }
+
+        /// <summary>
+        /// Check if a player is the defender in this conflict
+        /// </summary>
+        /// <param name="player">Player to check</param>
+        /// <returns>True if player is defender</returns>
+        public bool IsDefender(Player player)
+        {
+            return defendingPlayer == player;
         }
 
     }

@@ -18,6 +18,12 @@ namespace L5RGame
 
         public ActionWindow() { }
 
+        public ActionWindow(Game game, string name)
+        {
+            this.game = game;
+            this.windowName = name;
+        }
+
         public ActionWindow(Game game, Player player = null)
         {
             this.game = game;
@@ -44,8 +50,9 @@ namespace L5RGame
             return isComplete;
         }
         
-        public bool IsComplete() => isComplete;
+        public bool IsComplete => isComplete;
         public bool CanCancel => true;
+        public string StepName => windowName ?? "ActionWindow";
 
         public void Complete()
         {
@@ -61,9 +68,20 @@ namespace L5RGame
             actionTaken = true;
         }
         
-        public void OnMenuCommand(Player player, string command, string arg, string uuid, string method) { }
-        public void OnCardClicked(Player player, BaseCard card) { }
-        public void OnRingClicked(Player player, Ring ring) { }
+        public bool CancelStep() 
+        { 
+            isComplete = true; 
+            return true; 
+        }
+        
+        public void QueueStep(IGameStep step) 
+        { 
+            // ActionWindow doesn't support queuing sub-steps by default
+        }
+        
+        public bool OnMenuCommand(Player player, string command, string arg1, string arg2) { return false; }
+        public bool OnCardClicked(Player player, BaseCard card) { return false; }
+        public bool OnRingClicked(Player player, Ring ring) { return false; }
         public void Initialize() { }
         public void Cleanup() { }
 

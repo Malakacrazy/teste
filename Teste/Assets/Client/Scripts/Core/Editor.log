@@ -1,0 +1,11 @@
+Assets\Client\Scripts\Core\InitiateAbilityEventWindow.cs(43,44): error CS1061: 'object' does not contain a definition for 'Cancelled' and no accessible extension method 'Cancelled' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
+
+Assets\Client\Scripts\Core\InitiateAbilityEventWindow.cs(55,95): error CS1503: Argument 2: cannot convert from 'object' to 'L5RGame.BaseCard'
+
+Assets\Client\Scripts\Core\InitiateAbilityEventWindow.cs(56,74): error CS1061: 'object' does not contain a definition for 'Fate' and no accessible extension method 'Fate' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
+
+Assets\Client\Scripts\Core\InitiateAbilityEventWindow.cs(57,109): error CS1061: 'Player' does not contain a definition for 'Fate' and no accessible extension method 'Fate' accepting a first argument of type 'Player' could be found (are you missing a using directive or an assembly reference?)
+
+Assets\Client\Scripts\Core\InitiateAbilityEventWindow.cs(58,49): error CS1061: 'BaseAbility' does not contain a definition for 'GetReducedCost' and no accessible extension method 'GetReducedCost' accepting a first argument of type 'BaseAbility' could be found (are you missing a using directive or an assembly reference?)
+
+Assets\Client\Scripts\Core\InitiateAbilityEventWindow.cs(67,36): error CS1061: 'object' does not contain a definition for 'CanCancel' and no accessible extension method 'CanCancel' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)

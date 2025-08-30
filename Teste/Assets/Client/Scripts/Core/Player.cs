@@ -16,7 +16,7 @@ namespace L5RGame
     {
         public static AbilityContext ContextFor(Player player, string element, bool optional)
         {
-            var context = new GameObject("AbilityContext").AddComponent<AbilityContext>();
+            var context = new UnityEngine.GameObject("AbilityContext").AddComponent<AbilityContext>();
             context.game = player.game;
             context.player = player;
             return context;
@@ -47,7 +47,7 @@ namespace L5RGame
         public int windowTimer = 10;
     }
 
-    public class Player : MonoBehaviour
+    public partial class Player : MonoBehaviour
     {
         [Header("Player Identity")]
         public UserInfo user;
@@ -142,6 +142,9 @@ namespace L5RGame
         public Dictionary<string, bool> promptedActionWindows => settings.promptedActionWindows;
         public Dictionary<string, object> timerSettings => settings.timerSettings;
         public Dictionary<string, object> optionSettings => settings.optionSettings;
+        
+        // Property aliases with capital letters for API compatibility
+        public int Fate => fate;
 
         // Placeholder methods for missing functionality
         public List<object> GetEffects(string effectName)
@@ -1030,6 +1033,88 @@ namespace L5RGame
         {
             addChoiceAction?.Invoke();
         }
+    }
+
+    // Additional player methods needed for compilation
+    public partial class Player
+    {
+        private Dictionary<string, object> properties = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Get cards currently in play for this player
+        /// </summary>
+        /// <returns>List of cards in play</returns>
+        public List<BaseCard> GetCardsInPlay()
+        {
+            return cardsInPlay.Where(c => c != null && c.IsInPlay()).ToList();
+        }
+
+        /// <summary>
+        /// Check if player has a specific property
+        /// </summary>
+        /// <param name="propertyName">Name of the property</param>
+        /// <returns>True if property exists</returns>
+        public bool HasProperty(string propertyName)
+        {
+            return properties.ContainsKey(propertyName);
+        }
+
+        /// <summary>
+        /// Get value of a player property
+        /// </summary>
+        /// <param name="propertyName">Name of the property</param>
+        /// <returns>Property value or null</returns>
+        public object GetProperty(string propertyName)
+        {
+            return properties.ContainsKey(propertyName) ? properties[propertyName] : null;
+        }
+
+        /// <summary>
+        /// Set a player property
+        /// </summary>
+        /// <param name="propertyName">Name of the property</param>
+        /// <param name="value">Value to set</param>
+        public void SetProperty(string propertyName, object value)
+        {
+            properties[propertyName] = value;
+        }
+
+        /// <summary>
+        /// Remove a player property
+        /// </summary>
+        /// <param name="propertyName">Name of the property to remove</param>
+        public void RemoveProperty(string propertyName)
+        {
+            properties.Remove(propertyName);
+        }
+
+        /// <summary>
+        /// Get all cards owned by this player
+        /// </summary>
+        /// <returns>List of all cards</returns>
+        public List<BaseCard> GetAllCards()
+        {
+            var allCards = new List<BaseCard>();
+            allCards.AddRange(hand);
+            allCards.AddRange(cardsInPlay);
+            allCards.AddRange(conflictDeck);
+            allCards.AddRange(dynastyDeck);
+            allCards.AddRange(conflictDiscardPile);
+            allCards.AddRange(dynastyDiscardPile);
+            allCards.AddRange(removedFromGame);
+            allCards.AddRange(provinceOne);
+            allCards.AddRange(provinceTwo);
+            allCards.AddRange(provinceThree);
+            allCards.AddRange(provinceFour);
+            allCards.AddRange(strongholdProvince);
+            allCards.AddRange(underneathStronghold);
+            
+            if (stronghold != null) allCards.Add(stronghold);
+            if (role != null) allCards.Add(role);
+            
+            return allCards;
+        }
+
     }
 
 

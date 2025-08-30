@@ -466,7 +466,7 @@ namespace L5RGame
                 eventObj = eventObj
             };
 
-            var contextGO = new GameObject("AbilityContext");
+            var contextGO = new UnityEngine.GameObject("AbilityContext");
             var context = contextGO.AddComponent<AbilityContext>();
             context.Initialize(contextProperties);
             return context;
@@ -487,7 +487,7 @@ namespace L5RGame
             }
             if (eventObj is GameEvent ge)
             {
-                return ge.eventName;
+                return ge.name;
             }
             // Try to get name property via reflection if available
             var nameProperty = eventObj?.GetType().GetProperty("name");
@@ -658,22 +658,31 @@ namespace L5RGame
     {
         public string Name { get; set; }
         public string EventName => Name;
-        public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
         public BaseCard Card { get; set; }
         public Ring Ring { get; set; }
         public string Phase { get; set; }
         public AbilityContext Context { get; set; }
         public bool cancelled { get; set; }
-        public bool IsCancelled => cancelled;
+        public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
         
         public void Cancel()
         {
             cancelled = true;
         }
         
-        public bool Execute()
+        public bool IsCancelled()
         {
-            return !cancelled;
+            return cancelled;
+        }
+        
+        public bool IsResolved()
+        {
+            return false; // MockGameEvent is never resolved
+        }
+        
+        public void Execute()
+        {
+            // Mock execution - do nothing
         }
     }
 

@@ -15,6 +15,12 @@ namespace L5RGame
             stepFunction = step;
         }
         
+        public SimpleStep(Game gameInstance, Func<bool> step, string stepName) : base(gameInstance)
+        {
+            stepFunction = step;
+            this.stepName = stepName;
+        }
+        
         public override bool Continue()
         {
             try

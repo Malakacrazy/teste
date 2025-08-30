@@ -1,27 +1,50 @@
-using System;
+using UnityEngine;
 
 namespace L5RGame
 {
-    /// <summary>
-    /// Prompt for ending the round
-    /// </summary>
-    public class EndRoundPrompt : BaseStep, IGameStep
+    public class EndRoundPrompt : BaseStep
     {
-        public EndRoundPrompt(Game game) : base(game)
+        private Player currentPlayer;
+        
+        public Player CurrentPlayer => currentPlayer ?? game.GetActivePlayer();
+        
+        public EndRoundPrompt(Game game) : base(game, "End Round Prompt")
         {
         }
 
-        public override bool Continue()
+        public object GetActivePrompt(Player player)
         {
-            // Simple implementation - just complete
+            return new
+            {
+                menuTitle = "",
+                buttons = new[] { new { text = "End Round" } }
+            };
+        }
+
+        public object GetWaitingPrompt()
+        {
+            return new { menuTitle = "Waiting for opponent to end the round" };
+        }
+
+        public override bool OnMenuCommand(Player player, string command, string arg1, string arg2)
+        {
+            if (player != CurrentPlayer)
+            {
+                return false;
+            }
+
+            CompletePlayer();
             return true;
         }
-
-        bool IGameStep.IsComplete() => IsComplete;
-
-        public override string GetDebugInfo()
+        
+        private void CompletePlayer()
         {
-            return "EndRoundPrompt - Waiting for round end";
+            isComplete = true;
+        }
+        
+        public override bool Execute()
+        {
+            return true;
         }
     }
 }

@@ -48,7 +48,7 @@ namespace L5RGame
         /// <summary>
         /// Current sub-step being executed
         /// </summary>
-        public BaseStep CurrentSubStep => pipeline?.CurrentStep;
+        public BaseStep CurrentSubStep => pipeline?.CurrentStep as BaseStep;
 
         /// <summary>
         /// Progress through the pipeline (0.0 to 1.0)
@@ -102,9 +102,9 @@ namespace L5RGame
             pipeline = new GamePipeline();
 
             // Subscribe to pipeline events
-            pipeline.OnStepStarted += OnPipelineStepStarted;
-            pipeline.OnStepCompleted += OnPipelineStepCompleted;
-            pipeline.OnStepError += OnPipelineStepError;
+            pipeline.OnStepStarted += (step) => OnPipelineStepStarted(step as BaseStep);
+            pipeline.OnStepCompleted += (step) => OnPipelineStepCompleted(step as BaseStep);
+            pipeline.OnStepError += (step, ex) => OnPipelineStepError(step as BaseStep, ex);
             pipeline.OnPipelineCompleted += OnPipelineCompleted;
 
             if (autoInitializePipeline)
@@ -270,7 +270,7 @@ namespace L5RGame
                 return;
             }
 
-            pipeline.InsertStep(step);
+            pipeline.InsertStep(0, step);
 
             if (debugPipelineSteps)
             {
@@ -325,7 +325,7 @@ namespace L5RGame
         /// </summary>
         /// <param name="player">Player who clicked</param>
         /// <param name="card">Card that was clicked</param>
-        public override void OnCardClicked(Player player, BaseCard card)
+        public override bool OnCardClicked(Player player, BaseCard card)
         {
             try
             {
@@ -337,11 +337,13 @@ namespace L5RGame
                 {
                     LogStep($"Card click handled by sub-step: {card.name}");
                 }
+                return true;
             }
             catch (Exception ex)
             {
                 LogError($"Error handling card click: {ex.Message}");
                 game.ReportError(ex);
+                return false;
             }
         }
 
@@ -350,7 +352,7 @@ namespace L5RGame
         /// </summary>
         /// <param name="player">Player who clicked</param>
         /// <param name="ring">Ring that was clicked</param>
-        public override void OnRingClicked(Player player, Ring ring)
+        public override bool OnRingClicked(Player player, Ring ring)
         {
             try
             {
@@ -362,11 +364,13 @@ namespace L5RGame
                 {
                     LogStep($"Ring click handled by sub-step: {ring.element}");
                 }
+                return true;
             }
             catch (Exception ex)
             {
                 LogError($"Error handling ring click: {ex.Message}");
                 game.ReportError(ex);
+                return false;
             }
         }
 
@@ -378,23 +382,25 @@ namespace L5RGame
         /// <param name="arg">Argument</param>
         /// <param name="uuid">UUID</param>
         /// <param name="method">Method</param>
-        public override void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
+        public override bool OnMenuCommand(Player player, string command, string arg1, string arg2)
         {
             try
             {
                 EnsurePipelineInitialized();
 
-                pipeline.HandleMenuCommand(player, command, new object[] { arg, uuid, method });
+                pipeline.HandleMenuCommand(player, command, arg1, arg2);
 
                 if (debugPipelineSteps)
                 {
                     LogStep($"Menu command handled by sub-step: {command}");
                 }
+                return true;
             }
             catch (Exception ex)
             {
                 LogError($"Error handling menu command: {ex.Message}");
                 game.ReportError(ex);
+                return false;
             }
         }
 
@@ -409,7 +415,7 @@ namespace L5RGame
             {
                 EnsurePipelineInitialized();
 
-                pipeline.HandleProvinceClicked(player, province);
+                pipeline.HandleProvinceClicked(player, province as ProvinceCard);
 
                 if (debugPipelineSteps)
                 {
@@ -435,7 +441,7 @@ namespace L5RGame
             {
                 EnsurePipelineInitialized();
 
-                pipeline.HandleButtonClicked(player, buttonId, args);
+                pipeline.HandleButtonClicked(player, buttonId);
 
                 if (debugPipelineSteps)
                 {

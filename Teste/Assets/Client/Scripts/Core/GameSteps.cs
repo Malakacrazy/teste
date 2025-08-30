@@ -77,34 +77,6 @@ namespace L5RGame
         }
     }
 
-    public class InitiateAbilityEventWindow : BaseStep, IGameStep
-    {
-        private List<InitiateCardAbilityEvent> events;
-
-        public InitiateAbilityEventWindow(Game game) : base(game) { }
-        public InitiateAbilityEventWindow(Game game, List<InitiateCardAbilityEvent> abilityEvents) : base(game)
-        {
-            events = abilityEvents ?? new List<InitiateCardAbilityEvent>();
-        }
-
-        public override bool Continue()
-        {
-            // Process all events and complete
-            if (events != null)
-            {
-                foreach (var eventObj in events)
-                {
-                    eventObj.Execute();
-                }
-            }
-            return true;
-        }
-
-        public override string GetDebugInfo()
-        {
-            return $"InitiateAbilityEventWindow - Events: {events?.Count ?? 0}";
-        }
-    }
 
     public class HandlerMenuPrompt : BaseStep, IGameStep
     {

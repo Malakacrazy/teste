@@ -635,6 +635,192 @@ namespace L5RGame
         /// </summary>
         public string name => printedName;
 
+        /// <summary>
+        /// Get or set fate tokens on this card
+        /// </summary>
+        public int fate
+        {
+            get => GetTokenCount("fate");
+            set 
+            {
+                int current = GetTokenCount("fate");
+                if (value > current)
+                {
+                    AddTokens("fate", value - current);
+                }
+                else if (value < current)
+                {
+                    RemoveToken("fate", current - value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Modify fate tokens on this card
+        /// </summary>
+        /// <param name="amount">Amount to modify (can be negative)</param>
+        public void ModifyFate(int amount)
+        {
+            if (amount > 0)
+            {
+                AddTokens("fate", amount);
+            }
+            else if (amount < 0)
+            {
+                RemoveToken("fate", Math.Abs(amount));
+            }
+        }
+
+        /// <summary>
+        /// Add tokens to this card
+        /// </summary>
+        /// <param name="tokenType">Type of token to add</param>
+        /// <param name="amount">Number of tokens to add</param>
+        public virtual void AddTokens(string tokenType, int amount)
+        {
+            if (amount <= 0) return;
+            
+            if (!tokens.ContainsKey(tokenType))
+            {
+                tokens[tokenType] = 0;
+            }
+            tokens[tokenType] += amount;
+        }
+
+        /// <summary>
+        /// Remove tokens from this card (method overload for single token)
+        /// </summary>
+        /// <param name="tokenType">Type of token to remove</param>
+        public virtual void RemoveToken(string tokenType)
+        {
+            RemoveToken(tokenType, 1);
+        }
+        
+        /// <summary>
+        /// Remove tokens from this card
+        /// </summary>
+        /// <param name="tokenType">Type of token to remove</param>
+        /// <param name="amount">Number of tokens to remove</param>
+        public virtual void RemoveToken(string tokenType, int amount)
+        {
+            if (tokens.ContainsKey(tokenType))
+            {
+                tokens[tokenType] = Mathf.Max(0, tokens[tokenType] - amount);
+                if (tokens[tokenType] == 0)
+                {
+                    tokens.Remove(tokenType);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get token count for a specific token type
+        /// </summary>
+        /// <param name="tokenType">Type of token to count</param>
+        /// <returns>Number of tokens</returns>
+        public virtual int GetTokenCount(string tokenType)
+        {
+            return tokens.ContainsKey(tokenType) ? tokens[tokenType] : 0;
+        }
+
+        /// <summary>
+        /// Ready this card (un-bow it)
+        /// </summary>
+        public virtual void Ready()
+        {
+            bowed = false;
+            ready = true;
+        }
+
+        /// <summary>
+        /// Bow this card
+        /// </summary>
+        public virtual void Bow()
+        {
+            bowed = true;
+            ready = false;
+        }
+
+        /// <summary>
+        /// Check if this card is an attachment
+        /// </summary>
+        /// <returns>True if card is an attachment</returns>
+        public virtual bool IsAttachment()
+        {
+            return type == CardTypes.Attachment;
+        }
+
+        /// <summary>
+        /// Check if this card is a holding
+        /// </summary>
+        /// <returns>True if card is a holding</returns>
+        public virtual bool IsHolding()
+        {
+            return type == CardTypes.Holding;
+        }
+
+        /// <summary>
+        /// Check if this card can be targeted by an ability
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <returns>True if card can be targeted</returns>
+        public virtual bool CanBeTargetedBy(AbilityContext context)
+        {
+            if (context == null) return false;
+            
+            // Basic targeting checks
+            if (facedown && type != CardTypes.Province) return false;
+            if (HasRestriction("cannotBeTargeted", context)) return false;
+            
+            return true;
+        }
+
+        /// <summary>
+        /// Check if this card readies during the ready phase
+        /// </summary>
+        /// <returns>True if card readies during ready phase</returns>
+        public virtual bool ReadiesDuringReadyPhase()
+        {
+            return bowed && !HasEffect("doesNotReady");
+        }
+
+        /// <summary>
+        /// Move this card to a specific location
+        /// </summary>
+        /// <param name="newLocation">Location to move to</param>
+        public virtual void MoveTo(string newLocation)
+        {
+            string oldLocation = location;
+            location = newLocation;
+            
+            // Update game state
+            game?.OnCardMoved(this, oldLocation, newLocation);
+        }
+
+        /// <summary>
+        /// Check if a specific game action is allowed on this card
+        /// </summary>
+        /// <param name="actionType">Type of action to check</param>
+        /// <param name="context">Game action context</param>
+        /// <returns>True if action is allowed</returns>
+        public virtual bool AllowGameAction(string actionType, object context = null)
+        {
+            // Basic action allowance checks
+            switch (actionType)
+            {
+                case "discardFromPlay":
+                    return IsInPlay() && !HasRestriction("cannotBeDiscarded", context as AbilityContext);
+                case "removeFate":
+                    return GetTokenCount("fate") > 0;
+                case "bow":
+                    return !bowed && !HasRestriction("cannotBeBowed", context as AbilityContext);
+                case "ready":
+                    return bowed;
+                default:
+                    return !HasRestriction($"cannot{char.ToUpper(actionType[0]) + actionType.Substring(1)}", context as AbilityContext);
+            }
+        }
+
         // Cleanup when destroyed
         protected virtual void OnDestroy()
         {

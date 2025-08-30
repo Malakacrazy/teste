@@ -11,6 +11,14 @@ using Microsoft.Scripting.Hosting;
 
 namespace L5RGame
 {
+    /// <summary>
+    /// Types of conflict in L5R
+    /// </summary>
+    public enum ConflictType
+    {
+        Military,
+        Political
+    }
     [Serializable]
     public class GameDetails
     {
@@ -75,7 +83,7 @@ namespace L5RGame
         public string name;
     }
 
-    public class Game : MonoBehaviour
+    public partial class Game : MonoBehaviour
     {
         // Events
         public event System.Action<string> OnGameMessage;
@@ -112,7 +120,7 @@ namespace L5RGame
 
         // Game objects
         private Dictionary<string, Player> playersAndSpectators = new Dictionary<string, Player>();
-        private Dictionary<string, Ring> rings = new Dictionary<string, Ring>();
+        public Dictionary<string, Ring> rings = new Dictionary<string, Ring>();
         private List<ConflictRecord> conflictRecord = new List<ConflictRecord>();
         private List<BaseCard> allCards = new List<BaseCard>();
         private List<BaseCard> provinceCards = new List<BaseCard>();
@@ -144,6 +152,11 @@ namespace L5RGame
         /// Gets the game actions system
         /// </summary>
         public GameActions actions => gameActions;
+        
+        /// <summary>
+        /// Gets the game actions system (uppercase alias for compatibility)
+        /// </summary>
+        public GameActions Actions => gameActions;
         
         /// <summary>
         /// Gets the game costs system  
@@ -181,7 +194,7 @@ namespace L5RGame
                 
             if (pipeline == null)
             {
-                var pipelineGO = new GameObject("GamePipeline");
+                var pipelineGO = new UnityEngine.GameObject("GamePipeline");
                 pipelineGO.transform.SetParent(transform);
                 pipeline = pipelineGO.AddComponent<GamePipeline>();
             }
@@ -200,11 +213,18 @@ namespace L5RGame
 
         private void InitializeRings()
         {
-            rings["air"] = new Ring(this, "air", "military");
-            rings["earth"] = new Ring(this, "earth", "political");
-            rings["fire"] = new Ring(this, "fire", "military");
-            rings["void"] = new Ring(this, "void", "political");
-            rings["water"] = new Ring(this, "water", "military");
+            rings["air"] = CreateRing("air", ConflictType.Military);
+            rings["earth"] = CreateRing("earth", ConflictType.Political);
+            rings["fire"] = CreateRing("fire", ConflictType.Military);
+            rings["void"] = CreateRing("void", ConflictType.Political);
+            rings["water"] = CreateRing("water", ConflictType.Military);
+        }
+
+        private Ring CreateRing(string element, ConflictType conflictType)
+        {
+            var ring = new Ring();
+            ring.Initialize(this, element, conflictType);
+            return ring;
         }
 
         private void InitializePython()
@@ -392,12 +412,12 @@ def on_trigger(card, event_name, event_data):
             gameCosts.Initialize(this);
             gameChat.Initialize(this);
             chatCommands.Initialize(this);
-            pipeline.Initialize(this);
+            pipeline.Initialize();
         }
 
         private Player CreatePlayer(PlayerDetails details, ClockSettings clocks)
         {
-            var playerGO = new GameObject($"Player_{details.user.username}");
+            var playerGO = new UnityEngine.GameObject($"Player_{details.user.username}");
             playerGO.transform.SetParent(transform);
             
             var player = playerGO.AddComponent<Player>();
@@ -408,7 +428,7 @@ def on_trigger(card, event_name, event_data):
 
         private Spectator CreateSpectator(SpectatorDetails details)
         {
-            var spectatorGO = new GameObject($"Spectator_{details.user.username}");
+            var spectatorGO = new UnityEngine.GameObject($"Spectator_{details.user.username}");
             spectatorGO.transform.SetParent(transform);
             
             var spectator = spectatorGO.AddComponent<Spectator>();
@@ -539,7 +559,7 @@ def on_trigger(card, event_name, event_data):
         public BaseCard CreateToken(BaseCard card)
         {
             // Create a spirit token (placeholder implementation)
-            var tokenGO = new GameObject($"Token_{card.name}");
+            var tokenGO = new UnityEngine.GameObject($"Token_{card.name}");
             tokenGO.transform.SetParent(transform);
             var token = tokenGO.AddComponent<BaseCard>();
             // token.Initialize(card.cardData, card.owner); // Fixed - will need proper initialization method
@@ -924,7 +944,7 @@ def on_trigger(card, event_name, event_data):
         public ActionWindow OpenActionWindow(string windowName, string windowType, System.Action onComplete = null)
         {
             // Create and configure action window
-            var windowGO = new GameObject($"ActionWindow_{windowName}");
+            var windowGO = new UnityEngine.GameObject($"ActionWindow_{windowName}");
             windowGO.transform.SetParent(transform);
             var actionWindow = windowGO.AddComponent<ActionWindow>();
             actionWindow.Initialize(this, windowName, windowType, onComplete);
@@ -1256,7 +1276,7 @@ def on_trigger(card, event_name, event_data):
         // Events
         public GameEvent GetEvent(string eventName, Dictionary<string, object> parameters, System.Func<bool> handler)
         {
-            return new GameEvent(eventName, parameters, handler);
+            return new GameEvent(eventName, parameters, (evt) => { handler?.Invoke(); });
         }
 
         public GameEvent RaiseEvent(string eventName, Dictionary<string, object> parameters = null, System.Func<bool> handler = null)
@@ -1302,7 +1322,7 @@ def on_trigger(card, event_name, event_data):
         public void RaiseMultipleInitiateAbilityEvents(List<InitiateAbilityEventProps> eventProps)
         {
             var events = eventProps.Select(eventProp => 
-                new InitiateCardAbilityEvent(eventProp.parameters, eventProp.handler)).ToList();
+                new InitiateCardAbilityEvent(eventProp.parameters, () => eventProp.handler()) as GameEvent).ToList();
             QueueStep(new InitiateAbilityEventWindow(this, events));
         }
 
@@ -1350,7 +1370,7 @@ def on_trigger(card, event_name, event_data):
             if (!allowSpectators)
                 return false;
 
-            var spectatorGO = new GameObject($"Spectator_{user.username}");
+            var spectatorGO = new UnityEngine.GameObject($"Spectator_{user.username}");
             spectatorGO.transform.SetParent(transform);
             var spectator = spectatorGO.AddComponent<Spectator>();
             spectator.Initialize(socketId, user);
@@ -1366,7 +1386,7 @@ def on_trigger(card, event_name, event_data):
             if (started || GetPlayers().Count >= 2)
                 return false;
 
-            var playerGO = new GameObject($"Player_{user.username}");
+            var playerGO = new UnityEngine.GameObject($"Player_{user.username}");
             playerGO.transform.SetParent(transform);
             var player = playerGO.AddComponent<Player>();
             player.Initialize(socketId, user, owner == user.username, this, new ClockSettings());
@@ -1722,12 +1742,8 @@ def on_trigger(card, event_name, event_data):
         public const string OnClaimRing = "onClaimRing";
         public const string OnReturnHome = "onReturnHome";
         public const string OnParticipantsReturnHome = "onParticipantsReturnHome";
-    }
-
-    public enum ConflictType
-    {
-        Military,
-        Political
+        public const string OnPhaseCreated = "onPhaseCreated";
+        public const string OnPhaseStarted = "onPhaseStarted";
     }
 
     [Serializable]
@@ -1819,6 +1835,74 @@ def on_trigger(card, event_name, event_data):
     {
         public Dictionary<string, object> parameters;
         public System.Func<bool> handler;
+    }
+
+    // Additional methods needed for compilation
+    public partial class Game
+    {
+        /// <summary>
+        /// Get all cards currently in play from all players
+        /// </summary>
+        /// <returns>List of all cards in play</returns>
+        public List<BaseCard> GetAllCardsInPlay()
+        {
+            var allCards = new List<BaseCard>();
+            foreach (var player in GetPlayers())
+            {
+                allCards.AddRange(player.GetCardsInPlay());
+            }
+            return allCards;
+        }
+
+        /// <summary>
+        /// Get all cards from all players (in play and in hands/decks)
+        /// </summary>
+        /// <returns>List of all cards</returns>
+        public List<BaseCard> GetAllCards()
+        {
+            var allCards = new List<BaseCard>();
+            foreach (var player in GetPlayers())
+            {
+                allCards.AddRange(player.GetAllCards());
+            }
+            return allCards;
+        }
+
+        /// <summary>
+        /// Get all rings in the game
+        /// </summary>
+        /// <returns>List of all rings</returns>
+        public List<Ring> GetAllRings()
+        {
+            return rings.Values.ToList();
+        }
+
+        /// <summary>
+        /// Get the currently active player
+        /// </summary>
+        public Player activePlayer
+        {
+            get
+            {
+                // Return the first player who has action phase priority
+                return GetPlayers().FirstOrDefault(p => p.actionPhasePriority) ?? GetFirstPlayer();
+            }
+        }
+
+        /// <summary>
+        /// Check if a card can be moved (with card checking)
+        /// </summary>
+        /// <param name="card">Card to check</param>
+        /// <param name="newLocation">Target location</param>
+        /// <returns>True if move is valid</returns>
+        public void OnCardMoved(BaseCard card, string oldLocation, string newLocation)
+        {
+            // Placeholder implementation for card movement tracking
+            if (card != null && !string.IsNullOrEmpty(newLocation))
+            {
+                AddMessage("{0} moved from {1} to {2}", card.name, oldLocation ?? "unknown", newLocation);
+            }
+        }
     }
 
     // Interface for game router (will be implemented by network layer)

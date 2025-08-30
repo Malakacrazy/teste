@@ -23,6 +23,9 @@ namespace L5RGame
     public class ConflictPhaseManager : GamePhase
     {
         [Header("Conflict Phase Settings")]
+        
+        // Phase step management
+        protected List<IGameStep> steps;
         public float conflictDeclarationTimeout = 30f;
         public bool enableSkipConflictOption = true;
         public bool autoPassWhenNoValidAttackers = true;
@@ -66,7 +69,7 @@ namespace L5RGame
         #endregion
 
         #region Phase Execution
-        public override void StartPhase()
+        protected override bool StartPhase()
         {
             base.StartPhase();
             
@@ -83,6 +86,7 @@ namespace L5RGame
             completedConflicts = 0;
             
             BeginConflictPhase();
+            return true;
         }
 
         private bool BeginConflictPhase()
@@ -365,7 +369,7 @@ namespace L5RGame
         #endregion
 
         #region Phase Management
-        public override void EndPhase()
+        protected override bool EndPhase()
         {
             OnAllConflictsComplete?.Invoke();
             ExecutePythonScript("on_conflict_phase_end");
@@ -380,6 +384,7 @@ namespace L5RGame
             }
 
             base.EndPhase();
+            return true;
         }
 
         private void EndConflictPhase()

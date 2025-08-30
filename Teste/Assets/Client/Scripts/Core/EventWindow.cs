@@ -10,6 +10,11 @@ namespace L5RGame
     {
         protected List<GameEvent> events;
         
+        /// <summary>
+        /// Public access to events list
+        /// </summary>
+        public List<GameEvent> Events => events;
+        
         public EventWindow(Game game) : base(game)
         {
         }
@@ -25,7 +30,18 @@ namespace L5RGame
             // Add event processing steps here
         }
 
-        bool IGameStep.IsComplete() => IsComplete;
+        /// <summary>
+        /// Remove an event from this window
+        /// </summary>
+        /// <param name="gameEvent">Event to remove</param>
+        public virtual void RemoveEvent(GameEvent gameEvent)
+        {
+            if (events != null && gameEvent != null)
+            {
+                events.Remove(gameEvent);
+            }
+        }
+
 
         public override string GetDebugInfo()
         {

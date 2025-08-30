@@ -82,21 +82,36 @@ namespace L5RGame
             return true;
         }
         
-        bool IGameStep.IsComplete() => IsComplete;
-        
-        public virtual void OnMenuCommand(Player player, string command, string arg, string uuid, string method)
+        public virtual bool CancelStep()
         {
-            // Default implementation - no handling
+            // Default implementation - can be cancelled
+            isComplete = true;
+            return true;
         }
         
-        public virtual void OnCardClicked(Player player, BaseCard card)
+        public virtual void QueueStep(IGameStep step)
         {
-            // Default implementation - no handling
+            // Default implementation - no step queuing capability
+            Debug.LogWarning($"Step {StepName} does not support queuing sub-steps");
         }
         
-        public virtual void OnRingClicked(Player player, Ring ring)
+        
+        public virtual bool OnMenuCommand(Player player, string command, string arg1, string arg2)
         {
             // Default implementation - no handling
+            return false;
+        }
+        
+        public virtual bool OnCardClicked(Player player, BaseCard card)
+        {
+            // Default implementation - no handling
+            return false;
+        }
+        
+        public virtual bool OnRingClicked(Player player, Ring ring)
+        {
+            // Default implementation - no handling
+            return false;
         }
         
         public virtual void Initialize()
