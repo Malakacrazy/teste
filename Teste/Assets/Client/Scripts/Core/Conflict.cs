@@ -502,6 +502,24 @@ namespace L5RGame
         {
             return defendingPlayer == player;
         }
+        
+        // Property aliases and missing methods for API compatibility
+        public Ring Ring => ring;
+        
+        public void SwitchType()
+        {
+            // Switch between military and political
+            declaredType = declaredType == "military" ? "political" : "military";
+        }
+        
+        public void SwitchElement(string newElement)
+        {
+            if (game.rings.ContainsKey(newElement))
+            {
+                ring = game.rings[newElement];
+                ring.conflictType = declaredType;
+            }
+        }
 
     }
 

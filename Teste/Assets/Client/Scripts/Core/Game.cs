@@ -113,6 +113,7 @@ namespace L5RGame
         public bool started = false;
         public bool playStarted = false;
         public string gameType;
+        public bool debugMode = false;
         public bool manualMode = false;
         public string currentPhase = "";
         public string password;
@@ -157,6 +158,17 @@ namespace L5RGame
         /// Gets the game actions system (uppercase alias for compatibility)
         /// </summary>
         public GameActions Actions => gameActions;
+        
+        /// <summary>
+        /// Property aliases with capital letters for API compatibility
+        /// </summary>
+        public Conflict CurrentConflict 
+        { 
+            get => currentConflict; 
+            set => currentConflict = value; 
+        }
+        public ActionWindow CurrentActionWindow => currentActionWindow;
+        public EventWindow CurrentEventWindow => currentEventWindow;
         
         /// <summary>
         /// Gets the game costs system  

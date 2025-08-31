@@ -85,6 +85,9 @@ namespace L5RGame
         public void Initialize() { }
         public void Cleanup() { }
 
+        // Property aliases for API compatibility
+        public string WindowName => windowName;
+        
         public string GetDebugInfo()
         {
             var playerInfo = currentPlayer != null ? $" ({currentPlayer.name})" : "";

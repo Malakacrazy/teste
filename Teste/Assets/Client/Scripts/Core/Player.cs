@@ -119,7 +119,7 @@ namespace L5RGame
         public Player opponent;
         public Deck deck;
         public Game game;
-        public MonoBehaviour clock;
+        public IClock clock;
         public PreparedDeck preparedDeck;
 
         // Systems
@@ -145,6 +145,28 @@ namespace L5RGame
         
         // Property aliases with capital letters for API compatibility
         public int Fate => fate;
+        public Player Opponent => opponent;
+        
+        // Player flag system for game state tracking
+        private HashSet<string> playerFlags = new HashSet<string>();
+        
+        public bool HasFlag(string flag)
+        {
+            return playerFlags.Contains(flag);
+        }
+        
+        public void SetFlag(string flag, bool value = true)
+        {
+            if (value)
+                playerFlags.Add(flag);
+            else
+                playerFlags.Remove(flag);
+        }
+        
+        public void ClearFlag(string flag)
+        {
+            playerFlags.Remove(flag);
+        }
 
         // Placeholder methods for missing functionality
         public List<object> GetEffects(string effectName)
@@ -176,7 +198,7 @@ namespace L5RGame
             game = gameInstance;
             
             // Initialize clock - placeholder
-            clock = gameObject.AddComponent<MonoBehaviour>();
+            clock = gameObject.AddComponent<Clock>();
             
             // Initialize prompt state
             promptState = new object();

@@ -576,6 +576,15 @@ namespace L5RGame
         /// <summary>
         /// Cleanup when ring is destroyed
         /// </summary>
+        // Property aliases for API compatibility
+        public string Element => element;
+        public bool Claimed => claimed;
+        public int Fate 
+        { 
+            get => fate; 
+            set => fate = value; 
+        }
+
         protected override void OnDestroy()
         {
             attachments.Clear();

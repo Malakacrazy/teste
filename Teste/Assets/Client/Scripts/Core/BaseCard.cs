@@ -821,6 +821,27 @@ namespace L5RGame
             }
         }
 
+        // Property aliases for API compatibility
+        public bool Bowed => bowed;
+        public bool IsBroken 
+        { 
+            get => isBroken; 
+            set => isBroken = value; 
+        }
+        public bool Facedown 
+        { 
+            get => facedown; 
+            set => facedown = value; 
+        }
+        public Player Controller => controller;
+        public string Location => location;
+        public int Fate => tokens.ContainsKey("fate") ? tokens["fate"] : 0;
+        
+        public void Honor() { /* TODO: Implement honor logic */ }
+        public void Dishonor() { /* TODO: Implement dishonor logic */ }
+        public void SetDefaultController(Player newController) { controller = newController; }
+        public bool CanParticipateInConflict() { return !bowed && IsInPlay(); }
+
         // Cleanup when destroyed
         protected virtual void OnDestroy()
         {
