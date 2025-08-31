@@ -4,19 +4,6 @@ using System.Collections.Generic;
 namespace L5RGame
 {
     /// <summary>
-    /// Properties for menu prompts
-    /// </summary>
-    [System.Serializable]
-    public class MenuPromptProperties
-    {
-        public string title;
-        public string text;
-        public List<MenuOption> options = new List<MenuOption>();
-        public bool canCancel = true;
-        public float timeoutSeconds = 30f;
-    }
-
-    /// <summary>
     /// Properties for handler menu prompts
     /// </summary>
     [System.Serializable]

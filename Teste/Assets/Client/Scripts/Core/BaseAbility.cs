@@ -18,6 +18,7 @@ namespace L5RGame
         public bool cannotTargetFirst = false;
         public int max = 0;
         public string maxIdentifier;
+        public bool collectiveTrigger = false;
         
         [Header("References")]
         public Game game;
@@ -133,6 +134,11 @@ namespace L5RGame
         public virtual bool IsTriggeredAbility() { return abilityType != AbilityTypes.Action; }
         public virtual bool HasLegalTargets(AbilityContext context) { return true; }
         public virtual bool CheckAllTargets(AbilityContext context) { return true; }
+        public virtual bool IsInValidLocation(AbilityContext context) 
+        { 
+            // Check if the ability can be triggered from its current location
+            return card?.location != null && card.location != Locations.Limbo;
+        }
         
         public virtual TargetResults ResolveTargets(AbilityContext context) 
         { 

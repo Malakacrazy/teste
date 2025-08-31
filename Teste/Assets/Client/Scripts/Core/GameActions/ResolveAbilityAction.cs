@@ -1,0 +1,175 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+namespace L5RGame
+{
+    public class NoCostsAbilityResolver : AbilityResolver
+    {
+        public override void Initialise()
+        {
+            Pipeline.Initialise(new List<BaseStep>
+            {
+                new SimpleStep(Game, () => CreateSnapshot()),
+                new SimpleStep(Game, () => OpenInitiateAbilityEventWindow()),
+                new SimpleStep(Game, () => RefillProvinces())
+            });
+        }
+
+        public void OpenInitiateAbilityEventWindow()
+        {
+            var events = new List<GameEvent>
+            {
+                Game.GetEvent(EventNames.OnCardAbilityInitiated, 
+                    new { card = Context.Source, ability = Context.Ability, context = Context }, 
+                    () =>
+                    {
+                        Game.QueueSimpleStep(() => ResolveTargets());
+                        Game.QueueSimpleStep(() => InitiateAbilityEffects());
+                        Game.QueueSimpleStep(() => ExecuteHandler());
+                    })
+            };
+
+            if (Context.Ability.IsTriggeredAbility() && !Context.SubResolution)
+            {
+                events.Add(Game.GetEvent(EventNames.OnCardAbilityTriggered, new
+                {
+                    player = Context.Player,
+                    card = Context.Source,
+                    context = Context
+                }));
+            }
+
+            Game.OpenEventWindow(events);
+        }
+
+        public void InitiateAbilityEffects()
+        {
+            if (Cancelled)
+            {
+                foreach (var eventObj in Events)
+                {
+                    if (eventObj is GameEvent gameEvent)
+                    {
+                        gameEvent.Cancel();
+                    }
+                }
+                return;
+            }
+            else if (Context.Ability.Max != null && !Context.SubResolution)
+            {
+                Context.Player.IncrementAbilityMax(Context.Ability.MaxIdentifier);
+            }
+
+            Context.Ability.DisplayMessage(Context, "resolves");
+            Game.OpenEventWindow(new InitiateCardAbilityEvent(
+                new { card = Context.Source, context = Context },
+                () => InitiateAbility = true));
+        }
+    }
+
+    public interface IResolveAbilityProperties : ICardActionProperties
+    {
+        CardAbility Ability { get; set; }
+        bool SubResolution { get; set; }
+        Player Player { get; set; }
+        GameEvent Event { get; set; }
+    }
+
+    public class ResolveAbilityProperties : CardActionProperties, IResolveAbilityProperties
+    {
+        public CardAbility Ability { get; set; }
+        public bool SubResolution { get; set; }
+        public Player Player { get; set; }
+        public GameEvent Event { get; set; }
+    }
+
+    public partial class ResolveAbilityAction : CardGameAction
+    {
+        #region Constructors
+        
+        public ResolveAbilityAction() : base()
+        {
+            Initialize();
+        }
+        
+        public ResolveAbilityAction(CardActionProperties properties) : base(properties)
+        {
+            Initialize();
+        }
+        
+        public ResolveAbilityAction(System.Func<AbilityContext, CardActionProperties> factory) : base(factory)
+        {
+            Initialize();
+        }
+        
+        #endregion
+        
+        #region Initialization
+        
+        protected override void Initialize()
+        {
+            base.Initialize();
+            actionName = "resolveAbility";
+            
+            defaultProperties = new ResolveAbilityProperties
+            {
+                Ability = null,
+                SubResolution = false
+            };
+        }
+        
+        #endregion
+
+        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        {
+            var properties = GetProperties(context) as IResolveAbilityProperties;
+            return ("resolve {0}'s {1} ability", new object[] { properties.Target, properties.Ability?.Title });
+        }
+
+        public override bool CanAffect(DrawCard card, AbilityContext context, object additionalProperties = null)
+        {
+            var properties = GetProperties(context, additionalProperties) as IResolveAbilityProperties;
+            var ability = properties.Ability as TriggeredAbility;
+            var player = properties.Player ?? context.Player;
+            var newContextEvent = properties.Event;
+
+            if (!base.CanAffect(card, context) || ability == null || 
+                (!properties.SubResolution && player.IsAbilityAtMax(ability.MaxIdentifier)))
+            {
+                return false;
+            }
+
+            var newContext = ability.CreateContext(player, newContextEvent);
+            if (ability.Targets.Count == 0)
+            {
+                return ability.GameAction.Count == 0 || ability.GameAction.Any(action => action.HasLegalTarget(newContext));
+            }
+
+            return ability.CanResolveTargets(newContext);
+        }
+
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        {
+            var properties = GetProperties(gameEvent.context, additionalProperties) as IResolveAbilityProperties;
+            if (properties?.Ability is TriggeredAbility ability)
+            {
+                var player = properties.Player ?? gameEvent.context.Player;
+                var newContextEvent = properties.Event;
+                var newContext = ability.CreateContext(player, newContextEvent);
+                newContext.SubResolution = properties.SubResolution;
+                gameEvent.context.Game.QueueStep(new NoCostsAbilityResolver(gameEvent.context.Game, newContext));
+                LogExecution("Resolved {0} ability for {1}", ability.Title, player.name);
+                return true;
+            }
+            return false;
+        }
+
+        public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
+        {
+            var properties = GetProperties(context, additionalProperties) as IResolveAbilityProperties;
+            return properties.Ability.HasTargetsChosenByInitiatingPlayer(context);
+        }
+    }
+}

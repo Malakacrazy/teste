@@ -1375,6 +1375,11 @@ def has_role_ability(card, ability_name):
         public int errorCount;
         public bool isLoaded;
         public List<string> availableMethods;
+
+        public void RegisterTriggeredAbilities(object context, object additionalParam)
+        {
+            // Placeholder implementation for registering triggered abilities
+        }
     }
 
     [System.Serializable]

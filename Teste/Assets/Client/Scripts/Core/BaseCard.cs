@@ -104,7 +104,7 @@ namespace L5RGame
         [Header("IronPython Integration")]
         public string scriptName;
         public bool hasCustomScript = false;
-        public PythonCardScript pythonScript;
+        public PythonScriptInfo pythonScript;
         public object reactionAbility;
         public object interruptAbility;
 
@@ -315,6 +315,42 @@ namespace L5RGame
         public virtual void Play(AbilityContext context) 
         { 
             // Placeholder implementation
+        }
+
+        /// <summary>
+        /// Get short summary for UI display
+        /// </summary>
+        /// <returns>Card summary object</returns>
+        public virtual object GetShortSummary()
+        {
+            return new 
+            {
+                id = id,
+                name = printedName,
+                type = type,
+                location = location,
+                selected = selected,
+                facedown = facedown
+            };
+        }
+
+        /// <summary>
+        /// Get short summary for control displays with player context
+        /// </summary>
+        /// <param name="player">Player viewing the controls</param>
+        /// <returns>Card summary object for controls</returns>
+        public virtual object GetShortSummaryForControls(Player player)
+        {
+            return new 
+            {
+                id = id,
+                name = printedName,
+                type = type,
+                location = location,
+                selected = selected,
+                facedown = facedown,
+                canSelect = player == controller
+            };
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -7,7 +8,7 @@ namespace L5RGame
     /// <summary>
     /// Represents a spectator in the game - someone who can watch but not participate
     /// </summary>
-    public class Spectator : MonoBehaviour
+    public class Spectator : Player
     {
         [Header("Spectator Identity")]
         public UserInfo user;
@@ -329,7 +330,8 @@ namespace L5RGame
         /// <returns>New spectator instance</returns>
         public static Spectator CreateSpectator(this Game game, UserInfo user, string socketId)
         {
-            var spectatorGO = new GameObject($"Spectator_{user.username}");
+            var spectatorGO = new UnityEngine.GameObject();
+            spectatorGO.name = $"Spectator_{user.username}";
             spectatorGO.transform.SetParent(game.transform);
             
             var spectator = spectatorGO.AddComponent<Spectator>();
@@ -345,7 +347,8 @@ namespace L5RGame
         /// <returns>New anonymous spectator instance</returns>
         public static AnonymousSpectator CreateAnonymousSpectator(this Game game)
         {
-            var spectatorGO = new GameObject("AnonymousSpectator");
+            var spectatorGO = new UnityEngine.GameObject();
+            spectatorGO.name = "AnonymousSpectator";
             spectatorGO.transform.SetParent(game.transform);
             
             var spectator = spectatorGO.AddComponent<AnonymousSpectator>();

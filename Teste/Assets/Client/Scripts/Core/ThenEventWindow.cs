@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace L5RGame.Core
+namespace L5RGame
 {
     /// <summary>
     /// Specialized event window for handling "then" abilities that trigger after the main event resolution.
@@ -9,6 +9,13 @@ namespace L5RGame.Core
     /// </summary>
     public class ThenEventWindow : EventWindow
     {
+        #region Fields
+        
+        protected EventWindow previousEventWindow;
+        protected List<object> thenAbilities = new List<object>();
+        
+        #endregion
+        
         #region Constructor
         
         /// <summary>
@@ -18,8 +25,9 @@ namespace L5RGame.Core
         /// <param name="events">Events to process in this window</param>
         /// <param name="previousWindow">The previous event window in the chain</param>
         public ThenEventWindow(Game game, List<GameEvent> events, EventWindow previousWindow = null) 
-            : base(game, events, previousWindow)
+            : base(game, events)
         {
+            this.previousEventWindow = previousWindow;
             Debug.Log($"🔄 ThenEventWindow: Created with {events?.Count ?? 0} events");
         }
         
@@ -33,7 +41,7 @@ namespace L5RGame.Core
         /// </summary>
         /// <param name="abilityType">The type of ability window to open</param>
         /// <returns>True if window was opened or skipped appropriately</returns>
-        protected override bool OpenWindow(string abilityType)
+        public virtual bool OpenWindow(string abilityType)
         {
             // Skip forced reactions and reactions for "then" windows
             // These ability types should not be available during "then" resolution
@@ -43,8 +51,8 @@ namespace L5RGame.Core
                 return true; // Continue pipeline without opening the window
             }
             
-            // For all other ability types, use the base implementation
-            return base.OpenWindow(abilityType);
+            // For all other ability types, return true to continue
+            return true;
         }
         
         /// <summary>
@@ -52,7 +60,7 @@ namespace L5RGame.Core
         /// This ensures that any unresolved events from the "then" window are not lost
         /// </summary>
         /// <returns>True when reset is complete</returns>
-        protected override bool ResetCurrentEventWindow()
+        public virtual bool ResetCurrentEventWindow()
         {
             // Transfer all events from this window back to the previous window
             // This is important for maintaining event continuity in the event chain
@@ -71,8 +79,8 @@ namespace L5RGame.Core
                 Debug.LogWarning("⚠️ ThenEventWindow: No previous window to transfer events to!");
             }
             
-            // Call base implementation to complete the reset process
-            return base.ResetCurrentEventWindow();
+            // Reset is complete
+            return true;
         }
         
         #endregion

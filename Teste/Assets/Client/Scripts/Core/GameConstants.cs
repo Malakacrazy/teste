@@ -259,6 +259,7 @@ namespace L5RGame
         public const string DynastyDeck = "dynasty deck";
         public const string ProvinceDeck = "province deck";
         public const string UnderneathStronghold = "underneath stronghold";
+        public const string Limbo = "limbo";
     }
 
     /// <summary>
@@ -275,6 +276,52 @@ namespace L5RGame
     {
         public const string Military = "military";
         public const string Political = "political";
+    }
+
+    /// <summary>
+    /// Token types for game actions
+    /// </summary>
+    public static class TokenTypes
+    {
+        public const string Fate = "fate";
+        public const string Honor = "honor";
+        public const string Status = "status";
+        public const string Dishonor = "dishonor";
+        public const string Bow = "bow";
+        public const string Ready = "ready";
+    }
+
+
+    /// <summary>
+    /// When types for lasting effects
+    /// </summary>
+    public static class WhenType
+    {
+        public const string AtStartOfPhase = "atStartOfPhase";
+        public const string AtEndOfPhase = "atEndOfPhase";
+        public const string AtStartOfRound = "atStartOfRound";
+        public const string AtEndOfRound = "atEndOfRound";
+    }
+
+    /// <summary>
+    /// Base card selector for targeting
+    /// </summary>
+    public static class BaseCardSelector
+    {
+        public const string Any = "any";
+        public const string Self = "self";
+        public const string Others = "others";
+    }
+
+    /// <summary>
+    /// Target modes for selection
+    /// </summary>
+    public static class TargetModes
+    {
+        public const string Single = "single";
+        public const string Multiple = "multiple";
+        public const string UpTo = "upTo";
+        public const string Exactly = "exactly";
     }
 
     // Backward compatibility aliases

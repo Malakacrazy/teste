@@ -165,7 +165,7 @@ namespace L5RGame
     /// <summary>
     /// Base class for triggered ability windows that handles forced abilities
     /// </summary>
-    public class ForcedTriggeredAbilityWindow : BaseStep
+    public class ForcedTriggeredAbilityWindow : BaseStep, IAbilityWindow
     {
         protected List<AbilityContext> choices = new List<AbilityContext>();
         protected List<object> events = new List<object>();
@@ -174,6 +174,21 @@ namespace L5RGame
         protected string abilityType;
         protected Player currentPlayer;
         protected List<ResolvedAbility> resolvedAbilities = new List<ResolvedAbility>();
+
+        // IAbilityWindow implementation
+        public string AbilityType => abilityType;
+        public List<object> Events => events;
+        public event Action<IAbilityWindow> OnWindowClosed;
+
+        public virtual void Open()
+        {
+            // Start processing the window
+        }
+
+        public virtual void Close()
+        {
+            OnWindowClosed?.Invoke(this);
+        }
 
         public ForcedTriggeredAbilityWindow(Game game, string abilityType, object window, List<object> eventsToExclude = null) 
             : base(game)
@@ -186,7 +201,7 @@ namespace L5RGame
 
         public override bool Continue()
         {
-            game.currentAbilityWindow = this;
+            game.currentAbilityWindow = null; // Cannot convert ForcedTriggeredAbilityWindow to AbilityWindow
             
             if (eventWindow != null)
             {
@@ -226,7 +241,7 @@ namespace L5RGame
                 return true;
             }
 
-            if (choices.Count == 1 || !currentPlayer.optionSettings.orderForcedAbilities)
+            if (choices.Count == 1 || (currentPlayer.optionSettings.ContainsKey("orderForcedAbilities") && !(bool)currentPlayer.optionSettings["orderForcedAbilities"]))
             {
                 ResolveAbility(choices[0]);
                 return false;
@@ -261,7 +276,14 @@ namespace L5RGame
                 return true;
             });
 
-            game.PromptForSelect(currentPlayer, promptProperties);
+            var selectProps = new SelectCardPromptProperties
+            {
+                activePromptTitle = promptProperties.ContainsKey("activePromptTitle") ? (string)promptProperties["activePromptTitle"] : "",
+                waitingPromptTitle = promptProperties.ContainsKey("waitingPromptTitle") ? (string)promptProperties["waitingPromptTitle"] : "",
+                cardCondition = promptProperties.ContainsKey("cardCondition") ? (Func<BaseCard, bool>)promptProperties["cardCondition"] : null,
+                onSelect = promptProperties.ContainsKey("onSelect") ? (Func<Player, BaseCard, bool>)promptProperties["onSelect"] : null
+            };
+            game.PromptForSelect(currentPlayer, selectProps);
         }
 
         /// <summary>
@@ -361,7 +383,13 @@ namespace L5RGame
             promptProperties["choices"] = menuChoices;
             promptProperties["handlers"] = handlers;
 
-            game.PromptWithHandlerMenu(currentPlayer, promptProperties);
+            var handlerProps = new HandlerMenuPromptProperties
+            {
+                activePromptTitle = "Which ability would you like to use?",
+                waitingPromptTitle = promptProperties.ContainsKey("waitingPromptTitle") ? (string)promptProperties["waitingPromptTitle"] : "",
+                handlers = handlers
+            };
+            game.PromptWithHandlerMenu(currentPlayer, handlerProps);
         }
 
         /// <summary>
@@ -408,7 +436,14 @@ namespace L5RGame
                 return false;
             });
 
-            game.PromptForSelect(currentPlayer, promptProperties);
+            var selectProps2 = new SelectCardPromptProperties
+            {
+                activePromptTitle = promptProperties.ContainsKey("activePromptTitle") ? (string)promptProperties["activePromptTitle"] : "",
+                waitingPromptTitle = promptProperties.ContainsKey("waitingPromptTitle") ? (string)promptProperties["waitingPromptTitle"] : "",
+                cardCondition = promptProperties.ContainsKey("cardCondition") ? (Func<BaseCard, bool>)promptProperties["cardCondition"] : null,
+                onSelect = promptProperties.ContainsKey("onSelect") ? (Func<Player, BaseCard, bool>)promptProperties["onSelect"] : null
+            };
+            game.PromptForSelect(currentPlayer, selectProps2);
         }
 
         /// <summary>
@@ -441,7 +476,13 @@ namespace L5RGame
             promptProperties["choices"] = menuChoices;
             promptProperties["handlers"] = handlers;
 
-            game.PromptWithHandlerMenu(currentPlayer, promptProperties);
+            var handlerProps2 = new HandlerMenuPromptProperties
+            {
+                activePromptTitle = "Choose an event to respond to",
+                waitingPromptTitle = promptProperties.ContainsKey("waitingPromptTitle") ? (string)promptProperties["waitingPromptTitle"] : "",
+                handlers = handlers
+            };
+            game.PromptWithHandlerMenu(currentPlayer, handlerProps2);
         }
 
         /// <summary>
@@ -558,7 +599,7 @@ namespace L5RGame
     /// <summary>
     /// Advanced triggered ability window that handles optional abilities and bluff prompts
     /// </summary>
-    public class TriggeredAbilityWindow : ForcedTriggeredAbilityWindow
+    public class TriggeredAbilityWindow : ForcedTriggeredAbilityWindow, IAbilityWindow
     {
         protected bool complete = false;
         protected bool prevPlayerPassed = false;
@@ -574,18 +615,18 @@ namespace L5RGame
         protected bool ShowBluffPrompt(Player player)
         {
             // Show a bluff prompt if the player has an event which could trigger (but isn't in their hand)
-            if (player.timerSettings.eventsInDeck && choices.Any(context => context.player == player))
+            if (player.timerSettings.ContainsKey("eventsInDeck") && (bool)player.timerSettings["eventsInDeck"] && choices.Any(context => context.player == player))
             {
                 return true;
             }
 
             // Show a bluff prompt if we're in Step 6, the player has the appropriate setting, and there's an event for the other player
             return abilityType == AbilityTypes.WouldInterrupt && 
-                   player.timerSettings.events && 
+                   player.timerSettings.ContainsKey("events") && (bool)player.timerSettings["events"] && 
                    events.Any(eventObj => 
                    {
                        var gameEvent = eventObj as IGameEvent;
-                       return gameEvent?.Name == EventNames.OnInitiateAbilityEffects &&
+                       return gameEvent?.Name == "OnInitiateAbilityEffects" &&
                               gameEvent.Card?.GetCardType() == CardTypes.Event &&
                               gameEvent.Context?.player != player;
                    });
@@ -655,11 +696,11 @@ namespace L5RGame
             }
 
             // Remove any choices which involve the current player canceling their own abilities
-            if (abilityType == AbilityTypes.WouldInterrupt && !currentPlayer.optionSettings.cancelOwnAbilities)
+            if (abilityType == AbilityTypes.WouldInterrupt && currentPlayer.optionSettings.ContainsKey("cancelOwnAbilities") && !(bool)currentPlayer.optionSettings["cancelOwnAbilities"])
             {
                 choices = choices.Where(context => !(
                     context.player == currentPlayer &&
-                    GetEventName(context.eventObj) == EventNames.OnInitiateAbilityEffects &&
+                    GetEventName(context.eventObj) == "OnInitiateAbilityEffects" &&
                     GetEventContext(context.eventObj)?.player == currentPlayer
                 )).ToList();
             }
@@ -700,7 +741,7 @@ namespace L5RGame
         protected override Dictionary<string, object> GetPromptForSelectProperties()
         {
             var properties = base.GetPromptForSelectProperties();
-            properties["selectCard"] = currentPlayer.optionSettings.markCardsUnselectable;
+            properties["selectCard"] = currentPlayer.optionSettings.ContainsKey("markCardsUnselectable") ? (bool)currentPlayer.optionSettings["markCardsUnselectable"] : false;
             properties["buttons"] = new List<object> { new { text = "Pass", arg = "pass" } };
             properties["onMenuCommand"] = new Func<Player, string, bool>((player, arg) =>
             {

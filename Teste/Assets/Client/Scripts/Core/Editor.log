@@ -1,19 +1,120 @@
-Assets\Client\Scripts\Core\TriggeredAbility.cs(561,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'TriggeredAbilityWindow'
-
-Assets\Client\Scripts\Core\TriggeredAbility.cs(168,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'ForcedTriggeredAbilityWindow'
-
-Assets\Client\Scripts\Core\Spectator.cs(236,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'AnonymousSpectator'
-
-Assets\Client\Scripts\Core\AbilityWindows.cs(59,18): error CS0263: Partial declarations of 'TriggeredAbilityWindow' must not specify different base classes
-
-Assets\Client\Scripts\Core\ThenEventWindow.cs(36,33): error CS0115: 'ThenEventWindow.OpenWindow(string)': no suitable method found to override
-
-Assets\Client\Scripts\Core\ThenEventWindow.cs(55,33): error CS0115: 'ThenEventWindow.ResetCurrentEventWindow()': no suitable method found to override
-
-Assets\Client\Scripts\Core\AbilityWindows.cs(105,18): error CS0263: Partial declarations of 'ForcedTriggeredAbilityWindow' must not specify different base classes
-
-Assets\Client\Scripts\Core\Game.cs(1317,16): error CS0246: The type or namespace name 'ThenEventWindow' could not be found (are you missing a using directive or an assembly reference?)
-
-Assets\Client\Scripts\Core\BaseCard.cs(107,16): error CS0246: The type or namespace name 'PythonCardScript' could not be found (are you missing a using directive or an assembly reference?)
-
-Assets\Client\Scripts\Core\AnonymousSpectator.cs(5,18): error CS0263: Partial declarations of 'AnonymousSpectator' must not specify different base classes
+Assets\Client\Scripts\Core\GameActions\SwitchConflictElementAction.cs(27,44): error CS0246: The type or namespace name 'Func<,>' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\GameActions\SwitchConflictTypeAction.cs(51,58): error CS0115: 'SwitchConflictTypeAction.GetProperties(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\ResolveConflictRingAction.cs(50,59): error CS0115: 'ResolveConflictRingAction.DefaultProperties': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\ResolveElementAction.cs(53,30): error CS0115: 'ResolveElementAction.AddEventsToArray(List<object>, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\MoveTokenAction.cs(47,44): error CS0115: 'MoveTokenAction.GetEffectMessage(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TakeFateRingAction.cs(46,52): error CS0115: 'TakeFateRingAction.DefaultProperties': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TakeFateRingAction.cs(53,44): error CS0115: 'TakeFateRingAction.GetEffectMessage(AbilityContext)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TakeFateRingAction.cs(79,33): error CS0115: 'TakeFateRingAction.CheckEventCondition(object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TakeFateRingAction.cs(84,33): error CS0115: 'TakeFateRingAction.IsEventFullyResolved(object, Ring, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\CancelAction.cs(192,33): error CS0508: 'CancelAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\ReturnToDeckAction.cs(162,33): error CS0508: 'ReturnToDeckAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\PlaceFateAction.cs(11,26): error CS0263: Partial declarations of 'PlaceFateAction' must not specify different base classes
+Assets\Client\Scripts\Core\GameActions\TakeRingAction.cs(47,48): error CS0115: 'TakeRingAction.DefaultProperties': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\InitiateConflictAction.cs(67,38): error CS0507: 'InitiateConflictAction.DefaultTargets(AbilityContext)': cannot change access modifiers when overriding 'protected' inherited member 'PlayerAction.DefaultTargets(AbilityContext)'
+Assets\Client\Scripts\Core\GameActions\TokenAction.cs(58,33): error CS0115: 'TokenAction.CheckEventCondition(object, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\ReturnToHandAction.cs(112,33): error CS0508: 'ReturnToHandAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\TransferFateAction.cs(46,52): error CS0115: 'TransferFateAction.DefaultProperties': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TransferFateAction.cs(59,44): error CS0115: 'TransferFateAction.GetEffectMessage(AbilityContext)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TransferFateAction.cs(65,30): error CS0115: 'TransferFateAction.CanAffect(Player, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TransferFateAction.cs(72,33): error CS0115: 'TransferFateAction.AddPropertiesToEvent(object, Player, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TransferFateAction.cs(85,33): error CS0115: 'TransferFateAction.CheckEventCondition(object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\PlaceFateRingAction.cs(48,53): error CS0115: 'PlaceFateRingAction.DefaultProperties': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\PlaceFateRingAction.cs(61,44): error CS0115: 'PlaceFateRingAction.GetEffectMessage(AbilityContext)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\PlaceFateRingAction.cs(118,33): error CS0115: 'PlaceFateRingAction.CheckEventCondition(object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\PlaceFateRingAction.cs(123,33): error CS0115: 'PlaceFateRingAction.IsEventFullyResolved(object, Ring, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\RevealAction.cs(112,33): error CS0508: 'RevealAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\CardGameAction.cs(27,19): error CS0111: Type 'CardGameAction' already defines a member called 'CardGameAction' with the same parameter types
+Assets\Client\Scripts\Core\GameActions\CardGameAction.cs(32,19): error CS0111: Type 'CardGameAction' already defines a member called 'CardGameAction' with the same parameter types
+Assets\Client\Scripts\Core\GameActions\CardGameAction.cs(37,19): error CS0111: Type 'CardGameAction' already defines a member called 'CardGameAction' with the same parameter types
+Assets\Client\Scripts\Core\GameActions\CardMenuAction.cs(39,26): error CS0263: Partial declarations of 'CardMenuAction' must not specify different base classes
+Assets\Client\Scripts\Core\GameActions\PlayCardAction.cs(25,30): error CS0506: 'PlayCardResolver.CheckForCancel()': cannot override inherited member 'AbilityResolver.CheckForCancel()' because it is not marked virtual, abstract, or override
+Assets\Client\Scripts\Core\GameActions\PlayCardAction.cs(36,30): error CS0506: 'PlayCardResolver.PayCosts()': cannot override inherited member 'AbilityResolver.PayCosts()' because it is not marked virtual, abstract, or override
+Assets\Client\Scripts\Core\GameActions\PlayCardAction.cs(47,30): error CS0506: 'PlayCardResolver.ExecuteHandler()': cannot override inherited member 'AbilityResolver.ExecuteHandler()' because it is not marked virtual, abstract, or override
+Assets\Client\Scripts\Core\GameActions\RingAction.cs(53,33): error CS0115: 'RingAction.CheckEventCondition(object, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TransferHonorAction.cs(48,53): error CS0115: 'TransferHonorAction.DefaultProperties': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TransferHonorAction.cs(62,44): error CS0115: 'TransferHonorAction.GetEffectMessage(AbilityContext)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TransferHonorAction.cs(68,30): error CS0115: 'TransferHonorAction.CanAffect(Player, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\TransferHonorAction.cs(74,33): error CS0115: 'TransferHonorAction.AddPropertiesToEvent(object, Player, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\PlayCardAction.cs(111,48): error CS0115: 'PlayCardAction.GetProperties(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\PlayCardAction.cs(116,30): error CS0115: 'PlayCardAction.CanAffect(DrawCard, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\PlayCardAction.cs(144,30): error CS0115: 'PlayCardAction.AddEventsToArray(List<object>, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\PlayCardAction.cs(201,33): error CS0115: 'PlayCardAction.CheckEventCondition(object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\AddTokenAction.cs(11,26): error CS0263: Partial declarations of 'AddTokenAction' must not specify different base classes
+Assets\Client\Scripts\Core\GameActions\PutIntoPlayAction.cs(175,33): error CS0508: 'PutIntoPlayAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\AttachAction.cs(159,33): error CS0508: 'AttachAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\DeckSearchAction.cs(159,33): error CS0508: 'DeckSearchAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\SelectCardAction.cs(38,44): error CS0722: 'BaseCardSelector': static types cannot be used as return types
+Assets\Client\Scripts\Core\GameActions\SelectCardAction.cs(38,49): error CS0721: 'BaseCardSelector': static types cannot be used as parameters
+Assets\Client\Scripts\Core\GameActions\SelectCardAction.cs(39,36): error CS0722: 'TargetModes': static types cannot be used as return types
+Assets\Client\Scripts\Core\GameActions\SelectCardAction.cs(39,41): error CS0721: 'TargetModes': static types cannot be used as parameters
+Assets\Client\Scripts\Core\GameActions\DiscardFromPlayAction.cs(159,33): error CS0508: 'DiscardFromPlayAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\SelectCardAction.cs(26,63): error CS0738: 'SelectCardProperties' does not implement interface member 'ISelectCardProperties.Selector'. 'SelectCardProperties.Selector' cannot implement 'ISelectCardProperties.Selector' because it does not have the matching return type of 'string'.
+Assets\Client\Scripts\Core\GameActions\LastingEffectAction.cs(61,53): error CS0115: 'LastingEffectAction.DefaultProperties': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\LastingEffectAction.cs(69,53): error CS0115: 'LastingEffectAction.GetProperties(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\LastingEffectAction.cs(81,30): error CS0115: 'LastingEffectAction.HasLegalTarget(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\LastingEffectAction.cs(88,30): error CS0115: 'LastingEffectAction.AddEventsToArray(List<object>, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\SelectCardAction.cs(44,26): error CS0263: Partial declarations of 'SelectCardAction' must not specify different base classes
+Assets\Client\Scripts\Core\GameActions\ChooseGameAction.cs(34,52): error CS0115: 'ChooseGameAction.DefaultProperties': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\ChooseGameAction.cs(64,52): error CS0115: 'ChooseGameAction.GetProperties(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\ChooseGameAction.cs(74,30): error CS0115: 'ChooseGameAction.HasLegalTarget(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\ChooseGameAction.cs(80,30): error CS0115: 'ChooseGameAction.AddEventsToArray(List<object>, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\ChooseGameAction.cs(115,30): error CS0115: 'ChooseGameAction.CanAffect(object, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\ChooseGameAction.cs(121,30): error CS0115: 'ChooseGameAction.HasTargetsChosenByInitiatingPlayer(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\LastingEffectCardAction.cs(13,48): error CS0246: The type or namespace name 'LastingEffectGeneralProperties' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\GameActions\ChosenDiscardAction.cs(167,33): error CS0508: 'ChosenDiscardAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\RandomDiscardAction.cs(123,33): error CS0508: 'RandomDiscardAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\ModifyBidAction.cs(67,38): error CS0507: 'ModifyBidAction.DefaultTargets(AbilityContext)': cannot change access modifiers when overriding 'protected' inherited member 'PlayerAction.DefaultTargets(AbilityContext)'
+Assets\Client\Scripts\Core\GameActions\ModifyBidAction.cs(72,44): error CS0115: 'ModifyBidAction.GetEffectMessage(AbilityContext)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\ModifyBidAction.cs(154,33): error CS0115: 'ModifyBidAction.AddPropertiesToEvent(object, Player, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\DuelAction.cs(171,33): error CS0508: 'DuelAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\DuelAction.cs(20,30): error CS0723: Cannot declare a variable of static type 'DuelTypes'
+Assets\Client\Scripts\Core\GameActions\RefillFaceupAction.cs(49,38): error CS0507: 'RefillFaceupAction.DefaultTargets(AbilityContext)': cannot change access modifiers when overriding 'protected' inherited member 'PlayerAction.DefaultTargets(AbilityContext)'
+Assets\Client\Scripts\Core\GameActions\LastingEffectCardAction.cs(13,80): error CS0535: 'LastingEffectCardProperties' does not implement interface member 'ILastingEffectGeneralProperties.Duration'
+Assets\Client\Scripts\Core\GameActions\LastingEffectCardAction.cs(13,80): error CS0535: 'LastingEffectCardProperties' does not implement interface member 'ILastingEffectGeneralProperties.Condition'
+Assets\Client\Scripts\Core\GameActions\LastingEffectCardAction.cs(13,80): error CS0535: 'LastingEffectCardProperties' does not implement interface member 'ILastingEffectGeneralProperties.Until'
+Assets\Client\Scripts\Core\GameActions\LastingEffectCardAction.cs(13,80): error CS0535: 'LastingEffectCardProperties' does not implement interface member 'ILastingEffectGeneralProperties.Effect'
+Assets\Client\Scripts\Core\GameActions\LastingEffectCardAction.cs(13,80): error CS0535: 'LastingEffectCardProperties' does not implement interface member 'IGameActionProperties.Target'
+Assets\Client\Scripts\Core\GameActions\LastingEffectCardAction.cs(13,80): error CS0535: 'LastingEffectCardProperties' does not implement interface member 'IGameActionProperties.CannotBeCancelled'
+Assets\Client\Scripts\Core\GameActions\LastingEffectCardAction.cs(13,80): error CS0535: 'LastingEffectCardProperties' does not implement interface member 'IGameActionProperties.Optional'
+Assets\Client\Scripts\Core\GameActions\LastingEffectCardAction.cs(13,80): error CS0535: 'LastingEffectCardProperties' does not implement interface member 'IGameActionProperties.ParentAction'
+Assets\Client\Scripts\Core\GameActions\DuelAction.cs(34,20): error CS0721: 'DuelTypes': static types cannot be used as parameters
+Assets\Client\Scripts\Core\GameActions\SelectRingActions.cs(36,50): error CS0115: 'SelectRingAction.DefaultProperties': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\SelectRingActions.cs(65,44): error CS0115: 'SelectRingAction.GetEffectMessage(AbilityContext)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\SelectRingActions.cs(81,30): error CS0115: 'SelectRingAction.HasLegalTarget(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\SelectRingActions.cs(86,30): error CS0115: 'SelectRingAction.AddEventsToArray(List<object>, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\SelectRingActions.cs(134,30): error CS0115: 'SelectRingAction.HasTargetsChosenByInitiatingPlayer(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\LastingEffectCardAction.cs(18,26): error CS0263: Partial declarations of 'LastingEffectCardAction' must not specify different base classes
+Assets\Client\Scripts\Core\GameActions\DuelAction.cs(40,20): error CS0721: 'DuelTypes': static types cannot be used as parameters
+Assets\Client\Scripts\Core\GameActions\RemoveFromGameAction.cs(140,33): error CS0508: 'RemoveFromGameAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\RemoveFateAction.cs(190,33): error CS0508: 'RemoveFateAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\ResolveAbilityAction.cs(10,30): error CS0115: 'NoCostsAbilityResolver.Initialise()': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\SendHomeAction.cs(96,33): error CS0508: 'SendHomeAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\LastingEffectRingAction.cs(11,48): error CS0246: The type or namespace name 'LastingEffectGeneralProperties' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\GameActions\CreateTokenAction.cs(100,33): error CS0508: 'CreateTokenAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\ResolveAbilityAction.cs(88,26): error CS0263: Partial declarations of 'ResolveAbilityAction' must not specify different base classes
+Assets\Client\Scripts\Core\GameActions\ReadyAction.cs(106,33): error CS0508: 'ReadyAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\FlipDynastyAction.cs(111,33): error CS0508: 'FlipDynastyAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\LastingEffectRingAction.cs(11,80): error CS0535: 'LastingEffectRingProperties' does not implement interface member 'ILastingEffectGeneralProperties.Duration'
+Assets\Client\Scripts\Core\GameActions\LastingEffectRingAction.cs(11,80): error CS0535: 'LastingEffectRingProperties' does not implement interface member 'ILastingEffectGeneralProperties.Condition'
+Assets\Client\Scripts\Core\GameActions\LastingEffectRingAction.cs(11,80): error CS0535: 'LastingEffectRingProperties' does not implement interface member 'ILastingEffectGeneralProperties.Until'
+Assets\Client\Scripts\Core\GameActions\LastingEffectRingAction.cs(11,80): error CS0535: 'LastingEffectRingProperties' does not implement interface member 'ILastingEffectGeneralProperties.Effect'
+Assets\Client\Scripts\Core\GameActions\LastingEffectRingAction.cs(11,80): error CS0535: 'LastingEffectRingProperties' does not implement interface member 'IGameActionProperties.Target'
+Assets\Client\Scripts\Core\GameActions\LastingEffectRingAction.cs(11,80): error CS0535: 'LastingEffectRingProperties' does not implement interface member 'IGameActionProperties.CannotBeCancelled'
+Assets\Client\Scripts\Core\GameActions\LastingEffectRingAction.cs(11,80): error CS0535: 'LastingEffectRingProperties' does not implement interface member 'IGameActionProperties.Optional'
+Assets\Client\Scripts\Core\GameActions\LastingEffectRingAction.cs(11,80): error CS0535: 'LastingEffectRingProperties' does not implement interface member 'IGameActionProperties.ParentAction'
+Assets\Client\Scripts\Core\GameActions\DiscardCardAction.cs(132,33): error CS0508: 'DiscardCardAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\SetDialAction.cs(58,44): error CS0115: 'SetDialAction.GetEffectMessage(AbilityContext)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\SetDialAction.cs(64,30): error CS0115: 'SetDialAction.CanAffect(Player, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\SetDialAction.cs(70,33): error CS0115: 'SetDialAction.AddPropertiesToEvent(object, Player, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\LastingEffectRingAction.cs(46,57): error CS0115: 'LastingEffectRingAction.DefaultProperties': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\ShuffleDeckAction.cs(117,33): error CS0508: 'ShuffleDeckAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\LookAtAction.cs(127,33): error CS0508: 'LookAtAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\LoseFateAction.cs(145,33): error CS0508: 'LoseFateAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\LoseHonorAction.cs(149,33): error CS0508: 'LoseHonorAction.EventHandler(GameEvent, GameAction.GameActionProperties)': return type must be 'bool' to match overridden member 'GameAction.EventHandler(GameEvent, GameAction.GameActionProperties)'
+Assets\Client\Scripts\Core\GameActions\MenuPromptAction.cs(50,44): error CS0115: 'MenuPromptAction.GetEffectMessage(AbilityContext)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\MenuPromptAction.cs(56,50): error CS0115: 'MenuPromptAction.GetProperties(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\MenuPromptAction.cs(68,30): error CS0115: 'MenuPromptAction.CanAffect(object, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\MenuPromptAction.cs(82,30): error CS0115: 'MenuPromptAction.HasLegalTarget(AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\MenuPromptAction.cs(96,30): error CS0115: 'MenuPromptAction.AddEventsToArray(List<object>, AbilityContext, object)': no suitable method found to override
+Assets\Client\Scripts\Core\GameActions\MenuPromptAction.cs(133,30): error CS0115: 'MenuPromptAction.HasTargetsChosenByInitiatingPlayer(AbilityContext, object)': no suitable method found to override

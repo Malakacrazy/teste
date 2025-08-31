@@ -1148,6 +1148,12 @@ def on_trigger(card, event_name, event_data):
         /// <summary>
         /// Emit a game event
         /// </summary>
+        public void Emit(string eventName, object eventData, object context = null)
+        {
+            // Simplified emit method for triggered abilities
+            // In a full implementation, this would notify listeners
+        }
+
         public void EmitEvent(string eventName, Dictionary<string, object> eventData)
         {
             OnEventTriggered?.Invoke(eventData, currentPhase);

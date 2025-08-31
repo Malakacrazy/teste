@@ -42,6 +42,18 @@ namespace L5RGame
             }
         }
 
+        /// <summary>
+        /// Add an event to this window
+        /// </summary>
+        /// <param name="gameEvent">Event to add</param>
+        public virtual void AddEvent(GameEvent gameEvent)
+        {
+            if (events != null && gameEvent != null)
+            {
+                events.Add(gameEvent);
+            }
+        }
+
 
         public override string GetDebugInfo()
         {
