@@ -17,6 +17,24 @@ namespace L5RGame
         [System.Serializable]
         public class CardActionProperties : GameActionProperties
         {
+            public List<object> Target 
+            { 
+                get { return target; } 
+                set { target = value; } 
+            }
+            
+            public bool CannotBeCancelled 
+            { 
+                get { return cannotBeCancelled; } 
+                set { cannotBeCancelled = value; } 
+            }
+            
+            public bool Optional 
+            { 
+                get { return optional; } 
+                set { optional = value; } 
+            }
+            
             public CardActionProperties() : base() { }
             
             public CardActionProperties(List<object> targets) : base(targets) { }

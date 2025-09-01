@@ -44,7 +44,7 @@ namespace L5RGame
             effectMessage = "take {0}";
         }
         
-        protected override ITakeRingProperties DefaultProperties => new TakeRingProperties
+        protected ITakeRingProperties DefaultProperties => new TakeRingProperties
         {
             TakeFate = true
         };

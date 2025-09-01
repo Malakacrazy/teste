@@ -939,12 +939,6 @@ namespace L5RGame
         public string forcedDeclaredType;
     }
 
-    [System.Serializable]
-    public class CardMoveOptions
-    {
-        public bool bottom = false;
-        public bool facedown = false;
-    }
 
     [System.Serializable]
     public class AdditionalPile
@@ -1137,6 +1131,10 @@ namespace L5RGame
             return allCards;
         }
 
+        // Missing properties for compilation
+        public List<BaseCard> dynastyCards { get; set; } = new List<BaseCard>();
+        public bool ImperialFavor { get; set; } = false;
+        
     }
 
 

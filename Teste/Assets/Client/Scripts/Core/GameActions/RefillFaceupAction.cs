@@ -46,9 +46,9 @@ namespace L5RGame
         
         #endregion
 
-        public override List<Player> DefaultTargets(AbilityContext context)
+        protected override List<object> DefaultTargets(AbilityContext context)
         {
-            return new List<Player> { context.Player };
+            return new List<object> { context.Player };
         }
 
         protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)

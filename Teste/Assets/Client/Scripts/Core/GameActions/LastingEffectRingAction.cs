@@ -43,7 +43,7 @@ namespace L5RGame
             effectMessage = "apply a lasting effect";
         }
         
-        protected override ILastingEffectRingProperties DefaultProperties => new LastingEffectRingProperties
+        protected ILastingEffectRingProperties DefaultProperties => new LastingEffectRingProperties
         {
             Duration = Durations.UntilEndOfConflict,
             Effect = new List<object>()

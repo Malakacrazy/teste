@@ -43,14 +43,14 @@ namespace L5RGame
             eventName = EventNames.OnMoveFate;
         }
         
-        protected override ITakeFateRingProperties DefaultProperties => new TakeFateRingProperties
+        protected ITakeFateRingProperties DefaultProperties => new TakeFateRingProperties
         {
             Amount = 1
         };
         
         #endregion
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context) as ITakeFateRingProperties;
             return ("take {1} fate from {0}", new object[] { properties.Target, properties.Amount });
@@ -76,12 +76,12 @@ namespace L5RGame
             }
         }
 
-        protected override bool CheckEventCondition(object eventObj)
+        protected bool CheckEventCondition(object eventObj)
         {
             return MoveFateEventCondition(eventObj);
         }
 
-        protected override bool IsEventFullyResolved(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
+        protected bool IsEventFullyResolved(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
         {
             var properties = GetProperties(context, additionalProperties) as ITakeFateRingProperties;
             

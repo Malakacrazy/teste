@@ -48,7 +48,7 @@ namespace L5RGame
         #endregion
 
 
-        protected override ISwitchConflictTypeProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected ISwitchConflictTypeProperties GetProperties(AbilityContext context, object additionalProperties = null)
         {
             return base.GetProperties(context, additionalProperties) as ISwitchConflictTypeProperties;
         }

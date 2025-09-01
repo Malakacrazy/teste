@@ -88,7 +88,7 @@ namespace L5RGame
                 return false;
                 
             // Already broken provinces cannot be broken again
-            if (card.IsBroken())
+            if (card.IsBroken)
                 return false;
             
             return base.CanAffect(target, context, additionalProperties);

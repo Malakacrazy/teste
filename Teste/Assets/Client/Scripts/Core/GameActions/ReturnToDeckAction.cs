@@ -159,7 +159,7 @@ namespace L5RGame
             }
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             LeavesPlayEventHandler(gameEvent, additionalProperties);
             
@@ -179,6 +179,7 @@ namespace L5RGame
                     card.owner.ShuffleConflictDeck();
                 }
             }
+            return true;
         }
         
         /// <summary>

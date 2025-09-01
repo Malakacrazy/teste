@@ -49,6 +49,13 @@ namespace L5RGame
             Initialize();
         }
         
+        public MoveCardAction(BaseCard card, string destination) : base(new MoveCardProperties { destination = destination })
+        {
+            if (card != null)
+                GetProperties(null).target.Add(card);
+            Initialize();
+        }
+        
         #endregion
         
         #region Initialization

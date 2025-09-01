@@ -43,7 +43,7 @@ namespace L5RGame
             eventName = EventNames.OnMoveFate;
         }
         
-        protected override ITransferFateProperties DefaultProperties => new TransferFateProperties
+        protected ITransferFateProperties DefaultProperties => new TransferFateProperties
         {
             Amount = 1
         };
@@ -56,20 +56,20 @@ namespace L5RGame
             return ("giving {1} fate to {2}", new object[] { properties.Amount, context.Player.Opponent });
         }
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context) as ITransferFateProperties;
             return ("take {1} fate from {0}", new object[] { properties.Target, properties.Amount });
         }
 
-        public override bool CanAffect(Player player, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(Player player, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ITransferFateProperties;
             return player.Opponent != null && properties.Amount > 0 && 
                    player.Fate >= properties.Amount && base.CanAffect(player, context);
         }
 
-        protected override void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
+        protected void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
         {
             var properties = GetProperties(context, additionalProperties) as ITransferFateProperties;
             base.AddPropertiesToEvent(eventObj, player, context, additionalProperties);
@@ -82,7 +82,7 @@ namespace L5RGame
             }
         }
 
-        protected override bool CheckEventCondition(object eventObj)
+        protected bool CheckEventCondition(object eventObj)
         {
             return MoveFateEventCondition(eventObj);
         }

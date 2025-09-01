@@ -54,7 +54,7 @@ namespace L5RGame
         
         #endregion
 
-        protected override ILastingEffectCardProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected ILastingEffectCardProperties GetProperties(AbilityContext context, object additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ILastingEffectCardProperties;
             

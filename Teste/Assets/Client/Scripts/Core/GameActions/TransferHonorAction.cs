@@ -45,7 +45,7 @@ namespace L5RGame
             eventName = EventNames.OnTransferHonor;
         }
         
-        protected override ITransferHonorProperties DefaultProperties => new TransferHonorProperties
+        protected ITransferHonorProperties DefaultProperties => new TransferHonorProperties
         {
             Amount = 1,
             AfterBid = false
@@ -59,19 +59,19 @@ namespace L5RGame
             return ("giving {1} honor to {2}", new object[] { properties.Amount, context.Player.Opponent });
         }
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context) as ITransferHonorProperties;
             return ("take {1} honor from {0}", new object[] { properties.Target, properties.Amount });
         }
 
-        public override bool CanAffect(Player player, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(Player player, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ITransferHonorProperties;
             return player.Opponent != null && properties.Amount > 0 && base.CanAffect(player, context);
         }
 
-        protected override void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
+        protected void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
         {
             var properties = GetProperties(context, additionalProperties) as ITransferHonorProperties;
             base.AddPropertiesToEvent(eventObj, player, context, additionalProperties);

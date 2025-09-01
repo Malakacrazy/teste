@@ -189,7 +189,7 @@ namespace L5RGame
             events.Add(gameEvent);
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var context = gameEvent.context;
             var properties = GetProperties(context, additionalProperties);
@@ -236,6 +236,7 @@ namespace L5RGame
                 trigContext.Cancel();
                 LogExecution("Cancelled event for {0}", trigContext.eventObject?.card?.name ?? "unknown");
             }
+            return true;
         }
         
         #endregion

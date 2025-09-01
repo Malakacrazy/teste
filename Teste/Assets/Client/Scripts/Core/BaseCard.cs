@@ -887,5 +887,24 @@ namespace L5RGame
 
             Debug.Log($"🃏 Card {printedName ?? "Unknown"} destroyed");
         }
+
+        // Missing methods for compilation
+        public virtual bool IsAncestral() => HasKeyword("Ancestral");
+        public virtual bool IsProvince() => type == "province";
+        public virtual bool AllowAttachment(DrawCard attachment) => true;
+        public virtual void AddToken(object token) { /* stub */ }
+        public virtual void AddAttachment(DrawCard attachment) 
+        { 
+            if (attachments == null) attachments = new List<BaseCard>();
+            attachments.Add(attachment);
+        }
+        public virtual bool IsDishonored() => HasEffect("dishonored");
+        public virtual bool IsHonored() => HasEffect("honored");
+        public virtual void RemoveAttachment(DrawCard attachment) 
+        {
+            if (attachments != null) attachments.Remove(attachment);
+        }
+        public virtual int PersonalHonor { get; set; } = 0;
+        public virtual void MakeOrdinary() { /* stub */ }
     }
 }

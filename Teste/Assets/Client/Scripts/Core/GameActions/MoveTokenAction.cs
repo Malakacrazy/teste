@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace L5RGame
@@ -44,7 +45,7 @@ namespace L5RGame
         
         #endregion
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context, object additionalProperties = null)
+        public (string, object[]) GetEffectMessage(AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IMoveTokenProperties;
             var target = properties.Target as StatusToken;

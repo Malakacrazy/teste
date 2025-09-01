@@ -12,6 +12,10 @@ namespace L5RGame
         public object value;
         public Player owner;
         
+        // Missing properties for compilation
+        public BaseCard Card { get; set; }
+        public bool Honored { get; set; }
+        
         public StatusToken() { }
         public StatusToken(string tokenName, object tokenValue, Player tokenOwner = null)
         {

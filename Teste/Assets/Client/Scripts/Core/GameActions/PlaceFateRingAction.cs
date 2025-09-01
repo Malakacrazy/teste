@@ -45,7 +45,7 @@ namespace L5RGame
             eventName = EventNames.OnMoveFate;
         }
         
-        protected override IPlaceFateRingProperties DefaultProperties => new PlaceFateRingProperties
+        protected IPlaceFateRingProperties DefaultProperties => new PlaceFateRingProperties
         {
             Amount = 1
         };
@@ -58,7 +58,7 @@ namespace L5RGame
             return ("placing {1} fate on {0}", new object[] { properties.Target, properties.Amount });
         }
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context) as IPlaceFateRingProperties;
             if (properties.Origin != null)
@@ -115,12 +115,12 @@ namespace L5RGame
             }
         }
 
-        protected override bool CheckEventCondition(object eventObj)
+        protected bool CheckEventCondition(object eventObj)
         {
             return MoveFateEventCondition(eventObj);
         }
 
-        protected override bool IsEventFullyResolved(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
+        protected bool IsEventFullyResolved(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
         {
             var properties = GetProperties(context, additionalProperties) as IPlaceFateRingProperties;
             

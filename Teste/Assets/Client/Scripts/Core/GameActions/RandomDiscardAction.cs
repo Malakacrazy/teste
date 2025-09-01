@@ -120,17 +120,17 @@ namespace L5RGame
             gameEvent.AddProperty("amount", properties.amount);
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var player = gameEvent.GetProperty("player") as Player;
             var requestedAmount = gameEvent.GetProperty("amount", 1);
             
             if (player == null)
-                return;
+                return false;
                 
             var amount = Mathf.Min(requestedAmount, player.hand.Count);
             if (amount == 0)
-                return;
+                return false;
                 
             // Shuffle hand and take random cards
             var shuffledHand = player.hand.OrderBy(x => UnityEngine.Random.value).ToList();
@@ -180,6 +180,7 @@ namespace L5RGame
             }
             
             LogExecution("{0} discarded {1} cards at random", player.name, amount);
+            return true;
         }
         
         #endregion

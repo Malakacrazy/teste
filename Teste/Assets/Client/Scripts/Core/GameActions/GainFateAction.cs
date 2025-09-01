@@ -43,6 +43,13 @@ namespace L5RGame
             Initialize();
         }
         
+        public GainFateAction(Player player, int amount) : base(new GainFateProperties { amount = amount })
+        {
+            if (player != null)
+                GetProperties(null).target.Add(player);
+            Initialize();
+        }
+        
         #endregion
         
         #region Initialization

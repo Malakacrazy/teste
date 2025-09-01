@@ -55,19 +55,19 @@ namespace L5RGame
 
         public SetDialAction(Func<AbilityContext, object> propertyFactory) : base(propertyFactory) { }
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context) as ISetDialProperties;
             return ("set {0}'s dial to {1}", new object[] { properties.Target, properties.Value });
         }
 
-        public override bool CanAffect(Player player, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(Player player, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ISetDialProperties;
             return properties.Value > 0 && properties.Value < 6 && base.CanAffect(player, context);
         }
 
-        protected override void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
+        protected void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
         {
             var properties = GetProperties(context, additionalProperties) as ISetDialProperties;
             base.AddPropertiesToEvent(eventObj, player, context, additionalProperties);

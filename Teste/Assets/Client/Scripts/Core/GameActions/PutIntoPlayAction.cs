@@ -172,7 +172,7 @@ namespace L5RGame
             gameEvent.AddProperty("originalLocation", card?.location);
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var card = gameEvent.GetProperty("card") as DrawCard;
             var context = gameEvent.context;
@@ -181,7 +181,7 @@ namespace L5RGame
             var intoConflict = gameEvent.GetProperty("intoConflict", false);
             
             if (card == null || context?.player == null)
-                return;
+                return false;
             
             // Check for province refill
             CheckForRefillProvince(card, gameEvent, additionalProperties);
@@ -224,6 +224,7 @@ namespace L5RGame
             }
             
             LogExecution("Put {0} into play{1}", card.name, intoConflict ? " in the conflict" : "");
+            return true;
         }
         
         #endregion

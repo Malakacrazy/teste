@@ -55,7 +55,7 @@ namespace L5RGame
             return target.Type == "token";
         }
 
-        protected override bool CheckEventCondition(object eventObj, object additionalProperties = null)
+        protected bool CheckEventCondition(object eventObj, object additionalProperties = null)
         {
             if (eventObj is GameEvent gameEvent && gameEvent.Token != null)
             {

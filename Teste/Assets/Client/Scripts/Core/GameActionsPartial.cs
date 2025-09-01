@@ -139,9 +139,6 @@ namespace L5RGame
     
     #region Ring Actions
     
-    public partial class PlaceFateAction : RingAction
-    {
-    }
     
     public partial class SelectRingAction : RingAction
     {
@@ -187,9 +184,6 @@ namespace L5RGame
     
     #region Token Actions
     
-    public partial class AddTokenAction : TokenAction
-    {
-    }
     
     public partial class DiscardStatusAction : TokenAction
     {
@@ -203,21 +197,9 @@ namespace L5RGame
     
     #region General Actions
     
-    public partial class LastingEffectCardAction : GameAction
-    {
-    }
     
-    public partial class ResolveAbilityAction : GameAction
-    {
-    }
     
-    public partial class SelectCardAction : GameAction
-    {
-    }
     
-    public partial class CardMenuAction : GameAction
-    {
-    }
     
     #endregion
 }

@@ -93,7 +93,7 @@ namespace L5RGame
         
         #region Event Management
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var card = gameEvent.GetProperty("card") as BaseCard;
             var context = gameEvent.context;
@@ -103,6 +103,7 @@ namespace L5RGame
                 context.game.currentConflict.RemoveFromConflict(card);
                 LogExecution("Sent {0} home from conflict", card.name);
             }
+            return true;
         }
         
         #endregion

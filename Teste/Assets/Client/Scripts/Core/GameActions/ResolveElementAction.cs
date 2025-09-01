@@ -50,7 +50,7 @@ namespace L5RGame
         
         #endregion
 
-        public override void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IResolveElementProperties;
             var target = properties.Target as IList<Ring>;

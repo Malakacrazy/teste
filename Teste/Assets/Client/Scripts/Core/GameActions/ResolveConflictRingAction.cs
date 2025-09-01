@@ -17,6 +17,24 @@ namespace L5RGame
 
     public partial class ResolveConflictRingAction : RingAction
     {
+        public Ring ring
+        {
+            get { return GetProperties(null).target?.Cast<Ring>()?.FirstOrDefault(); }
+            set { 
+                var props = GetProperties(null);
+                props.target.Clear();
+                if (value != null) props.target.Add(value);
+            }
+        }
+        
+        public Player player
+        {
+            get { return (GetProperties(null) as IResolveConflictRingProperties)?.PlayerTarget; }
+            set { 
+                var props = GetProperties(null) as IResolveConflictRingProperties;
+                if (props != null) props.PlayerTarget = value;
+            }
+        }
         #region Constructors
         
         public ResolveConflictRingAction() : base()
@@ -47,7 +65,7 @@ namespace L5RGame
             effectMessage = "resolve {0}";
         }
         
-        protected override IResolveConflictRingProperties DefaultProperties => new ResolveConflictRingProperties
+        protected IResolveConflictRingProperties DefaultProperties => new ResolveConflictRingProperties
         {
             ResolveAsAttacker = true
         };

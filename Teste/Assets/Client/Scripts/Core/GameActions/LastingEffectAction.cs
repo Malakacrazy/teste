@@ -18,12 +18,16 @@ namespace L5RGame
         string TargetController { get; set; }
     }
 
-    public class LastingEffectProperties : GameActionProperties, ILastingEffectProperties
+    public class LastingEffectGeneralProperties : GameActionProperties, ILastingEffectGeneralProperties
     {
         public string Duration { get; set; }
         public Func<AbilityContext, bool> Condition { get; set; }
         public string Until { get; set; }
         public object Effect { get; set; }
+    }
+
+    public class LastingEffectProperties : LastingEffectGeneralProperties, ILastingEffectProperties
+    {
         public string TargetController { get; set; }
     }
 
@@ -58,7 +62,7 @@ namespace L5RGame
             effectMessage = "apply a lasting effect";
         }
         
-        protected override ILastingEffectProperties DefaultProperties => new LastingEffectProperties
+        protected ILastingEffectProperties DefaultProperties => new LastingEffectProperties
         {
             Duration = Durations.UntilEndOfConflict,
             Effect = new List<object>()
@@ -66,7 +70,7 @@ namespace L5RGame
         
         #endregion
 
-        protected override ILastingEffectProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected ILastingEffectProperties GetProperties(AbilityContext context, object additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ILastingEffectProperties;
             
@@ -78,14 +82,14 @@ namespace L5RGame
             return properties;
         }
 
-        public override bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
+        public bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var effectList = properties.Effect as IList<object>;
             return effectList != null && effectList.Count > 0;
         }
 
-        public override void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
         {
             if (HasLegalTarget(context, additionalProperties))
             {

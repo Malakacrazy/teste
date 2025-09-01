@@ -187,9 +187,10 @@ namespace L5RGame
                    eventRecipient == properties.recipient;
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             MoveFateEventHandler(gameEvent);
+            return true;
         }
         
         #endregion

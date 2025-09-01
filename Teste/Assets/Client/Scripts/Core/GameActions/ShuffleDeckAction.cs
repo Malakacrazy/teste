@@ -114,7 +114,7 @@ namespace L5RGame
             gameEvent.AddProperty("deck", properties.deck);
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var player = gameEvent.GetProperty("player") as Player;
             var deck = gameEvent.GetProperty("deck") as string;
@@ -125,13 +125,16 @@ namespace L5RGame
                 {
                     player.ShuffleConflictDeck();
                     LogExecution("Shuffled {0}'s conflict deck", player.name);
+                    return true;
                 }
                 else if (deck == Locations.DynastyDeck)
                 {
                     player.ShuffleDynastyDeck();
                     LogExecution("Shuffled {0}'s dynasty deck", player.name);
+                    return true;
                 }
             }
+            return false;
         }
         
         #endregion

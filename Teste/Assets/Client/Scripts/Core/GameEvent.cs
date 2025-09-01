@@ -895,5 +895,18 @@ namespace L5RGame
         {
             return propertyNames.All(prop => gameEvent.HasProperty(prop));
         }
+
+        /// <summary>
+        /// Set whether this event should create contingent events
+        /// </summary>
+        public static void SetCreateContingentEvents(this GameEvent gameEvent, bool value)
+        {
+            gameEvent.AddProperty("createContingentEvents", value);
+        }
+
+        public static void SetHandler(this GameEvent gameEvent, System.Action handler)
+        {
+            gameEvent.AddProperty("handler", handler);
+        }
     }
 }

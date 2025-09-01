@@ -50,7 +50,7 @@ namespace L5RGame
                 : new List<Ring>();
         }
 
-        protected override bool CheckEventCondition(object eventObj, object additionalProperties = null)
+        protected bool CheckEventCondition(object eventObj, object additionalProperties = null)
         {
             if (eventObj is GameEvent gameEvent && gameEvent.Ring != null)
             {

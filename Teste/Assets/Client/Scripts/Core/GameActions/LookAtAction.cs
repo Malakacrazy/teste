@@ -124,7 +124,7 @@ namespace L5RGame
             gameEvent.context = context;
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var context = gameEvent.context;
             var cards = gameEvent.GetProperty("cards") as List<BaseCard>;
@@ -146,6 +146,7 @@ namespace L5RGame
                 context.game.AddMessage(properties.message, messageArgs);
                 LogExecution("{0} looked at {1} cards", context.player.name, cards.Count);
             }
+            return true;
         }
         
         protected override bool IsEventFullyResolved(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)

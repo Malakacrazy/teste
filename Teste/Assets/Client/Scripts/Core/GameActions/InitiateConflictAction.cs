@@ -64,9 +64,9 @@ namespace L5RGame
                    player.HasLegalConflictDeclaration(new { forcedDeclaredType = properties.ForcedDeclaredType });
         }
 
-        public override List<Player> DefaultTargets(AbilityContext context)
+        protected override List<object> DefaultTargets(AbilityContext context)
         {
-            return new List<Player> { context.Player };
+            return new List<object> { context.Player };
         }
 
         protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)

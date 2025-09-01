@@ -77,7 +77,7 @@ namespace L5RGame
         
         #endregion
 
-        protected override ICardMenuProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected ICardMenuProperties GetProperties(AbilityContext context, object additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ICardMenuProperties;
             properties.GameAction?.SetDefaultTarget(() => properties.Target);

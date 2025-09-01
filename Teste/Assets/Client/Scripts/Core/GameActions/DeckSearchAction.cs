@@ -156,7 +156,7 @@ namespace L5RGame
             gameEvent.AddProperty("amount", properties.amount);
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var context = gameEvent.context;
             var player = gameEvent.GetProperty("player") as Player;
@@ -164,7 +164,7 @@ namespace L5RGame
             var requestedAmount = gameEvent.GetProperty("amount", -1);
             
             if (player == null)
-                return;
+                return false;
                 
             var amount = requestedAmount > -1 ? requestedAmount : player.conflictDeck.Count;
             var cards = player.conflictDeck.Take(amount).ToList();
@@ -209,6 +209,7 @@ namespace L5RGame
             });
             
             LogExecution("{0} searched their deck", player.name);
+            return true;
         }
         
         #endregion

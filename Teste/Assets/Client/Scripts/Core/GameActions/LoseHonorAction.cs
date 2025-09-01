@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -10,6 +11,24 @@ namespace L5RGame
     [System.Serializable]
     public partial class LoseHonorAction : PlayerAction
     {
+        public Player player
+        {
+            get { return GetProperties(null).target?.Cast<Player>()?.FirstOrDefault(); }
+            set { 
+                var props = GetProperties(null);
+                props.target.Clear();
+                if (value != null) props.target.Add(value);
+            }
+        }
+        
+        public int amount
+        {
+            get { return (GetProperties(null) as LoseHonorProperties)?.amount ?? 0; }
+            set { 
+                var props = GetProperties(null) as LoseHonorProperties;
+                if (props != null) props.amount = value;
+            }
+        }
         /// <summary>
         /// Properties specific to losing honor
         /// </summary>
@@ -146,7 +165,7 @@ namespace L5RGame
             gameEvent.AddProperty("dueToUnopposed", properties.dueToUnopposed);
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var player = gameEvent.GetProperty("player") as Player;
             var amount = gameEvent.GetProperty("amount", -1);
@@ -155,7 +174,9 @@ namespace L5RGame
             {
                 player.ModifyHonor(amount);
                 LogExecution("{0} lost {1} honor", player.name, -amount);
+                return true;
             }
+            return false;
         }
         
         #endregion

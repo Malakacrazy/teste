@@ -17,7 +17,7 @@ namespace L5RGame
         [System.Serializable]
         public class DuelProperties : CardActionProperties
         {
-            public DuelTypes type;
+            public string type;
             public DrawCard challenger;
             public GameAction gameAction;
             public System.Func<Duel, AbilityContext, GameAction> gameActionFactory;
@@ -31,13 +31,13 @@ namespace L5RGame
             
             public DuelProperties() : base() { }
             
-            public DuelProperties(DuelTypes type, GameAction gameAction) : base()
+            public DuelProperties(string type, GameAction gameAction) : base()
             {
                 this.type = type;
                 this.gameAction = gameAction;
             }
             
-            public DuelProperties(DuelTypes type, System.Func<Duel, AbilityContext, GameAction> gameActionFactory) : base()
+            public DuelProperties(string type, System.Func<Duel, AbilityContext, GameAction> gameActionFactory) : base()
             {
                 this.type = type;
                 this.gameActionFactory = gameActionFactory;
@@ -58,6 +58,17 @@ namespace L5RGame
         
         public DuelAction(System.Func<AbilityContext, DuelProperties> factory) : base(factory)
         {
+            Initialize();
+        }
+        
+        public DuelAction(Dictionary<string, object> properties) : base(new DuelProperties())
+        {
+            // Convert dictionary properties to DuelProperties
+            if (properties.ContainsKey("type")) 
+            {
+                var props = GetProperties(null) as DuelProperties;
+                if (props != null) props.type = properties["type"] as string;
+            }
             Initialize();
         }
         
@@ -168,7 +179,7 @@ namespace L5RGame
         
         #region Event Management
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var context = gameEvent.context;
             var cards = gameEvent.GetProperty("cards") as List<DrawCard>;
@@ -178,7 +189,7 @@ namespace L5RGame
                 cards?.All(card => card.location != Locations.PlayArea) == true)
             {
                 context.game.AddMessage("The duel cannot proceed as at least one participant for each side has to be in play");
-                return;
+                return false;
             }
             
             // Create the duel
@@ -218,6 +229,7 @@ namespace L5RGame
             var resolutionHandler = new System.Action<Duel>(completedDuel => ResolveDuel(completedDuel, context, additionalProperties));
             
             context.game.QueueStep(new DuelFlow(context.game, duel, costHandlerWrapper, resolutionHandler));
+            return true;
         }
         
         #endregion

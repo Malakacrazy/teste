@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -10,6 +11,15 @@ namespace L5RGame
     [System.Serializable]
     public partial class RevealAction : CardGameAction
     {
+        public List<BaseCard> cards
+        {
+            get { return GetProperties(null).target?.Cast<BaseCard>()?.ToList() ?? new List<BaseCard>(); }
+            set { 
+                var props = GetProperties(null);
+                props.target.Clear();
+                if (value != null) props.target.AddRange(value.Cast<object>());
+            }
+        }
         /// <summary>
         /// Properties specific to revealing cards
         /// </summary>
@@ -109,7 +119,7 @@ namespace L5RGame
             base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var card = gameEvent.GetProperty("card") as BaseCard;
             var context = gameEvent.context;
@@ -127,6 +137,7 @@ namespace L5RGame
                 card.facedown = false;
                 LogExecution("Revealed {0}", card.name);
             }
+            return true;
         }
         
         #endregion

@@ -18,7 +18,7 @@ namespace L5RGame
         Func<BaseCard, Player, ISelectCardProperties, object[]> MessageArgs { get; set; }
         GameAction GameAction { get; set; }
         string Selector { get; set; }
-        TargetModes? Mode { get; set; }
+        string Mode { get; set; }
         Func<BaseCard, object> SubActionProperties { get; set; }
         Action CancelHandler { get; set; }
     }
@@ -35,15 +35,15 @@ namespace L5RGame
         public string Message { get; set; }
         public Func<BaseCard, Player, ISelectCardProperties, object[]> MessageArgs { get; set; }
         public GameAction GameAction { get; set; }
-        public BaseCardSelector Selector { get; set; }
-        public TargetModes? Mode { get; set; }
+        public string Selector { get; set; }
+        public string Mode { get; set; }
         public Func<BaseCard, object> SubActionProperties { get; set; }
         public Action CancelHandler { get; set; }
     }
 
     public partial class SelectCardAction : CardGameAction
     {
-        protected override ISelectCardProperties DefaultProperties => new SelectCardProperties
+        protected ISelectCardProperties DefaultProperties => new SelectCardProperties
         {
             CardCondition = (card, context) => true,
             GameAction = null,
@@ -73,13 +73,13 @@ namespace L5RGame
             eventName = EventNames.OnGameStateChanged;
         }
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context);
             return ("choose a target for {0}", new object[] { properties.Target });
         }
 
-        protected override ISelectCardProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected ISelectCardProperties GetProperties(AbilityContext context, object additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ISelectCardProperties;
             properties.GameAction?.SetDefaultTarget(() => properties.Target);
@@ -115,7 +115,7 @@ namespace L5RGame
             return properties.Selector.CanTarget(card, context, player);
         }
 
-        public override bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
+        public bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var player = (properties.Targets && context.ChoosingPlayerOverride != null) ? context.ChoosingPlayerOverride :
@@ -125,7 +125,7 @@ namespace L5RGame
             return properties.Selector.HasEnoughTargets(context, player);
         }
 
-        public override void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             
@@ -187,7 +187,7 @@ namespace L5RGame
             context.Game.PromptForSelect(player, promptProperties);
         }
 
-        public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
+        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             return properties.Targets && properties.Player != Players.Opponent;

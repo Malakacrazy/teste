@@ -107,15 +107,15 @@ namespace L5RGame
     {
         public virtual string[] TargetType => new string[] { "card" };
 
-        protected CardGameAction() : base() { }
-        protected CardGameAction(CardActionProperties properties) : base(ConvertProperties(properties)) { }
-        
         private static GameAction.GameActionProperties ConvertProperties(CardActionProperties properties)
         {
             if (properties == null) return null;
-            return new GameAction.GameActionProperties(properties.Target, properties.CannotBeCancelled, properties.Optional);
+            var result = new GameAction.GameActionProperties();
+            result.target = properties.Target;
+            result.cannotBeCancelled = properties.CannotBeCancelled;
+            result.optional = properties.Optional;
+            return result;
         }
-        protected CardGameAction(Func<AbilityContext, CardActionProperties> factory) : base((context) => ConvertProperties(factory(context))) { }
 
         public virtual bool CanAffect(object target, AbilityContext context, object additionalProperties = null)
         {

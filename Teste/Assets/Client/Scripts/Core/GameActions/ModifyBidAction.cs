@@ -64,12 +64,12 @@ namespace L5RGame
         
         #endregion
 
-        public override List<Player> DefaultTargets(AbilityContext context)
+        protected override List<object> DefaultTargets(AbilityContext context)
         {
-            return new List<Player> { context.Player };
+            return new List<object> { context.Player };
         }
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context) as IModifyBidProperties;
             if (properties.Direction == Direction.Prompt)
@@ -79,7 +79,7 @@ namespace L5RGame
             return ("{0} their bid by {1}", new object[] { properties.Direction.ToString().ToLower(), properties.Amount });
         }
 
-        public override bool CanAffect(object target, AbilityContext context, GameActionProperties additionalProperties = null)
+        public bool CanAffect(object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var player = target as Player;
             if (player == null) return false;
@@ -92,7 +92,7 @@ namespace L5RGame
             return base.CanAffect(target, context, additionalProperties);
         }
 
-        public override void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameActionProperties additionalProperties = null)
+        public void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IModifyBidProperties;
             if (properties.Direction != Direction.Prompt)
@@ -151,7 +151,7 @@ namespace L5RGame
             }
         }
 
-        protected override void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
+        protected void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
         {
             var properties = GetProperties(context, additionalProperties) as IModifyBidProperties;
             base.AddPropertiesToEvent(eventObj, player, context, additionalProperties);

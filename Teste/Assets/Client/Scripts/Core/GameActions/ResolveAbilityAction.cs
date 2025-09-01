@@ -7,7 +7,7 @@ namespace L5RGame
 {
     public class NoCostsAbilityResolver : AbilityResolver
     {
-        public override void Initialise()
+        public void Initialise()
         {
             Pipeline.Initialise(new List<BaseStep>
             {
@@ -122,13 +122,13 @@ namespace L5RGame
         
         #endregion
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context) as IResolveAbilityProperties;
             return ("resolve {0}'s {1} ability", new object[] { properties.Target, properties.Ability?.Title });
         }
 
-        public override bool CanAffect(DrawCard card, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(DrawCard card, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IResolveAbilityProperties;
             var ability = properties.Ability as TriggeredAbility;
@@ -166,7 +166,7 @@ namespace L5RGame
             return false;
         }
 
-        public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
+        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IResolveAbilityProperties;
             return properties.Ability.HasTargetsChosenByInitiatingPlayer(context);

@@ -164,7 +164,7 @@ namespace L5RGame
             gameEvent.AddProperty("cards", new List<DrawCard>());
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var player = gameEvent.GetProperty("player") as Player;
             var cards = gameEvent.GetProperty("cards") as List<DrawCard>;
@@ -181,6 +181,7 @@ namespace L5RGame
                 
                 LogExecution("{0} discarded {1} chosen cards", player.name, cards.Count);
             }
+            return true;
         }
         
         #endregion

@@ -47,13 +47,13 @@ namespace L5RGame
             eventName = EventNames.OnGameStateChanged;
         }
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context);
             return ("make a choice for {0}", new object[] { properties.Target });
         }
 
-        protected override IMenuPromptProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected IMenuPromptProperties GetProperties(AbilityContext context, object additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as IMenuPromptProperties;
             
@@ -65,7 +65,7 @@ namespace L5RGame
             return properties;
         }
 
-        public override bool CanAffect(object target, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(object target, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var choices = properties.Choices as string[];
@@ -79,7 +79,7 @@ namespace L5RGame
             });
         }
 
-        public override bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
+        public bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var choices = properties.Choices as string[];
@@ -93,7 +93,7 @@ namespace L5RGame
             });
         }
 
-        public override void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var choices = properties.Choices as string[];
@@ -130,7 +130,7 @@ namespace L5RGame
             context.Game.PromptWithHandlerMenu(player, promptProperties);
         }
 
-        public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
+        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             return properties.GameAction.HasTargetsChosenByInitiatingPlayer(context);

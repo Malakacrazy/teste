@@ -43,6 +43,13 @@ namespace L5RGame
             Initialize();
         }
         
+        public GainHonorAction(Player player, int amount) : base(new GainHonorProperties { amount = amount })
+        {
+            if (player != null)
+                GetProperties(null).target.Add(player);
+            Initialize();
+        }
+        
         #endregion
         
         #region Initialization

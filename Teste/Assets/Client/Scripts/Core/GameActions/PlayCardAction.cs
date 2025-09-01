@@ -22,7 +22,7 @@ namespace L5RGame
             CancelPressed = false;
         }
 
-        public override void CheckForCancel()
+        public void CheckForCancel()
         {
             base.CheckForCancel();
             var properties = GameActionProperties as IPlayCardProperties;
@@ -33,7 +33,7 @@ namespace L5RGame
             }
         }
 
-        public override void PayCosts()
+        public void PayCosts()
         {
             base.PayCosts();
             var properties = GameActionProperties as IPlayCardProperties;
@@ -44,7 +44,7 @@ namespace L5RGame
             }
         }
 
-        public override void ExecuteHandler()
+        public void ExecuteHandler()
         {
             base.ExecuteHandler();
             if (!CancelPressed)
@@ -108,12 +108,12 @@ namespace L5RGame
         
         #endregion
 
-        protected override IPlayCardProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected IPlayCardProperties GetProperties(AbilityContext context, object additionalProperties = null)
         {
             return base.GetProperties(context, additionalProperties) as IPlayCardProperties;
         }
 
-        public override bool CanAffect(DrawCard card, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(DrawCard card, AbilityContext context, object additionalProperties = null)
         {
             if (!base.CanAffect(card, context))
             {
@@ -141,7 +141,7 @@ namespace L5RGame
             context.Ability.ExecuteHandler(context);
         }
 
-        public override void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var targets = properties.Target as IList<DrawCard>;
@@ -198,7 +198,7 @@ namespace L5RGame
             return gameEvent;
         }
 
-        protected override bool CheckEventCondition(object eventObj)
+        protected bool CheckEventCondition(object eventObj)
         {
             return true;
         }

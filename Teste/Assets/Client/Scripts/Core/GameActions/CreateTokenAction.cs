@@ -97,13 +97,13 @@ namespace L5RGame
         
         #region Event Management
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var context = gameEvent.context;
             var card = gameEvent.GetProperty("target") as BaseCard;
             
             if (card == null || context?.game == null)
-                return;
+                return false;
             
             // Create token copy of the card
             var token = context.game.CreateToken(card);
@@ -111,7 +111,7 @@ namespace L5RGame
             if (token == null)
             {
                 LogExecution("Failed to create token for {0}", card.name);
-                return;
+                return false;
             }
             
             // Remove original card from its pile
@@ -154,6 +154,7 @@ namespace L5RGame
             }).Resolve(token, context);
             
             LogExecution("Created token {0} from {1}", token.name, card.name);
+            return true;
         }
         
         /// <summary>

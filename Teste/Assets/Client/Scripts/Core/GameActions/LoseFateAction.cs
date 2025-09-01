@@ -142,7 +142,7 @@ namespace L5RGame
             gameEvent.AddProperty("amount", -properties.amount); // Negative because it's a loss
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var player = gameEvent.GetProperty("player") as Player;
             var amount = gameEvent.GetProperty("amount", -1);
@@ -152,6 +152,7 @@ namespace L5RGame
                 player.ModifyFate(amount);
                 LogExecution("{0} lost {1} fate", player.name, -amount);
             }
+            return true;
         }
         
         #endregion

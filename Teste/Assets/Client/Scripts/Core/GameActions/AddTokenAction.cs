@@ -139,7 +139,7 @@ namespace L5RGame
             gameEvent.AddProperty("tokenType", properties.tokenType);
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var card = gameEvent.GetProperty("target") as BaseCard;
             var tokenType = gameEvent.GetProperty("tokenType", TokenTypes.Honor);
@@ -149,6 +149,7 @@ namespace L5RGame
                 card.AddToken(tokenType);
                 LogExecution("Added {0} token to {1}", tokenType, card.name);
             }
+            return true;
         }
         
         #endregion

@@ -156,9 +156,10 @@ namespace L5RGame
             }
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             LeavesPlayEventHandler(gameEvent, additionalProperties);
+            return true;
         }
         
         /// <summary>
@@ -188,38 +189,7 @@ namespace L5RGame
             });
             
             // Create contingent events for attachments and fate
-            gameEvent.SetCreateContingentEvents(() =>
-            {
-                var contingentEvents = new List<GameEvent>();
-                
-                // Handle attachments leaving play
-                if (card.attachments?.Count > 0)
-                {
-                    foreach (var attachment in card.attachments.Where(a => a.location == Locations.PlayArea))
-                    {
-                        var attachmentEvent = GameActions.DiscardFromPlay()
-                            .GetEvent(attachment, context.game.GetFrameworkContext());
-                        attachmentEvent.order = gameEvent.order - 1;
-                        
-                        var previousCondition = attachmentEvent.GetCondition();
-                        attachmentEvent.SetCondition(() => previousCondition() && attachment.parent == card);
-                        attachmentEvent.SetProperty("isContingent", true);
-                        contingentEvents.Add(attachmentEvent);
-                    }
-                }
-                
-                // Handle fate removal
-                if (card.fate > 0)
-                {
-                    var fateEvent = GameActions.RemoveFate(new RemoveFateAction.RemoveFateProperties { amount = card.fate })
-                        .GetEvent(card, context.game.GetFrameworkContext());
-                    fateEvent.order = gameEvent.order - 1;
-                    fateEvent.SetProperty("isContingent", true);
-                    contingentEvents.Add(fateEvent);
-                }
-                
-                return contingentEvents;
-            });
+            gameEvent.SetCreateContingentEvents(true);
         }
         
         /// <summary>

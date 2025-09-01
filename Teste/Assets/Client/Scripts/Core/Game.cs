@@ -96,7 +96,7 @@ namespace L5RGame
 
         // Core game components
         [Header("Game Components")]
-        [SerializeField] public EffectEngine effectEngine;
+        // [SerializeField] public EffectEngine effectEngine; // Can't declare variable of static type
         [SerializeField] private GameChat gameChat;
         [SerializeField] private ChatCommands chatCommands;
         [SerializeField] public GamePipeline pipeline;
@@ -1920,6 +1920,12 @@ def on_trigger(card, event_name, event_data):
             {
                 AddMessage("{0} moved from {1} to {2}", card.name, oldLocation ?? "unknown", newLocation);
             }
+        }
+
+        // Missing methods for compilation        
+        public void QueueSimpleStep(System.Action action)
+        {
+            action?.Invoke(); // Simple immediate execution for now
         }
     }
 

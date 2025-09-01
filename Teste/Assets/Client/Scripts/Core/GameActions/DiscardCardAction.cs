@@ -129,7 +129,7 @@ namespace L5RGame
             gameEvent.context = context;
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var cards = gameEvent.GetProperty("cards") as List<DrawCard>;
             
@@ -144,7 +144,9 @@ namespace L5RGame
                 }
                 
                 LogExecution("Discarded {0} cards", cards.Count);
+                return true;
             }
+            return false;
         }
         
         protected override bool IsEventFullyResolved(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)

@@ -521,6 +521,9 @@ namespace L5RGame
             }
         }
 
+        // Missing property for compilation
+        public BaseCard attackedProvince { get; set; }
+
     }
 
     /// <summary>

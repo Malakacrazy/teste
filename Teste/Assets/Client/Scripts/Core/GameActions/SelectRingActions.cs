@@ -33,7 +33,7 @@ namespace L5RGame
 
     public partial class SelectRingAction : RingAction
     {
-        protected override ISelectRingProperties DefaultProperties => new SelectRingProperties
+        protected ISelectRingProperties DefaultProperties => new SelectRingProperties
         {
             RingCondition = (ring, context) => true,
             SubActionProperties = ring => new { target = ring },
@@ -62,7 +62,7 @@ namespace L5RGame
             eventName = EventNames.OnGameStateChanged;
         }
 
-        public override (string, object[]) GetEffectMessage(AbilityContext context)
+        public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context);
             return ("choose a ring for {0}", new object[] { properties.Target });
@@ -78,12 +78,12 @@ namespace L5RGame
             return base.CanAffect(ring, context) && properties.RingCondition(ring, context);
         }
 
-        public override bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
+        public bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
         {
             return context.Game.Rings.Values.Any(ring => CanAffect(ring, context, additionalProperties));
         }
 
-        public override void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ISelectRingProperties;
             
@@ -131,7 +131,7 @@ namespace L5RGame
             context.Game.PromptForRingSelect(player, promptProperties);
         }
 
-        public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
+        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ISelectRingProperties;
             return properties.Targets && properties.Player != Players.Opponent;

@@ -156,14 +156,14 @@ namespace L5RGame
             gameEvent.context = context;
         }
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var parent = gameEvent.GetProperty("parent") as BaseCard;
             var attachment = gameEvent.GetProperty("card") as DrawCard;
             var context = gameEvent.context;
             
             if (parent == null || attachment == null || context == null)
-                return;
+                return false;
             
             // If attachment is already in play, remove it from current parent
             if (attachment.location == Locations.PlayArea)
@@ -190,6 +190,7 @@ namespace L5RGame
             }
             
             LogExecution("Attached {0} to {1}", attachment.name, parent.name);
+            return true;
         }
         
         #endregion

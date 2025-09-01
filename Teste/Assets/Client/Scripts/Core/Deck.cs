@@ -601,6 +601,11 @@ namespace L5RGame
     /// </summary>
     public partial class DrawCard : BaseCard
     {
+        // Missing methods for compilation
+        public virtual bool IsUnique() => cardData?.unicity ?? false;
+        public virtual bool AnotherUniqueInPlay(Player player) => false; // stub
+        public virtual bool CanAttach(BaseCard target) => true; // stub
+        public virtual bool CanAttach(BaseCard target, AbilityContext context) => true; // stub
         // Default implementation for most cards
         // Specific cards can inherit from this and override behavior
     }

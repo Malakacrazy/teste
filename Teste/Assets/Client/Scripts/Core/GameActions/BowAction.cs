@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -10,6 +11,15 @@ namespace L5RGame
     [System.Serializable]
     public partial class BowAction : CardGameAction
     {
+        public List<BaseCard> cards
+        {
+            get { return GetProperties(null).target?.Cast<BaseCard>()?.ToList() ?? new List<BaseCard>(); }
+            set { 
+                var props = GetProperties(null);
+                props.target.Clear();
+                if (value != null) props.target.AddRange(value.Cast<object>());
+            }
+        }
         /// <summary>
         /// Properties specific to bowing
         /// </summary>

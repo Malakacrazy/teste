@@ -31,7 +31,7 @@ namespace L5RGame
     public partial class ChooseGameAction : GameAction
     {
 
-        protected override IChooseActionProperties DefaultProperties => new ChooseActionProperties
+        protected IChooseActionProperties DefaultProperties => new ChooseActionProperties
         {
             ActivePromptTitle = "Select an action:",
             Choices = new ChooseGameChoices(),
@@ -61,7 +61,7 @@ namespace L5RGame
             effectMessage = "choose between different actions";
         }
 
-        protected override IChooseActionProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected IChooseActionProperties GetProperties(AbilityContext context, object additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as IChooseActionProperties;
             foreach (var key in properties.Choices.Keys)
@@ -71,13 +71,13 @@ namespace L5RGame
             return properties;
         }
 
-        public override bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
+        public bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             return properties.Choices.Values.Any(gameAction => gameAction.HasLegalTarget(context));
         }
 
-        public override void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var activePromptTitle = properties.ActivePromptTitle;
@@ -112,13 +112,13 @@ namespace L5RGame
             context.Game.PromptWithHandlerMenu(player, promptProperties);
         }
 
-        public override bool CanAffect(object target, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(object target, AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             return properties.Choices.Values.Any(gameAction => gameAction.CanAffect(target, context));
         }
 
-        public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
+        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             return properties.Choices.Values.Any(gameAction => gameAction.HasTargetsChosenByInitiatingPlayer(context));

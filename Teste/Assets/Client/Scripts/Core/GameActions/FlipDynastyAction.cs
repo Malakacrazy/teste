@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -108,7 +109,7 @@ namespace L5RGame
         
         #region Event Management
         
-        protected override void EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
+        protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
             var card = gameEvent.GetProperty("card") as BaseCard;
             
@@ -116,7 +117,9 @@ namespace L5RGame
             {
                 card.facedown = false;
                 LogExecution("Flipped {0} face up in {1}", card.name, card.location);
+                return true;
             }
+            return false;
         }
         
         #endregion
