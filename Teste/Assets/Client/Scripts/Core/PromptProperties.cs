@@ -15,6 +15,16 @@ namespace L5RGame
         public List<Action> handlers = new List<Action>();
         public bool canCancel = true;
         public float timeoutSeconds = 30f;
+        
+        // Additional properties for compatibility
+        public AbilityContext context;
+        public List<BaseCard> cards = new List<BaseCard>();
+        public Func<BaseCard, AbilityContext, bool> cardCondition;
+        public System.Action<BaseCard> cardHandler;
+        public System.Action<string> choiceHandler;
+        public GameAction gameAction;
+        public List<object> target = new List<object>();
+        public bool targets;
     }
 
     /// <summary>
@@ -33,6 +43,16 @@ namespace L5RGame
         public Func<Player, BaseCard, bool> onSelect;
         public Func<Player, List<BaseCard>, bool> onSelectMultiple;
         public List<MenuOption> buttons = new List<MenuOption>();
+        
+        // Additional properties for compatibility
+        public AbilityContext context;
+        public string mode;
+        public bool ordered;
+        public string location;
+        public System.Action<Player, List<BaseCard>> onSelectAction;
+        public System.Action<Player> onCancel;
+        public bool optional = false;
+        public EffectSource source;
     }
 
     /// <summary>

@@ -46,6 +46,26 @@ namespace L5RGame
         public Game game { get; private set; }
 
         /// <summary>
+        /// Constructor for 5-parameter creation (backwards compatibility)
+        /// </summary>
+        public Duel(Game gameInstance, BaseCard challengingCard, List<DrawCard> targetCards, 
+                   string type, System.Func<BaseCard, int> statistic)
+        {
+            // Convert DrawCard list to BaseCard list for compatibility
+            var targets = targetCards?.Cast<BaseCard>().ToList() ?? new List<BaseCard>();
+            Initialize(gameInstance, challengingCard, targets, type, statistic);
+        }
+
+        /// <summary>
+        /// Constructor for single DrawCard target (backwards compatibility)
+        /// </summary>
+        public Duel(Game gameInstance, BaseCard challengingCard, DrawCard targetCard, 
+                   string type, System.Func<BaseCard, int> statistic)
+        {
+            Initialize(gameInstance, challengingCard, targetCard as BaseCard, type, statistic);
+        }
+
+        /// <summary>
         /// Initialize the duel with participants and type
         /// </summary>
         /// <param name="gameInstance">Game instance</param>

@@ -96,7 +96,7 @@ namespace L5RGame
 
         // Core game components
         [Header("Game Components")]
-        // [SerializeField] public EffectEngine effectEngine; // Can't declare variable of static type
+        [SerializeField] public EffectEngine effectEngine;
         [SerializeField] private GameChat gameChat;
         [SerializeField] private ChatCommands chatCommands;
         [SerializeField] public GamePipeline pipeline;

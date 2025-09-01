@@ -8,6 +8,18 @@ namespace L5RGame
     {
         public void Initialize(Game game) { }
         
+        // Static factory methods for common actions
+        public static DiscardFromPlayAction DiscardFromPlay() => new DiscardFromPlayAction();
+        public static LastingEffectCardAction CardLastingEffect() => new LastingEffectCardAction();
+        public static ReadyAction Ready() => new ReadyAction();
+        public static HonorAction Honor() => new HonorAction();
+        public static DishonorAction Dishonor() => new DishonorAction();
+        public static PlaceFateAction PlaceFate() => new PlaceFateAction();
+        public static RemoveFateAction RemoveFate() => new RemoveFateAction();
+        public static BowAction Bow() => new BowAction();
+        public static GainFateAction GainFate(Player player, int amount) => new GainFateAction(player, amount);
+        public static GainHonorAction GainHonor(Player player, int amount) => new GainHonorAction(player, amount);
+        
         public GameAction GetAction(string actionName, object value) => null; // Cannot instantiate abstract GameAction
 
         /// <summary>
@@ -74,21 +86,6 @@ namespace L5RGame
             return new DrawCardsAction(player, amount);
         }
         
-        /// <summary>
-        /// Creates a gain honor action
-        /// </summary>
-        public object GainHonor(Player player, int amount)
-        {
-            return new GainHonorAction(player, amount);
-        }
-        
-        /// <summary>
-        /// Creates a gain fate action
-        /// </summary>
-        public object GainFate(Player player, int amount)
-        {
-            return new GainFateAction(player, amount);
-        }
     }
     
     public partial class GameAction

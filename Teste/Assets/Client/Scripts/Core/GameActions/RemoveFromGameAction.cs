@@ -205,7 +205,7 @@ namespace L5RGame
             CheckForRefillProvince(card, gameEvent, additionalProperties);
             
             var options = gameEvent.GetProperty("options") as Dictionary<string, object>;
-            card.owner.MoveCard(card, destination, options);
+            card.owner.MoveCard(card, destination, new CardMoveOptions(options));
             
             LogExecution("Removed {0} from the game", card.name);
         }

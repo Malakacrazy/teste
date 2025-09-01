@@ -39,6 +39,9 @@ namespace L5RGame
             public bool optional = false;
             public GameAction parentAction = null;
             
+            // Additional properties storage for dynamic behavior
+            private Dictionary<string, object> additionalProperties = new Dictionary<string, object>();
+            
             public GameActionProperties()
             {
                 target = new List<object>();
@@ -49,6 +52,45 @@ namespace L5RGame
                 this.target = targets ?? new List<object>();
                 this.cannotBeCancelled = cannotBeCancelled;
                 this.optional = optional;
+            }
+            
+            // Dictionary-like interface
+            public bool ContainsKey(string key)
+            {
+                switch (key)
+                {
+                    case "target": return target != null;
+                    case "cannotBeCancelled": return true;
+                    case "optional": return true;
+                    case "parentAction": return parentAction != null;
+                    default: return additionalProperties.ContainsKey(key);
+                }
+            }
+            
+            public object this[string key]
+            {
+                get
+                {
+                    switch (key)
+                    {
+                        case "target": return target;
+                        case "cannotBeCancelled": return cannotBeCancelled;
+                        case "optional": return optional;
+                        case "parentAction": return parentAction;
+                        default: return additionalProperties.ContainsKey(key) ? additionalProperties[key] : null;
+                    }
+                }
+                set
+                {
+                    switch (key)
+                    {
+                        case "target": target = value as List<object> ?? new List<object>(); break;
+                        case "cannotBeCancelled": cannotBeCancelled = (bool)value; break;
+                        case "optional": optional = (bool)value; break;
+                        case "parentAction": parentAction = value as GameAction; break;
+                        default: additionalProperties[key] = value; break;
+                    }
+                }
             }
         }
         

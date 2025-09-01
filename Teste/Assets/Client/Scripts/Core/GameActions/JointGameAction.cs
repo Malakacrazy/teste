@@ -279,8 +279,8 @@ namespace L5RGame
         public static JointGameAction GainFateAndHonor(Player player, int fate = 1, int honor = 1)
         {
             return Create(
-                GameActions.GainFate(new GainFateAction.GainFateProperties(fate) { target = new List<object> { player } }),
-                GameActions.GainHonor(new GainHonorAction.GainHonorProperties(honor) { target = new List<object> { player } })
+                GameActions.GainFate(player, fate),
+                GameActions.GainHonor(player, honor)
             );
         }
         

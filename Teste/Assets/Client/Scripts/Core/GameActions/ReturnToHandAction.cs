@@ -184,7 +184,7 @@ namespace L5RGame
             }
             
             var options = gameEvent.GetProperty("options") as Dictionary<string, object>;
-            card.owner.MoveCard(card, destination, options);
+            card.owner.MoveCard(card, destination, new CardMoveOptions(options));
             
             LogExecution("Returned {0} to hand", card.name);
         }

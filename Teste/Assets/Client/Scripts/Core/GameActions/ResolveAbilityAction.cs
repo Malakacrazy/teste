@@ -7,6 +7,10 @@ namespace L5RGame
 {
     public class NoCostsAbilityResolver : AbilityResolver
     {
+        public NoCostsAbilityResolver(Game gameInstance, AbilityContext abilityContext) : base(gameInstance, abilityContext)
+        {
+        }
+        
         public void Initialise()
         {
             Pipeline.Initialise(new List<BaseStep>

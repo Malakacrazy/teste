@@ -1135,6 +1135,12 @@ namespace L5RGame
         public List<BaseCard> dynastyCards { get; set; } = new List<BaseCard>();
         public bool ImperialFavor { get; set; } = false;
         
+        // Additional missing methods and properties for compilation
+        public int HonorBidModifier { get; set; } = 0;
+        public Game Game => game;
+        public string Name => playerName;
+        public bool FirstPlayer => game?.firstPlayer == this;
+        
     }
 
 

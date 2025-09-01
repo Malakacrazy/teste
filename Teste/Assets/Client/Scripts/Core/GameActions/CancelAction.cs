@@ -138,7 +138,7 @@ namespace L5RGame
             var properties = GetProperties(context, additionalProperties);
             
             // Check if event can be cancelled
-            if (eventObj.CannotBeCancelled())
+            if (eventObj.CannotBeCancelled)
                 return false;
                 
             // Check if replacement action has legal targets
@@ -156,7 +156,7 @@ namespace L5RGame
                 return false;
                 
             var eventObj = triggeredContext.eventObject;
-            if (eventObj == null || eventObj.CannotBeCancelled())
+            if (eventObj == null || eventObj.CannotBeCancelled)
                 return false;
                 
             var properties = GetProperties(context, additionalProperties);
@@ -215,7 +215,7 @@ namespace L5RGame
                 context.game.QueueSimpleStep(() =>
                 {
                     // Set replacement event if not a sacrifice and single event
-                    if (!triggeredContext.eventObject.IsSacrifice() && events.Count == 1)
+                    if (!triggeredContext.eventObject.IsSacrifice && events.Count == 1)
                     {
                         triggeredContext.eventObject.SetReplacementEvent(events[0]);
                     }

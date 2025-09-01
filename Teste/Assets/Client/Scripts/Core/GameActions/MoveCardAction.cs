@@ -160,7 +160,7 @@ namespace L5RGame
             var properties = GetProperties(context, additionalProperties);
             
             if (card == null || string.IsNullOrEmpty(properties.destination))
-                return;
+                return false;
             
             // Handle card switching
             if (properties.switchCard)
@@ -183,9 +183,9 @@ namespace L5RGame
             // Move the card
             var moveOptions = new Dictionary<string, object>();
             if (properties.bottom)
-                moveOptions["bottom"] = true;
+                moveOptions["placement"] = "bottom";
                 
-            targetPlayer.MoveCard(card, properties.destination, moveOptions);
+            targetPlayer.MoveCard(card, properties.destination, new CardMoveOptions(moveOptions));
             
             // Handle shuffling
             var targetList = properties.target as List<object>;

@@ -63,12 +63,12 @@ namespace L5RGame
             
             if (card.Controller.IsAttackingPlayer())
             {
-                if (!card.CanParticipateAsAttacker())
+                if (!card.CanParticipateAsAttacker(context.Game.CurrentConflict.ConflictType))
                 {
                     return false;
                 }
             }
-            else if (!card.CanParticipateAsDefender())
+            else if (!card.CanParticipateAsDefender(context.Game.CurrentConflict.ConflictType))
             {
                 return false;
             }

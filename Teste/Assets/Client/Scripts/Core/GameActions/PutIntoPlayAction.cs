@@ -137,10 +137,10 @@ namespace L5RGame
                     return false;
                     
                 // Check participation restrictions
-                if (context.player.IsAttackingPlayer() && !card.CanParticipateAsAttacker())
+                if (context.player.IsAttackingPlayer() && !card.CanParticipateAsAttacker(context.game.currentConflict.conflictType))
                     return false;
                     
-                if (context.player.IsDefendingPlayer() && !card.CanParticipateAsDefender())
+                if (context.player.IsDefendingPlayer() && !card.CanParticipateAsDefender(context.game.currentConflict.conflictType))
                     return false;
                     
                 // Check conflict type restrictions (dash abilities)

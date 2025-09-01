@@ -181,10 +181,6 @@ namespace L5RGame
         /// </summary>
         public IReadOnlyDictionary<string, object> Properties => properties;
         
-        /// <summary>
-        /// Player associated with this event
-        /// </summary>
-        public Player Player => properties.ContainsKey("player") ? properties["player"] as Player : null;
         
         /// <summary>
         /// Resolver for this event
@@ -714,14 +710,86 @@ namespace L5RGame
         
         #endregion
         
+        #region Additional Properties
+        
+        /// <summary>
+        /// Card associated with this event (alias for interface compatibility)
+        /// </summary>
+        public BaseCard card => GetProperty("card") as BaseCard;
+        
+        /// <summary>
+        /// Whether this event cannot be cancelled
+        /// </summary>
+        public bool CannotBeCancelled 
+        { 
+            get => GetProperty("cannotBeCancelled", false);
+            set => SetProperty("cannotBeCancelled", value);
+        }
+        
+        /// <summary>
+        /// Check if this event cannot be cancelled (method version for compatibility)
+        /// </summary>
+        public bool CheckCannotBeCancelled() => GetProperty("cannotBeCancelled", false);
+        
+        /// <summary>
+        /// Whether this event is a sacrifice
+        /// </summary>
+        public bool IsSacrifice => GetProperty("isSacrifice", false);
+        
+        /// <summary>
+        /// Check if this event is a sacrifice (method version for compatibility)
+        /// </summary>
+        public bool CheckIsSacrifice() => GetProperty("isSacrifice", false);
+        
+        /// <summary>
+        /// Sets a replacement event for this event
+        /// </summary>
+        public void SetReplacementEvent(GameEvent replacement)
+        {
+            replacementEvent = replacement;
+            SetProperty("replacementEvent", replacement);
+        }
+        
+        #endregion
+        
         #region IGameEvent Implementation
         
-        public string Name => name;
+        public string Name
+        {
+            get => name;
+            set => name = value;
+        }
         public BaseCard Card => GetProperty("card") as BaseCard;
-        public Ring Ring => GetProperty("ring") as Ring;
+        public Ring Ring
+        {
+            get => GetProperty("ring") as Ring;
+            set => SetProperty("ring", value);
+        }
         public string Phase => GetProperty("phase") as string;
-        public AbilityContext Context => context;
+        public AbilityContext Context
+        {
+            get => context;
+            set => context = value;
+        }
         public Dictionary<string, object> Parameters => properties;
+        
+        // Additional properties for compilation compatibility
+        public object Recipient => GetProperty("recipient");
+        public string Direction => GetProperty("direction") as string;
+        public int Amount => GetProperty("amount", 0);
+        public int Fate => GetProperty("fate", 0);
+        public object Origin => GetProperty("origin");
+        public StatusToken Token => GetProperty("token") as StatusToken;
+        public int Value => GetProperty("value", 0);
+        public bool AfterBid => GetProperty("afterBid", false);
+        public object Conflict => GetProperty("conflict");
+        public Player Player
+        {
+            get => GetProperty("player") as Player;
+            set => SetProperty("player", value);
+        }
+        public object PhysicalRing => GetProperty("physicalRing");
+        public bool Optional => GetProperty("optional", false);
         // cancelled property already defined above
         public bool IsCancelled() => isCancelled;
         public bool IsResolved() => isResolved;

@@ -372,5 +372,41 @@ namespace L5RGame
         public const string ShowTopConflictCard = "showTopConflictCard";
         public const string EventsCannotBeCancelled = "eventsCannotBeCancelled";
         public const string ShowTopDynastyCard = "showTopDynastyCard";
+        public const string CannotApplyLastingEffects = "cannotApplyLastingEffects";
+        public const string MustBeChosen = "mustBeChosen";
+    }
+
+    /// <summary>
+    /// Duration constants for lasting effects (partial class continued from EffectSource.cs)
+    /// </summary>
+    public static partial class Durations
+    {
+        public const string UntilEndOfTurn = "untilEndOfTurn";
+        
+        // Duration factory methods that return objects with extension methods
+        public static object UntilEndOfTurnEffect() => new DurationEffect(UntilEndOfTurn);
+        public static object UntilEndOfPhaseEffect() => new DurationEffect(UntilEndOfPhase);
+        public static object UntilEndOfConflictEffect() => new DurationEffect(UntilEndOfConflict);
+        public static object UntilEndOfRoundEffect() => new DurationEffect(UntilEndOfRound);
+    }
+
+    /// <summary>
+    /// Duration effect object with extension methods
+    /// </summary>
+    public class DurationEffect
+    {
+        public string Duration { get; }
+        
+        public DurationEffect(string duration)
+        {
+            Duration = duration;
+        }
+        
+        public DurationEffect UntilEndOfTurn() => new DurationEffect(Durations.UntilEndOfTurn);
+        public DurationEffect UntilEndOfPhase() => new DurationEffect(Durations.UntilEndOfPhase);
+        public DurationEffect UntilEndOfConflict() => new DurationEffect(Durations.UntilEndOfConflict);
+        public DurationEffect UntilEndOfRound() => new DurationEffect(Durations.UntilEndOfRound);
+        public DurationEffect CustomDuration() => new DurationEffect(Durations.Custom);
+        public DurationEffect PersistentEffect() => new DurationEffect(Durations.Persistent);
     }
 }

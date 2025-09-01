@@ -16,5 +16,16 @@ namespace L5RGame
             triggeringEvent = gameEvent;
             eventObject = gameEvent;
         }
+        
+        /// <summary>
+        /// Cancel this triggered ability context
+        /// </summary>
+        public void Cancel()
+        {
+            if (triggeringEvent != null)
+            {
+                triggeringEvent.Cancel();
+            }
+        }
     }
 }

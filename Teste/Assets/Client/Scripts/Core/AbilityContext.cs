@@ -88,6 +88,7 @@ namespace L5RGame
         public Ring ring;
         public StatusToken token;
         public object eventObj;
+        public GameEvent eventObject;
 
         [Header("Game State")]
         public List<ProvinceRefillData> provincesToRefill = new List<ProvinceRefillData>();
@@ -100,6 +101,8 @@ namespace L5RGame
         public Player Player => player;
         public BaseAbility Ability => ability;
         public object Source => source;
+        public Game Game => game;
+        public Player ChoosingPlayerOverride => choosingPlayerOverride;
         public Dictionary<string, object> Targets => targets;
         public Dictionary<string, object> Rings => rings;
         public Dictionary<string, object> Selects => selects;

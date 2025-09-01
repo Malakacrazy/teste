@@ -53,5 +53,6 @@ namespace L5RGame
         public const string OnTakeControl = "onTakeControl";
         public const string OnTakeRing = "onTakeRing";
         public const string OnTransferHonor = "onTransferHonor";
+        public const string OnPhaseEnded = "onPhaseEnded";
     }
 }

@@ -906,5 +906,17 @@ namespace L5RGame
         }
         public virtual int PersonalHonor { get; set; } = 0;
         public virtual void MakeOrdinary() { /* stub */ }
+        
+        // Additional missing methods for compilation
+        public virtual bool IsUnique() => cardData?.unicity ?? false;
+        public virtual bool AnotherUniqueInPlay(Player player) => false; // Stub
+        public virtual void AddStatModifier(string stat, int modifier) { /* stub */ }
+        public virtual int cost => cardData?.fate ?? 0;
+        public virtual bool HasDash(string conflictType) => false; // Stub 
+        public virtual List<CardAbility> GetPlayActions() => new List<CardAbility>();
+        public virtual bool LeavesPlay() => false; // Stub
+        public virtual bool IsConflictProvince() => type == "province" && isConflict;
+        public virtual bool InConflict() => inConflict;
+        public virtual void SetPersonalHonor(int value) => PersonalHonor = value;
     }
 }

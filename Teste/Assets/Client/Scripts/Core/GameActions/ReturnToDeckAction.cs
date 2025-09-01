@@ -250,7 +250,7 @@ namespace L5RGame
             }
             
             var options = gameEvent.GetProperty("options") as Dictionary<string, object>;
-            card.owner.MoveCard(card, destination, options);
+            card.owner.MoveCard(card, destination, new CardMoveOptions(options));
             
             var bottom = options?.ContainsKey("bottom") == true;
             LogExecution("Returned {0} to {1} of deck", card.name, bottom ? "bottom" : "top");
