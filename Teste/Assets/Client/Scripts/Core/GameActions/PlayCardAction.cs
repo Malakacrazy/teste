@@ -180,10 +180,9 @@ namespace L5RGame
                 handlers.Add(() => CancelAction(context));
             }
             
-            var promptProperties = new
+            var promptProperties = new HandlerMenuPromptProperties
             {
-                source = card,
-                choices = choices,
+                choices = choices.Select(choice => new MenuOption { text = choice }).ToList(),
                 handlers = handlers
             };
             

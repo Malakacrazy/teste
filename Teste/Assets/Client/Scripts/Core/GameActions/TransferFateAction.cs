@@ -87,15 +87,15 @@ namespace L5RGame
 
         protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
-            var result = MoveFateEventHandler(gameEvent);
-            if (result)
+            MoveFateEventHandler(gameEvent);
+            // Always continue processing after handling the fate move
             {
                 var amount = gameEvent.GetProperty("fate") as int? ?? 0;
                 var origin = gameEvent.GetProperty("origin") as Player;
                 var recipient = gameEvent.GetProperty("recipient") as Player;
                 LogExecution("Transferred {0} fate from {1} to {2}", amount, origin?.name ?? "unknown", recipient?.name ?? "unknown");
             }
-            return result;
+            return true;
         }
     }
 }

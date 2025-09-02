@@ -199,7 +199,7 @@ namespace L5RGame
             });
             
             // Create contingent events for attachments and fate
-            gameEvent.SetCreateContingentEvents(() =>
+            gameEvent.SetCreateContingentEventsFunc(new System.Func<List<GameEvent>>(() =>
             {
                 var contingentEvents = new List<GameEvent>();
                 
@@ -212,8 +212,7 @@ namespace L5RGame
                             .GetEvent(attachment, context.game.GetFrameworkContext());
                         attachmentEvent.order = gameEvent.order - 1;
                         
-                        var previousCondition = attachmentEvent.GetCondition();
-                        attachmentEvent.SetCondition(() => previousCondition() && attachment.parent == card);
+                        attachmentEvent.SetCondition(new System.Func<GameEvent, bool>(evt => attachment.parent == card));
                         attachmentEvent.SetProperty("isContingent", true);
                         contingentEvents.Add(attachmentEvent);
                     }
@@ -222,7 +221,7 @@ namespace L5RGame
                 // Handle fate removal
                 if (card.fate > 0)
                 {
-                    var fateEvent = GameActions.RemoveFate(new RemoveFateAction.RemoveFateProperties { amount = card.fate })
+                    var fateEvent = new RemoveFateAction(new RemoveFateAction.RemoveFateProperties { amount = card.fate })
                         .GetEvent(card, context.game.GetFrameworkContext());
                     fateEvent.order = gameEvent.order - 1;
                     fateEvent.SetProperty("isContingent", true);
@@ -230,7 +229,7 @@ namespace L5RGame
                 }
                 
                 return contingentEvents;
-            });
+            }));
         }
         
         /// <summary>

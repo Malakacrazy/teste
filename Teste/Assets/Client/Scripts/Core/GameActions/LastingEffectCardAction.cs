@@ -162,7 +162,11 @@ namespace L5RGame
 
                     foreach (var effect in filteredEffects)
                     {
-                        gameEvent.context.Game.EffectEngine.Add(effect);
+                        var gameEffect = GetEffectFromProps(effect) as GameEffect;
+                        if (gameEffect != null)
+                        {
+                            gameEvent.context.Game.EffectEngine.Add(gameEffect);
+                        }
                     }
                     
                     LogExecution("Applied {0} lasting effects to {1} for duration {2}", filteredEffects.Count(), card.name, properties.Duration);

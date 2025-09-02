@@ -51,7 +51,7 @@ namespace L5RGame
         
         #endregion
 
-        public override bool CanAffect(Ring ring, AbilityContext context, object additionalProperties = null)
+        public override bool CanAffect(Ring ring, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             return ring.ClaimedBy != context.Player.Name && base.CanAffect(ring, context, additionalProperties);
         }

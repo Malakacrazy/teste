@@ -48,12 +48,12 @@ namespace L5RGame
         #endregion
 
 
-        protected ISwitchConflictTypeProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected ISwitchConflictTypeProperties GetProperties(AbilityContext context, GameActionProperties additionalProperties = null)
         {
             return base.GetProperties(context, additionalProperties) as ISwitchConflictTypeProperties;
         }
 
-        public override bool CanAffect(Ring ring, AbilityContext context, object additionalProperties = null)
+        public override bool CanAffect(Ring ring, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             if (context.Game.CurrentConflict == null)
             {

@@ -19,7 +19,7 @@ namespace L5RGame
         
         public void Initialise()
         {
-            Pipeline.Initialize(new List<BaseStep>
+            Pipeline.Initialize(new List<IGameStep>
             {
                 new SimpleStep(Game, () => { CreateSnapshot(); return true; }),
                 new SimpleStep(Game, () => { OpenInitiateAbilityEventWindow(); return true; }),
@@ -78,9 +78,9 @@ namespace L5RGame
             }
 
             Context.Ability.DisplayMessage(Context, "resolves");
-            Game.OpenEventWindow(new InitiateCardAbilityEvent(
-                new { card = Context.Source, context = Context },
-                () => InitiateAbility = true));
+            Game.OpenEventWindow(new List<GameEvent> { new InitiateCardAbilityEvent(
+                new Dictionary<string, object> { ["card"] = Context.Source, ["context"] = Context },
+                () => InitiateAbility = true) });
         }
     }
 
@@ -186,7 +186,7 @@ namespace L5RGame
             return false;
         }
 
-        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
+        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IResolveAbilityProperties;
             return properties.Ability.HasTargetsChosenByInitiatingPlayer(context);

@@ -68,7 +68,7 @@ namespace L5RGame
             return ("place {1} fate on {0}", new object[] { properties.Target, properties.Amount });
         }
 
-        public override bool CanAffect(Ring ring, AbilityContext context, object additionalProperties = null)
+        public override bool CanAffect(Ring ring, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties as GameAction.GameActionProperties) as IPlaceFateRingProperties;
             
@@ -102,17 +102,15 @@ namespace L5RGame
             return properties.Amount > 0 && base.CanAffect(ring, context, additionalProperties);
         }
 
-        protected override void AddPropertiesToEvent(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
-            var properties = GetProperties(context, additionalProperties as GameAction.GameActionProperties) as IPlaceFateRingProperties;
+            base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
+            var properties = GetProperties(context, additionalProperties) as IPlaceFateRingProperties;
             
-            if (eventObj is GameEvent gameEvent)
-            {
-                gameEvent.Fate = properties.Amount;
-                gameEvent.Origin = properties.Origin;
-                gameEvent.Context = context;
-                gameEvent.Recipient = ring;
-            }
+            gameEvent.Fate = properties.Amount;
+            gameEvent.Origin = properties.Origin;
+            gameEvent.Context = context;
+            gameEvent.Recipient = target as Ring;
         }
 
         protected bool CheckEventCondition(GameEvent eventObj)
@@ -138,8 +136,8 @@ namespace L5RGame
 
         protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
-            var result = MoveFateEventHandler(gameEvent);
-            if (result)
+            MoveFateEventHandler(gameEvent);
+            // Always continue processing after handling the fate move
             {
                 var amount = gameEvent.GetProperty("fate") as int? ?? 0;
                 var ring = gameEvent.GetProperty("recipient") as Ring;
@@ -153,7 +151,7 @@ namespace L5RGame
                     LogExecution("Placed {0} fate on {1}", amount, ring?.name ?? "ring");
                 }
             }
-            return result;
+            return true;
         }
     }
 }

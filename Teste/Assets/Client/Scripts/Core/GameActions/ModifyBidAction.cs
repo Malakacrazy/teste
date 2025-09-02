@@ -144,11 +144,11 @@ namespace L5RGame
                             }
                         };
 
-                        var promptProperties = new
+                        var promptProperties = new HandlerMenuPromptProperties
                         {
                             context = context,
-                            choices = choices,
-                            choiceHandler = choiceHandler
+                            choices = choices.Select(choice => new MenuOption { text = choice }).ToList(),
+                            handlers = choices.Select(choice => new Action(() => choiceHandler(choice))).ToList()
                         };
 
                         context.Game.PromptWithHandlerMenu(player, promptProperties);

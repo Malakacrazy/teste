@@ -148,13 +148,13 @@ namespace L5RGame
             else
             {
                 // Multiple cards - let player choose order for discard
-                var handler = new System.Action<Player, List<DrawCard>>((p, cards) =>
+                var handler = new System.Action<Player, List<BaseCard>>((p, cards) =>
                 {
                     // If no specific order chosen, use all cards to discard
                     if (cards == null || cards.Count == 0)
-                        cards = cardsToDiscard;
+                        cards = cardsToDiscard.Cast<BaseCard>().ToList();
                     else
-                        cards = cards.Concat(cardsToDiscard.Where(c => !cards.Contains(c))).ToList();
+                        cards = cards.Concat(cardsToDiscard.Cast<BaseCard>().Where(c => !cards.Contains(c))).ToList();
                         
                     foreach (var card in cards)
                     {
@@ -172,10 +172,10 @@ namespace L5RGame
                     ordered = true,
                     location = Locations.Hand,
                     controller = Players.Self,
-                    source = gameEvent.context.source,
+                    source = gameEvent.context.source as EffectSource,
                     cardCondition = card => cardsToDiscard.Contains(card),
-                    onSelect = handler,
-                    onCancel = () => handler(player, null)
+                    onSelect = (p, card) => { /* Card selection logic handled elsewhere */ return true; },
+                    onCancel = (p) => handler(player, null)
                 });
             }
             

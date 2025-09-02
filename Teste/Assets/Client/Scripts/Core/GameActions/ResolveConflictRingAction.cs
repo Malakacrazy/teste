@@ -75,23 +75,20 @@ namespace L5RGame
         #endregion
 
 
-        protected override void AddPropertiesToEvent(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
-            base.AddPropertiesToEvent(eventObj, ring, context, additionalProperties);
+            base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
             var properties = GetProperties(context, additionalProperties) as IResolveConflictRingProperties;
             var conflict = context.Game.CurrentConflict;
 
-            if (eventObj is GameEvent gameEvent)
+            if (conflict == null && !properties.ResolveAsAttacker)
             {
-                if (conflict == null && !properties.ResolveAsAttacker)
-                {
-                    gameEvent.Name = EventNames.Unnamed;
-                    return;
-                }
-
-                gameEvent.Conflict = conflict;
-                gameEvent.Player = properties.ResolveAsAttacker ? context.Player : conflict?.AttackingPlayer;
+                gameEvent.Name = EventNames.Unnamed;
+                return;
             }
+
+            gameEvent.Conflict = conflict;
+            gameEvent.Player = properties.ResolveAsAttacker ? context.Player : conflict?.AttackingPlayer;
         }
 
         protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
@@ -152,21 +149,21 @@ namespace L5RGame
                 buttons.Add(new { text = "Don't Resolve the Conflict Ring", arg = "cancel" });
             }
 
-            var promptProperties = new
+            var promptProperties = new Dictionary<string, object>
             {
-                activePromptTitle = activePromptTitle,
-                buttons = buttons,
-                source = "Resolve Ring Effect",
-                ringCondition = new Func<Ring, bool>(ring => elements.Contains(ring.Element)),
-                onSelect = new Func<Player, Ring, bool>((p, ring) =>
+                ["activePromptTitle"] = activePromptTitle,
+                ["buttons"] = buttons,
+                ["source"] = "Resolve Ring Effect",
+                ["ringCondition"] = new Func<Ring, bool>(ring => elements.Contains(ring.Element)),
+                ["onSelect"] = new Func<Player, Ring, bool>((p, ring) =>
                 {
                     elementsToResolve--;
                     chosenElements.Add(ring.Element);
                     ChooseElementsToResolve(p, elements.Where(e => e != ring.Element).ToList(), optional, elementsToResolve, chosenElements);
                     return true;
                 }),
-                onCancel = new Action<Player>(p => p.Game.AddMessage("{0} chooses not to resolve the conflict ring", p)),
-                onMenuCommand = new Func<Player, string, bool>((p, arg) =>
+                ["onCancel"] = new Action<Player>(p => p.Game.AddMessage("{0} chooses not to resolve the conflict ring", p)),
+                ["onMenuCommand"] = new Func<Player, string, bool>((p, arg) =>
                 {
                     if (arg == "all")
                     {

@@ -67,7 +67,7 @@ namespace L5RGame
             
             var properties = GetProperties(context, additionalProperties) as IInitiateConflictProperties;
             return base.CanAffect(target, context, additionalProperties) && 
-                   player.HasLegalConflictDeclaration(new { forcedDeclaredType = properties.ForcedDeclaredType });
+                   player.HasLegalConflictDeclaration(new ConflictProperties { forcedDeclaredType = properties.ForcedDeclaredType });
         }
 
         protected override List<object> DefaultTargets(AbilityContext context)

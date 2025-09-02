@@ -210,7 +210,7 @@ namespace L5RGame
         {
             if (effectArray == null || effectArray.Count == 0) return;
 
-            game.effectEngine.UnapplyAndRemove(effect => effectArray.Contains(effect));
+            game.effectEngine.UnapplyAndRemove((System.Func<GameEffect, bool>)(effect => effectArray.Contains(effect)));
             
             // Remove from our active effects tracking
             foreach (var effect in effectArray)

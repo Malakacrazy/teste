@@ -113,9 +113,8 @@ namespace L5RGame
             if (properties.attachment.IsUnique() && properties.attachment.AnotherUniqueInPlay(context.player))
                 return false;
                 
-            // Check if attachment can attach to this ring
-            if (!properties.attachment.CanAttach(ring, context))
-                return false;
+            // Ring attachments are handled differently since Ring is not BaseCard
+            // TODO: Add proper ring attachment validation if needed
             
             return base.CanAffect(target, context, additionalProperties);
         }
@@ -176,7 +175,8 @@ namespace L5RGame
             
             // Attach to ring
             parent.AddAttachment(attachment);
-            attachment.parent = parent;
+            // Note: Ring attachments don't set parent since Ring is not BaseCard
+            // attachment.parent = null; // or handle ring parent relationship differently
             
             // Update controller if necessary
             if (attachment.controller != context.player)

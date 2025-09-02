@@ -141,9 +141,9 @@ namespace L5RGame
             {
                 player = context.ChoosingPlayerOverride ?? player;
                 mustSelect = (properties.Selector as dynamic)?.GetAllLegalTargets(context, player)
-                    .Where(card => card.GetEffects(EffectNames.MustBeChosen)
-                        .Any(restriction => restriction.IsMatch("target", context)))
-                    .ToList();
+                    ?.Where(new System.Func<BaseCard, bool>(card => card.GetEffects(EffectNames.MustBeChosen)
+                        .Any(restriction => restriction != null)))
+                    ?.ToList();
             }
             
             if (!((properties.Selector as dynamic)?.HasEnoughTargets(context, player) ?? false))

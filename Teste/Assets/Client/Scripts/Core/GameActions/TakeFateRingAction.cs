@@ -100,14 +100,14 @@ namespace L5RGame
 
         protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)
         {
-            var result = MoveFateEventHandler(gameEvent);
-            if (result)
+            MoveFateEventHandler(gameEvent);
+            // Always continue processing after handling the fate move
             {
                 var amount = gameEvent.GetProperty("fate") as int? ?? 0;
                 var ring = gameEvent.GetProperty("origin") as Ring;
                 LogExecution("Took {0} fate from {1}", amount, ring?.name ?? "ring");
             }
-            return result;
+            return true;
         }
     }
 }

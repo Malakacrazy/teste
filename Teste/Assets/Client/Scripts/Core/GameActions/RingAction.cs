@@ -58,7 +58,7 @@ namespace L5RGame
         {
             if (eventObj is GameEvent gameEvent && gameEvent.Ring != null)
             {
-                return CanAffect(gameEvent.Ring, gameEvent.Context, additionalProperties);
+                return CanAffect(gameEvent.Ring, gameEvent.Context, (GameActionProperties)additionalProperties);
             }
             return false;
         }

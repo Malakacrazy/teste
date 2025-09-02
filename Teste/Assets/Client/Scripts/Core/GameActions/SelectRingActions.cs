@@ -117,18 +117,18 @@ namespace L5RGame
                 properties.GameAction.AddEventsToArray(events, context, MergeProperties(additionalProperties, properties.SubActionProperties(ring)) as GameActionProperties);
             };
             
-            var promptProperties = new
+            var promptProperties = new Dictionary<string, object>
             {
-                context = context,
-                buttons = buttons,
-                onCancel = properties.CancelHandler,
-                onSelect = onSelect,
-                activePromptTitle = properties.ActivePromptTitle,
-                ringCondition = properties.RingCondition,
-                targets = properties.Targets
+                ["context"] = context,
+                ["buttons"] = buttons,
+                ["onCancel"] = properties.CancelHandler,
+                ["onSelect"] = onSelect,
+                ["activePromptTitle"] = properties.ActivePromptTitle,
+                ["ringCondition"] = properties.RingCondition,
+                ["targets"] = properties.Targets
             };
             
-            context.Game.PromptForRingSelect(player, promptProperties as Dictionary<string, object>);
+            context.Game.PromptForRingSelect(player, promptProperties);
         }
 
         public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, GameActionProperties additionalProperties = null)

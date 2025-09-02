@@ -79,16 +79,16 @@ namespace L5RGame
                 }).ToList();
 
                 // Merge additional properties
-                var mergedProperties = additionalProperties ?? new { };
+                var mergedProperties = additionalProperties ?? new GameAction.GameActionProperties();
                 if (mergedProperties.GetType().GetProperty("optional") == null)
                 {
-                    mergedProperties = new { optional = false };
+                    mergedProperties = new GameAction.GameActionProperties { optional = false };
                 }
 
-                var effectObjects = sortedRings.Select(ring => new
+                var effectObjects = sortedRings.Select(ring => new EffectChoice
                 {
-                    title = GetRingName(ring.Element) + " Effect",
-                    handler = new Action(() => context.Game.OpenEventWindow(GetEvent(ring, context, mergedProperties)))
+                    Title = GetRingName(ring.Element) + " Effect",
+                    Handler = new Action(() => context.Game.OpenEventWindow(new List<GameEvent> { GetEvent(ring, context, mergedProperties) }))
                 }).ToList();
 
                 events.Add(context.Game.GetEvent(EventNames.Unnamed, new Dictionary<string, object>(), () => {
