@@ -304,9 +304,9 @@ namespace L5RGame
     }
 
     /// <summary>
-    /// Base card selector for targeting
+    /// Card selector constants for targeting
     /// </summary>
-    public static class BaseCardSelector
+    public static class CardSelectorConstants
     {
         public const string Any = "any";
         public const string Self = "self";
@@ -314,7 +314,7 @@ namespace L5RGame
     }
 
     /// <summary>
-    /// Target modes for selection
+    /// Target modes for selection 
     /// </summary>
     public static class TargetModes
     {
@@ -322,6 +322,15 @@ namespace L5RGame
         public const string Multiple = "multiple";
         public const string UpTo = "upTo";
         public const string Exactly = "exactly";
+        public const string Ability = "ability";
+        public const string AutoSingle = "autoSingle";
+        public const string ExactlyVariable = "exactlyVariable";
+        public const string MaxStat = "maxStat";
+        public const string Token = "token";
+        public const string Unlimited = "unlimited";
+        public const string UpToVariable = "upToVariable";
+        public const string Ring = "ring";
+        public const string Select = "select";
     }
 
     // Backward compatibility aliases

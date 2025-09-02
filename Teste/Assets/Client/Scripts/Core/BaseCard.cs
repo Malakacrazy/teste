@@ -812,6 +812,17 @@ namespace L5RGame
         }
 
         /// <summary>
+        /// Check if this card can be targeted in a selection context
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="selectedCards">Already selected cards</param>
+        /// <returns>True if card can be targeted</returns>
+        public virtual bool CanBeTargeted(AbilityContext context, List<BaseCard> selectedCards = null)
+        {
+            return CanBeTargetedBy(context);
+        }
+
+        /// <summary>
         /// Check if this card readies during the ready phase
         /// </summary>
         /// <returns>True if card readies during ready phase</returns>

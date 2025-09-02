@@ -17,7 +17,7 @@ namespace L5RGame
         string Message { get; set; }
         Func<BaseCard, Player, ISelectCardProperties, object[]> MessageArgs { get; set; }
         GameAction GameAction { get; set; }
-        string Selector { get; set; }
+        BaseCardSelector Selector { get; set; }
         string Mode { get; set; }
         Func<BaseCard, object> SubActionProperties { get; set; }
         Action CancelHandler { get; set; }
@@ -35,7 +35,7 @@ namespace L5RGame
         public string Message { get; set; }
         public Func<BaseCard, Player, ISelectCardProperties, object[]> MessageArgs { get; set; }
         public GameAction GameAction { get; set; }
-        public string Selector { get; set; }
+        public BaseCardSelector Selector { get; set; }
         public string Mode { get; set; }
         public Func<BaseCard, object> SubActionProperties { get; set; }
         public Action CancelHandler { get; set; }
