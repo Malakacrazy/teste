@@ -79,15 +79,15 @@ namespace L5RGame
             return ("choose a target for {0}", new object[] { properties.Target });
         }
 
-        protected ISelectCardProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected ISelectCardProperties GetProperties(AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ISelectCardProperties;
-            properties.GameAction?.SetDefaultTarget(() => properties.Target);
+            properties.GameAction?.SetDefaultTarget(ctx => properties.Target);
             
             if (properties.Selector == null)
             {
                 Func<BaseCard, AbilityContext, bool> cardCondition = (card, ctx) =>
-                    properties.GameAction.AllTargetsLegal(ctx, MergeProperties(additionalProperties, properties.SubActionProperties(card))) &&
+                    properties.GameAction.AllTargetsLegal(ctx, MergeProperties(additionalProperties, properties.SubActionProperties(card)) as GameActionProperties) &&
                     properties.CardCondition(card, ctx);
 
                 var selectorProperties = new
@@ -105,27 +105,27 @@ namespace L5RGame
             return properties;
         }
 
-        public override bool CanAffect(BaseCard card, AbilityContext context, object additionalProperties = null)
+        public virtual bool CanAffect(BaseCard card, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var player = (properties.Targets && context.ChoosingPlayerOverride != null) ? context.ChoosingPlayerOverride :
                          (properties.Player == Players.Opponent && context.Player.Opponent != null) ? context.Player.Opponent :
                          context.Player;
             
-            return properties.Selector.CanTarget(card, context, player);
+            return (properties.Selector as dynamic)?.CanTarget(card, context, player) ?? false;
         }
 
-        public bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
+        public bool HasLegalTarget(AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var player = (properties.Targets && context.ChoosingPlayerOverride != null) ? context.ChoosingPlayerOverride :
                          (properties.Player == Players.Opponent && context.Player.Opponent != null) ? context.Player.Opponent :
                          context.Player;
             
-            return properties.Selector.HasEnoughTargets(context, player);
+            return (properties.Selector as dynamic)?.HasEnoughTargets(context, player) ?? false;
         }
 
-        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             
@@ -140,13 +140,13 @@ namespace L5RGame
             if (properties.Targets)
             {
                 player = context.ChoosingPlayerOverride ?? player;
-                mustSelect = properties.Selector.GetAllLegalTargets(context, player)
+                mustSelect = (properties.Selector as dynamic)?.GetAllLegalTargets(context, player)
                     .Where(card => card.GetEffects(EffectNames.MustBeChosen)
                         .Any(restriction => restriction.IsMatch("target", context)))
                     .ToList();
             }
             
-            if (!properties.Selector.HasEnoughTargets(context, player))
+            if (!((properties.Selector as dynamic)?.HasEnoughTargets(context, player) ?? false))
             {
                 return;
             }
@@ -163,31 +163,28 @@ namespace L5RGame
                 {
                     context.Game.AddMessage(properties.Message, properties.MessageArgs(cards.FirstOrDefault(), p, properties));
                 }
-                properties.GameAction.AddEventsToArray(events, context, MergeProperties(additionalProperties, properties.SubActionProperties(cards.FirstOrDefault())));
+                properties.GameAction.AddEventsToArray(events, context, MergeProperties(additionalProperties, properties.SubActionProperties(cards.FirstOrDefault())) as GameActionProperties);
                 return;
             };
             
-            var promptProperties = new
+            var promptProperties = new SelectCardPromptProperties
             {
                 context = context,
-                selector = properties.Selector,
-                mustSelect = mustSelect,
-                buttons = buttons,
-                onCancel = properties.CancelHandler,
-                onSelect = onSelect,
+                mode = properties.Mode,
                 activePromptTitle = properties.ActivePromptTitle,
-                cardType = properties.CardType,
+                cardType = properties.CardType?.ToString(),
                 controller = properties.Controller,
-                location = properties.Location,
-                cardCondition = properties.CardCondition,
-                targets = properties.Targets,
-                mode = properties.Mode
+                location = properties.Location?.ToString(),
+                cardCondition = (card) => (properties.CardCondition?.Invoke(card, context) ?? false),
+                onSelectAction = onSelect,
+                onCancel = (player) => properties.CancelHandler?.Invoke(),
+                optional = true
             };
             
             context.Game.PromptForSelect(player, promptProperties);
         }
 
-        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
+        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             return properties.Targets && properties.Player != Players.Opponent;

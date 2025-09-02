@@ -49,8 +49,21 @@ namespace L5RGame
         }
         
         #endregion
+        
+        private string GetRingName(string element)
+        {
+            switch (element?.ToLower())
+            {
+                case "air": return "Air";
+                case "earth": return "Earth";
+                case "fire": return "Fire";
+                case "void": return "Void";
+                case "water": return "Water";
+                default: return element ?? "Unknown";
+            }
+        }
 
-        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IResolveElementProperties;
             var target = properties.Target as IList<Ring>;
@@ -59,9 +72,9 @@ namespace L5RGame
             {
                 var sortedRings = target.OrderBy(ring =>
                 {
-                    var ringContext = RingEffects.ContextFor(context.Player, ring.Element);
-                    var aPriority = ringContext.Ability.DefaultPriority;
-                    var bPriority = ringContext.Ability.DefaultPriority;
+                    var ringContext = RingEffects.ContextFor(context.Player, ring.Element, false);
+                    var aPriority = ringContext.Ability?.Priority ?? 0;
+                    var bPriority = ringContext.Ability?.Priority ?? 0;
                     return context.Player.FirstPlayer ? aPriority - bPriority : bPriority - aPriority;
                 }).ToList();
 
@@ -74,12 +87,14 @@ namespace L5RGame
 
                 var effectObjects = sortedRings.Select(ring => new
                 {
-                    title = RingEffects.GetRingName(ring.Element) + " Effect",
+                    title = GetRingName(ring.Element) + " Effect",
                     handler = new Action(() => context.Game.OpenEventWindow(GetEvent(ring, context, mergedProperties)))
                 }).ToList();
 
-                events.Add(new GameEvent(EventNames.Unnamed, new { }, 
-                    () => context.Game.OpenSimultaneousEffectWindow(effectObjects)));
+                events.Add(context.Game.GetEvent(EventNames.Unnamed, new Dictionary<string, object>(), () => {
+                    context.Game.OpenSimultaneousEffectWindow(effectObjects);
+                    return true;
+                }));
             }
             else if (target != null && target.Count > 0)
             {
@@ -87,24 +102,20 @@ namespace L5RGame
             }
         }
 
-        protected override void AddPropertiesToEvent(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IResolveElementProperties;
-            base.AddPropertiesToEvent(eventObj, ring, context, additionalProperties);
-
-            if (eventObj is GameEvent gameEvent)
+            var ring = target as Ring;
+            base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
             {
                 gameEvent.Player = properties.Player ?? context.Player;
                 gameEvent.PhysicalRing = properties.PhysicalRing;
                 
                 // Handle optional property from additionalProperties
-                if (additionalProperties != null)
+                if (additionalProperties?.GetType().GetProperty("optional") != null)
                 {
                     var optionalProperty = additionalProperties.GetType().GetProperty("optional");
-                    if (optionalProperty != null)
-                    {
-                        gameEvent.Optional = (bool)optionalProperty.GetValue(additionalProperties);
-                    }
+                    gameEvent.Optional = (bool)optionalProperty.GetValue(additionalProperties);
                 }
             }
         }

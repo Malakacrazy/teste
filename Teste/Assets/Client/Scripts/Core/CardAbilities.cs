@@ -690,6 +690,21 @@ namespace L5RGame
             }
             return false;
         }
+        
+        // Missing methods for API compatibility
+        public virtual AbilityContext CreateContext(Player player, GameEvent gameEvent)
+        {
+            var context = AbilityContext.CreateCardContext(game, card, player, this);
+            context.eventObject = gameEvent;
+            return context;
+        }
+        
+        public virtual string Title => title;
+        
+        public virtual bool HasTargetsChosenByInitiatingPlayer(AbilityContext context)
+        {
+            return false; // Placeholder implementation
+        }
     }
 
     #region Supporting Interfaces and Classes

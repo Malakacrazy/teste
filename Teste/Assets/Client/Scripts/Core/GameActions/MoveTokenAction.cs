@@ -71,12 +71,13 @@ namespace L5RGame
             return base.CanAffect(token, context, additionalProperties);
         }
 
-        protected override void AddPropertiesToEvent(object eventObj, StatusToken token, AbilityContext context, object additionalProperties = null)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
-            var properties = GetProperties(context) as IMoveTokenProperties;
-            base.AddPropertiesToEvent(eventObj, token, context, additionalProperties);
+            var properties = GetProperties(context, additionalProperties) as IMoveTokenProperties;
+            var token = target as StatusToken;
+            base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
             
-            if (eventObj is GameEvent gameEvent)
+            if (token != null)
             {
                 gameEvent.Recipient = properties.Recipient;
             }

@@ -257,8 +257,8 @@ namespace L5RGame
         public static JointGameAction BowAndHonor(BaseCard character)
         {
             return Create(
-                new BowAction(new GameAction.GameActionProperties { target = new List<object> { character } }),
-                new HonorAction(new GameAction.GameActionProperties { target = new List<object> { character } })
+                new BowAction(new BowAction.BowActionProperties { target = new List<object> { character } }),
+                new HonorAction(new HonorAction.HonorProperties { target = new List<object> { character } })
             );
         }
         
@@ -268,7 +268,7 @@ namespace L5RGame
         public static JointGameAction ReadyAndPlaceFate(BaseCard character, int fate = 1)
         {
             return Create(
-                new ReadyAction(new GameAction.GameActionProperties { target = new List<object> { character } }),
+                new ReadyAction(new ReadyAction.ReadyProperties { target = new List<object> { character } }),
                 new PlaceFateAction(new PlaceFateAction.PlaceFateProperties(fate) { target = new List<object> { character } })
             );
         }

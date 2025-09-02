@@ -49,9 +49,18 @@ namespace L5RGame
 
         public virtual List<StatusToken> DefaultTargets(AbilityContext context)
         {
-            return context.Source.PersonalHonor != null 
-                ? new List<StatusToken> { context.Source.PersonalHonor } 
-                : new List<StatusToken>();
+            var sourceCard = context.Source as BaseCard;
+            if (sourceCard?.PersonalHonor > 0)
+            {
+                var honorToken = new StatusToken("honor", sourceCard.PersonalHonor, sourceCard.controller)
+                {
+                    Card = sourceCard,
+                    Honored = sourceCard.PersonalHonor > 0,
+                    Type = "token"
+                };
+                return new List<StatusToken> { honorToken };
+            }
+            return new List<StatusToken>();
         }
 
         public virtual bool CanAffect(StatusToken target, AbilityContext context, object additionalProperties = null)
@@ -59,19 +68,19 @@ namespace L5RGame
             return target.Type == "token";
         }
 
-        protected bool CheckEventCondition(object eventObj, object additionalProperties = null)
+        protected bool CheckEventCondition(GameEvent eventObj, GameActionProperties additionalProperties = null)
         {
-            if (eventObj is GameEvent gameEvent && gameEvent.Token != null)
+            if (eventObj != null && eventObj.Token != null)
             {
-                return CanAffect(gameEvent.Token, gameEvent.Context, additionalProperties);
+                return CanAffect(eventObj.Token, eventObj.Context, additionalProperties);
             }
             return false;
         }
 
-        protected virtual void AddPropertiesToEvent(object eventObj, StatusToken token, AbilityContext context, object additionalProperties)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
-            base.AddPropertiesToEvent(eventObj, token, context, additionalProperties);
-            if (eventObj is GameEvent gameEvent)
+            base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
+            if (target is StatusToken token)
             {
                 gameEvent.Token = token;
             }

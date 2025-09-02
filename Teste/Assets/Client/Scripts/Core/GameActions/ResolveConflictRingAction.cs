@@ -188,14 +188,13 @@ namespace L5RGame
             if (elements == null) elements = new List<string>();
 
             var rings = elements.Select(element => player.Game.Rings[element]).ToList();
-            var action = new ResolveElementAction(new
+            var action = new ResolveElementAction(new RingActionProperties
             {
-                target = rings,
-                optional = optional,
-                physicalRing = player.Game.CurrentConflict?.Ring
+                target = rings.Cast<object>().ToList(),
+                optional = optional
             });
 
-            var events = new List<object>();
+            var events = new List<GameEvent>();
             action.AddEventsToArray(events, player.Game.GetFrameworkContext(player));
             player.Game.OpenThenEventWindow(events);
         }

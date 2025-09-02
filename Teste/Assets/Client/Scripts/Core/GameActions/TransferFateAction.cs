@@ -62,27 +62,25 @@ namespace L5RGame
             return ("take {1} fate from {0}", new object[] { properties.Target, properties.Amount });
         }
 
-        public bool CanAffect(Player player, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(Player player, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ITransferFateProperties;
             return player.Opponent != null && properties.Amount > 0 && 
                    player.Fate >= properties.Amount && base.CanAffect(player, context);
         }
 
-        protected void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ITransferFateProperties;
-            base.AddPropertiesToEvent(eventObj, player, context, additionalProperties);
+            base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
             
-            if (eventObj is GameEvent gameEvent)
-            {
-                gameEvent.Fate = properties.Amount;
-                gameEvent.Origin = player;
-                gameEvent.Recipient = player.Opponent;
-            }
+            var player = target as Player;
+            gameEvent.Fate = properties.Amount;
+            gameEvent.Origin = player;
+            gameEvent.Recipient = player?.Opponent;
         }
 
-        protected bool CheckEventCondition(object eventObj)
+        protected override bool CheckEventCondition(GameEvent eventObj, GameActionProperties additionalProperties = null)
         {
             return MoveFateEventCondition(eventObj);
         }

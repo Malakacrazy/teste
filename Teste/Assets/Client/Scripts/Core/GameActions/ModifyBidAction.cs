@@ -157,16 +157,13 @@ namespace L5RGame
             }
         }
 
-        protected void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, GameAction.GameActionProperties additionalProperties)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IModifyBidProperties;
-            base.AddPropertiesToEvent(eventObj, player, context, additionalProperties);
+            base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
             
-            if (eventObj is GameEvent gameEvent)
-            {
-                gameEvent.Amount = properties.Amount;
-                gameEvent.Direction = properties.Direction.ToString().ToLower();
-            }
+            gameEvent.Amount = properties.Amount;
+            gameEvent.Direction = properties.Direction.ToString().ToLower();
         }
 
         protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)

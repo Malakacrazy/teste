@@ -103,6 +103,29 @@ namespace L5RGame
                 game.UnregisterEventHandler(eventName, this);
             }
         }
+        
+        // Missing properties/methods for API compatibility
+        public string MaxIdentifier => maxIdentifier;
+        public string Title => title;
+        public Dictionary<string, object> Targets => targets ?? new Dictionary<string, object>();
+        public List<GameAction> GameAction => new List<GameAction>(); // Placeholder
+        
+        public virtual AbilityContext CreateContext(Player player, GameEvent gameEvent)
+        {
+            var context = AbilityContext.CreateCardContext(game, card, player, this);
+            context.eventObject = gameEvent;
+            return context;
+        }
+        
+        public virtual bool CanResolveTargets(AbilityContext context)
+        {
+            return true; // Placeholder implementation
+        }
+        
+        public virtual bool HasTargetsChosenByInitiatingPlayer(AbilityContext context)
+        {
+            return false; // Placeholder implementation
+        }
     }
 
     /// <summary>

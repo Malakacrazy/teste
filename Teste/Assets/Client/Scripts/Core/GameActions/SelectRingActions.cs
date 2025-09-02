@@ -68,7 +68,7 @@ namespace L5RGame
             return ("choose a ring for {0}", new object[] { properties.target });
         }
 
-        public override bool CanAffect(Ring ring, AbilityContext context, object additionalProperties = null)
+        public virtual bool CanAffect(Ring ring, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ISelectRingProperties;
             if (properties.Player == Players.Opponent && context.Player.Opponent == null)
@@ -78,12 +78,12 @@ namespace L5RGame
             return base.CanAffect(ring, context) && properties.RingCondition(ring, context);
         }
 
-        public bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
+        public bool HasLegalTarget(AbilityContext context, GameActionProperties additionalProperties = null)
         {
             return context.Game.Rings.Values.Any(ring => CanAffect(ring, context, additionalProperties));
         }
 
-        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ISelectRingProperties;
             
@@ -114,7 +114,7 @@ namespace L5RGame
                 {
                     context.Game.AddMessage(properties.Message, properties.MessageArgs(ring, p));
                 }
-                properties.GameAction.AddEventsToArray(events, context, MergeProperties(additionalProperties, properties.SubActionProperties(ring)));
+                properties.GameAction.AddEventsToArray(events, context, MergeProperties(additionalProperties, properties.SubActionProperties(ring)) as GameActionProperties);
             };
             
             var promptProperties = new
@@ -128,16 +128,16 @@ namespace L5RGame
                 targets = properties.Targets
             };
             
-            context.Game.PromptForRingSelect(player, promptProperties);
+            context.Game.PromptForRingSelect(player, promptProperties as Dictionary<string, object>);
         }
 
-        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
+        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ISelectRingProperties;
             return properties.Targets && properties.Player != Players.Opponent;
         }
 
-        private object MergeProperties(object additionalProperties, object subActionProperties)
+        private object MergeProperties(GameActionProperties additionalProperties, object subActionProperties)
         {
             if (additionalProperties == null) return subActionProperties;
             if (subActionProperties == null) return additionalProperties;

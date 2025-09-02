@@ -147,14 +147,14 @@ namespace L5RGame
                 }
             };
 
-            var promptProperties = new
+            var promptProperties = new HandlerMenuPromptProperties
             {
                 context = context,
                 cardHandler = cardHandler,
                 activePromptTitle = properties.ActivePromptTitle,
                 cards = properties.Cards,
                 cardCondition = cardCondition,
-                choices = properties.Choices,
+                choices = properties.Choices?.Select(c => new MenuOption { text = c, arg = c }).ToList(),
                 handlers = properties.Handlers,
                 targets = properties.Targets
             };

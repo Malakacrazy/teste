@@ -98,7 +98,7 @@ namespace L5RGame
             });
         }
 
-        public void AddEventsToArray(List<object> events, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
+        public void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var choices = properties.Choices as string[];
@@ -123,12 +123,12 @@ namespace L5RGame
                 return;
             }
             
-            var promptProperties = new
+            var promptProperties = new HandlerMenuPromptProperties
             {
                 activePromptTitle = properties.ActivePromptTitle,
                 context = context,
                 choiceHandler = choiceHandler,
-                choices = choices,
+                choices = choices.Select(c => new MenuOption { text = c, arg = c }).ToList(),
                 gameAction = properties.GameAction
             };
             

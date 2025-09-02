@@ -18,6 +18,7 @@ namespace L5RGame
         public bool cannotTargetFirst = false;
         public int max = 0;
         public string maxIdentifier;
+        public int Priority = 0;
         public bool collectiveTrigger = false;
         
         [Header("References")]
@@ -31,6 +32,16 @@ namespace L5RGame
         public Func<AbilityContext, object> target;
         public Action<AbilityContext> effect;
         public Action<AbilityContext> handler;
+        
+        // Property aliases for API compatibility
+        public string MaxIdentifier => maxIdentifier;
+        public int Max => max;
+        
+        // Methods
+        public virtual void DisplayMessage(AbilityContext context, string message)
+        {
+            context?.Game?.AddMessage($"{title}: {message}");
+        }
         
         public BaseAbility() 
         {

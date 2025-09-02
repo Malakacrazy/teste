@@ -10,7 +10,8 @@ namespace L5RGame
         public AbilityContext Context => context;
         public bool Cancelled => cancelled;
         public List<object> Events => events;
-        public bool InitiateAbility => initiateAbility;
+        private bool _initiateAbility;
+        public bool InitiateAbility { get => _initiateAbility; set => _initiateAbility = value; }
         
         public NoCostsAbilityResolver(Game gameInstance, AbilityContext abilityContext) : base(gameInstance, abilityContext)
         {
@@ -31,7 +32,11 @@ namespace L5RGame
             var events = new List<GameEvent>
             {
                 Game.GetEvent(EventNames.OnCardAbilityInitiated, 
-                    new { card = Context.Source, ability = Context.Ability, context = Context }, 
+                    new Dictionary<string, object> { 
+                        ["card"] = Context.Source, 
+                        ["ability"] = Context.Ability, 
+                        ["context"] = Context 
+                    }, 
                     () =>
                     {
                         Game.QueueSimpleStep(() => { ResolveTargets(); return true; });
@@ -43,12 +48,12 @@ namespace L5RGame
 
             if (Context.Ability.IsTriggeredAbility() && !Context.SubResolution)
             {
-                events.Add(Game.GetEvent(EventNames.OnCardAbilityTriggered, new
+                events.Add(Game.GetEvent(EventNames.OnCardAbilityTriggered, new Dictionary<string, object>
                 {
-                    player = Context.Player,
-                    card = Context.Source,
-                    context = Context
-                }));
+                    ["player"] = Context.Player,
+                    ["card"] = Context.Source,
+                    ["context"] = Context
+                }, () => true));
             }
 
             Game.OpenEventWindow(events);
@@ -123,11 +128,16 @@ namespace L5RGame
             base.Initialize();
             actionName = "resolveAbility";
             
-            defaultProperties = new ResolveAbilityProperties
+            var resolveAbilityProps = new ResolveAbilityProperties
             {
                 Ability = null,
                 SubResolution = false
-            } as GameAction.GameActionProperties;
+            };
+            // Create base GameActionProperties with the same target
+            defaultProperties = new GameAction.GameActionProperties
+            {
+                target = resolveAbilityProps.Target
+            };
         }
         
         #endregion

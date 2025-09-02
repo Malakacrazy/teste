@@ -65,22 +65,19 @@ namespace L5RGame
             return ("take {1} honor from {0}", new object[] { properties.Target, properties.Amount });
         }
 
-        public bool CanAffect(Player player, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(Player player, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ITransferHonorProperties;
             return player.Opponent != null && properties.Amount > 0 && base.CanAffect(player, context);
         }
 
-        protected void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ITransferHonorProperties;
-            base.AddPropertiesToEvent(eventObj, player, context, additionalProperties);
+            base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
             
-            if (eventObj is GameEvent gameEvent)
-            {
-                gameEvent.Amount = properties.Amount;
-                gameEvent.AfterBid = properties.AfterBid;
-            }
+            gameEvent.Amount = properties.Amount;
+            gameEvent.AfterBid = properties.AfterBid;
         }
 
         protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)

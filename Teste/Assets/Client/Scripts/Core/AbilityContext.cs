@@ -110,6 +110,8 @@ namespace L5RGame
         public Dictionary<string, object> Selects => selects;
         public Dictionary<string, object> Tokens => tokens;
         public object Resolver => source; // Placeholder - source acts as resolver
+        public bool SubResolution { get => subResolution; set => subResolution = value; }
+        public List<GameAction> GameActionsResolutionChain { get => gameActionsResolutionChain; set => gameActionsResolutionChain = value; }
 
         public void Awake()
         {

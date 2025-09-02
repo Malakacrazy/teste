@@ -52,7 +52,7 @@ namespace L5RGame
             if (!CancelPressed)
             {
                 var properties = GameActionProperties as IPlayCardProperties;
-                Game.QueueSimpleStep(() => properties?.PostHandler?.Invoke(Context.Source as DrawCard));
+                Game.QueueSimpleStep(() => { properties?.PostHandler?.Invoke(context.Source as DrawCard); return true; });
             }
         }
     }
@@ -134,10 +134,10 @@ namespace L5RGame
             // Filter actions to exclude actions which involve this game action, or which are not legal
             return actions.Where(action =>
             {
-                var newContext = action.CreateContext(context.Player);
+                var newContext = action.CreateContext(context.Player, null);
                 var newChain = new List<GameAction>(context.GameActionsResolutionChain) { this };
                 newContext.GameActionsResolutionChain = newChain;
-                return !action.MeetsRequirements(newContext, new string[] { "location", "player" });
+                return action.MeetsRequirements(newContext, new List<string> { "location", "player" }) == null;
             }).ToList();
         }
 
@@ -146,7 +146,7 @@ namespace L5RGame
             context.Ability.ExecuteHandler(context);
         }
 
-        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var targets = properties.Target as IList<DrawCard>;
@@ -161,7 +161,7 @@ namespace L5RGame
             
             if (actions.Count == 1)
             {
-                events.Add(GetPlayCardEvent(card, context, actions[0].CreateContext(context.Player), additionalProperties));
+                events.Add(GetPlayCardEvent(card, context, actions[0].CreateContext(context.Player, null), additionalProperties));
                 return;
             }
             
@@ -172,7 +172,7 @@ namespace L5RGame
             }
             
             var handlers = actions.Select<CardAbility, Action>(action => 
-                () => events.Add(GetPlayCardEvent(card, context, action.CreateContext(context.Player), additionalProperties))
+                () => events.Add(GetPlayCardEvent(card, context, action.CreateContext(context.Player, null), additionalProperties))
             ).ToList();
             
             if (properties.ResetOnCancel)
@@ -190,13 +190,13 @@ namespace L5RGame
             context.Game.PromptWithHandlerMenu(context.Player, promptProperties);
         }
 
-        public GameEvent GetPlayCardEvent(DrawCard card, AbilityContext context, AbilityContext actionContext, object additionalProperties)
+        public GameEvent GetPlayCardEvent(DrawCard card, AbilityContext context, AbilityContext actionContext, GameActionProperties additionalProperties)
         {
             var properties = GetProperties(context, additionalProperties);
             var gameEvent = CreateEvent(card, context, additionalProperties);
             UpdateEvent(gameEvent, card, context, additionalProperties);
             
-            gameEvent.ReplaceHandler(() => 
+            gameEvent.ReplaceHandler((gameEvent) => 
                 context.Game.QueueStep(new PlayCardResolver(context.Game, actionContext, this, context, properties))
             );
             

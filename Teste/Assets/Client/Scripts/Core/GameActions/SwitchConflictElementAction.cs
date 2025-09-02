@@ -20,12 +20,12 @@ namespace L5RGame
             Initialize();
         }
         
-        public SwitchConflictElementAction(GameActionProperties properties) : base(properties)
+        public SwitchConflictElementAction(RingActionProperties properties) : base(properties)
         {
             Initialize();
         }
         
-        public SwitchConflictElementAction(Func<AbilityContext, GameActionProperties> factory) : base(factory)
+        public SwitchConflictElementAction(Func<AbilityContext, RingActionProperties> factory) : base(factory)
         {
             Initialize();
         }

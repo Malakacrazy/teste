@@ -63,15 +63,16 @@ namespace L5RGame
             return false;
         }
 
-        public virtual bool CanAffect(Ring ring, AbilityContext context, object additionalProperties = null)
+        public virtual bool CanAffect(Ring ring, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             return base.CanAffect(ring, context, additionalProperties);
         }
 
-        protected virtual void AddPropertiesToEvent(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
-            base.AddPropertiesToEvent(eventObj, ring, context, additionalProperties);
-            if (eventObj is GameEvent gameEvent)
+            base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
+            var ring = target as Ring;
+            if (ring != null)
             {
                 gameEvent.Ring = ring;
             }

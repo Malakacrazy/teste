@@ -43,17 +43,16 @@ namespace L5RGame
             actionName = "setDial";
             eventName = EventNames.OnSetHonorDial;
             
-            defaultProperties = new SetDialProperties
+            var setDialProps = new SetDialProperties
             {
                 Value = 0
             };
+            // Create base GameActionProperties
+            defaultProperties = new GameAction.GameActionProperties();
         }
         
         #endregion
 
-        public SetDialAction(object propertyFactory) : base(propertyFactory) { }
-
-        public SetDialAction(Func<AbilityContext, object> propertyFactory) : base(propertyFactory) { }
 
         public (string, object[]) GetEffectMessage(AbilityContext context)
         {
@@ -61,21 +60,18 @@ namespace L5RGame
             return ("set {0}'s dial to {1}", new object[] { properties.Target, properties.Value });
         }
 
-        public bool CanAffect(Player player, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(Player player, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ISetDialProperties;
             return properties.Value > 0 && properties.Value < 6 && base.CanAffect(player, context);
         }
 
-        protected void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ISetDialProperties;
-            base.AddPropertiesToEvent(eventObj, player, context, additionalProperties);
+            base.AddPropertiesToEvent(gameEvent, target, context, additionalProperties);
             
-            if (eventObj is GameEvent gameEvent)
-            {
-                gameEvent.Value = properties.Value;
-            }
+            gameEvent.Value = properties.Value;
         }
 
         protected override bool EventHandler(GameEvent gameEvent, GameActionProperties additionalProperties = null)

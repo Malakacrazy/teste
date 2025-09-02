@@ -56,18 +56,19 @@ namespace L5RGame
             return ("take {1} fate from {0}", new object[] { properties.Target, properties.Amount });
         }
 
-        public override bool CanAffect(Ring ring, AbilityContext context, object additionalProperties = null)
+        public override bool CanAffect(Ring ring, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ITakeFateRingProperties;
             return context.Player.CheckRestrictions("takeFateFromRings", context) &&
                    ring.Fate > 0 && properties.Amount > 0 && base.CanAffect(ring, context);
         }
 
-        protected override void AddPropertiesToEvent(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
+        protected override void AddPropertiesToEvent(GameEvent gameEvent, object target, AbilityContext context, GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as ITakeFateRingProperties;
+            var ring = target as Ring;
             
-            if (eventObj is GameEvent gameEvent)
+            if (ring != null)
             {
                 gameEvent.Fate = properties.Amount;
                 gameEvent.Origin = ring;
@@ -76,16 +77,16 @@ namespace L5RGame
             }
         }
 
-        protected bool CheckEventCondition(object eventObj)
+        protected bool CheckEventCondition(GameEvent eventObj)
         {
             return MoveFateEventCondition(eventObj);
         }
 
-        protected bool IsEventFullyResolved(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
+        protected bool IsEventFullyResolved(GameEvent gameEvent, Ring ring, AbilityContext context, GameActionProperties additionalProperties)
         {
             var properties = GetProperties(context, additionalProperties) as ITakeFateRingProperties;
             
-            if (eventObj is GameEvent gameEvent)
+            if (gameEvent != null)
             {
                 return !gameEvent.Cancelled && 
                        gameEvent.Name == this.EventName && 

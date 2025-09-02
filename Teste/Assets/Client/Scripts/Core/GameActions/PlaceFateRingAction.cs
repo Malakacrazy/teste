@@ -70,7 +70,7 @@ namespace L5RGame
 
         public override bool CanAffect(Ring ring, AbilityContext context, object additionalProperties = null)
         {
-            var properties = GetProperties(context, additionalProperties) as IPlaceFateRingProperties;
+            var properties = GetProperties(context, additionalProperties as GameAction.GameActionProperties) as IPlaceFateRingProperties;
             
             if (properties.Origin != null)
             {
@@ -104,7 +104,7 @@ namespace L5RGame
 
         protected override void AddPropertiesToEvent(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
         {
-            var properties = GetProperties(context, additionalProperties) as IPlaceFateRingProperties;
+            var properties = GetProperties(context, additionalProperties as GameAction.GameActionProperties) as IPlaceFateRingProperties;
             
             if (eventObj is GameEvent gameEvent)
             {
@@ -115,14 +115,14 @@ namespace L5RGame
             }
         }
 
-        protected bool CheckEventCondition(object eventObj)
+        protected bool CheckEventCondition(GameEvent eventObj)
         {
             return MoveFateEventCondition(eventObj);
         }
 
         protected bool IsEventFullyResolved(object eventObj, Ring ring, AbilityContext context, object additionalProperties)
         {
-            var properties = GetProperties(context, additionalProperties) as IPlaceFateRingProperties;
+            var properties = GetProperties(context, additionalProperties as GameAction.GameActionProperties) as IPlaceFateRingProperties;
             
             if (eventObj is GameEvent gameEvent)
             {

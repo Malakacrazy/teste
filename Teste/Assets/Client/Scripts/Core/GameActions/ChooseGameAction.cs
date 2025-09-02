@@ -82,7 +82,7 @@ namespace L5RGame
             return properties.Choices.Values.Any(gameAction => gameAction.HasLegalTarget(context));
         }
 
-        public void AddEventsToArray(List<object> events, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
+        public void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var activePromptTitle = properties.ActivePromptTitle;
@@ -96,7 +96,7 @@ namespace L5RGame
                 {
                     context.Game.AddMessage(properties.Messages[choice].ToString(), player);
                 }
-                context.Game.QueueSimpleStep(() => { properties.Choices[choice].AddEventsToArray(events, context); return true; });
+                context.Game.QueueSimpleStep(() => { properties.Choices[choice].AddEventsToArray(events, context, additionalProperties); return true; });
             };
 
             if (choices.Count == 0)
@@ -105,11 +105,11 @@ namespace L5RGame
             }
 
             var target = properties.Target;
-            var promptProperties = new
+            var promptProperties = new HandlerMenuPromptProperties
             {
                 activePromptTitle = activePromptTitle,
                 context = context,
-                choices = choices,
+                choices = choices.Select(c => new MenuOption { text = c, arg = c }).ToList(),
                 choiceHandler = choiceHandler,
                 target = target
             };
