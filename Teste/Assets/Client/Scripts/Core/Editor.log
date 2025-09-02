@@ -1,3 +1,33 @@
-InvalidOperationException: You are trying to read Input using the UnityEngine.Input class, but you have switched active Input handling to Input System package in Player Settings.
-UnityEngine.Input.GetKeyDown (UnityEngine.KeyCode key) (at <921937907c924850a1d64935957a9b52>:0)
-L5RGame.GamePipeline.Update () (at Assets/Client/Scripts/Core/GamePipeline.cs:577)
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetToken.cs(52,41): error CS0266: Cannot implicitly convert type 'object' to 'L5RGame.StatusToken'. An explicit conversion exists (are you missing a cast?)
+
+Assets\Client\Scripts\Core\AbilityResolver.cs(324,22): error CS0266: Cannot implicitly convert type 'object' to 'bool'. An explicit conversion exists (are you missing a cast?)
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetToken.cs(147,41): error CS0266: Cannot implicitly convert type 'object' to 'L5RGame.StatusToken'. An explicit conversion exists (are you missing a cast?)
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetToken.cs(169,50): error CS1503: Argument 2: cannot convert from 'object' to 'L5RGame.SelectCardPromptProperties'
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetRing.cs(131,27): error CS0029: Cannot implicitly convert type 'System.Collections.Generic.List<L5RGame.MenuOption>' to 'System.Collections.Generic.List<object>'
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetRing.cs(159,54): error CS1503: Argument 2: cannot convert from 'object' to 'System.Collections.Generic.Dictionary<string, object>'
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetRing.cs(185,81): error CS1503: Argument 1: cannot convert from 'object' to 'L5RGame.Ring'
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetSelect.cs(196,41): error CS1061: 'AbilityTargetProperties' does not contain a definition for 'source' and no accessible extension method 'source' accepting a first argument of type 'AbilityTargetProperties' could be found (are you missing a using directive or an assembly reference?)
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetCard.cs(156,53): error CS1061: 'object' does not contain a definition for 'IsMatch' and no accessible extension method 'IsMatch' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetCard.cs(193,50): error CS1503: Argument 2: cannot convert from 'object' to 'L5RGame.SelectCardPromptProperties'
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetAbility.cs(172,39): error CS0029: Cannot implicitly convert type 'System.Collections.Generic.List<string>' to 'System.Collections.Generic.List<L5RGame.MenuOption>'
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetAbility.cs(207,50): error CS1503: Argument 2: cannot convert from 'object' to 'L5RGame.SelectCardPromptProperties'
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetAbility.cs(218,71): error CS1061: 'object' does not contain a definition for 'card' and no accessible extension method 'card' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetAbility.cs(219,104): error CS1061: 'object' does not contain a definition for 'card' and no accessible extension method 'card' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
+
+Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetAbility.cs(220,37): error CS1503: Argument 1: cannot convert from 'object' to 'L5RGame.BaseAbility'
+
+Assets\Client\Scripts\Core\GameActions\RandomDiscardAction.cs(178,32): error CS1593: Delegate 'Func<bool>' does not take 1 arguments
+
+Assets\Client\Scripts\Core\GameActions\SelectCardAction.cs(180,28): error CS1593: Delegate 'Func<bool>' does not take 1 arguments

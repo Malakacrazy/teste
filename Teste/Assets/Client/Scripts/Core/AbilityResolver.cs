@@ -54,8 +54,9 @@ namespace L5RGame
     public class TargetResults
     {
         public bool cancelled = false;
-        public bool delayTargeting = false;
+        public object delayTargeting = null;
         public bool payCostsFirst = false;
+        public bool noCostsFirstButton = false;
         public Dictionary<string, object> targets = new Dictionary<string, object>();
         public bool success = false;
     }

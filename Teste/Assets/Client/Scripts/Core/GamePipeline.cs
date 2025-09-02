@@ -574,15 +574,22 @@ namespace L5RGame
         {
             // Debug hotkeys (only in development builds)
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (Input.GetKeyDown(KeyCode.F1))
+            try 
             {
-                ConsoleDebugInfo();
+                if (Input.GetKeyDown(KeyCode.F1))
+                {
+                    ConsoleDebugInfo();
+                }
+                
+                if (Input.GetKeyDown(KeyCode.F2))
+                {
+                    enableStepTracing = !enableStepTracing;
+                    Debug.Log($"🔄 Step tracing: {(enableStepTracing ? "Enabled" : "Disabled")}");
+                }
             }
-            
-            if (Input.GetKeyDown(KeyCode.F2))
+            catch (System.InvalidOperationException)
             {
-                enableStepTracing = !enableStepTracing;
-                Debug.Log($"🔄 Step tracing: {(enableStepTracing ? "Enabled" : "Disabled")}");
+                // Input System package is active, skip legacy input
             }
 #endif
         }

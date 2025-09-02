@@ -42,6 +42,7 @@ namespace L5RGame
         {
             context?.Game?.AddMessage($"{title}: {message}");
         }
+
         
         public BaseAbility() 
         {

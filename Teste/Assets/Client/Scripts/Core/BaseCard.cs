@@ -95,6 +95,8 @@ namespace L5RGame
 
         [Header("Card Abilities")]
         public CardAbilities abilities = new CardAbilities();
+        public List<BaseAbility> actions => abilities.actions.Cast<BaseAbility>().ToList();
+        public List<BaseAbility> reactions => abilities.reactions.Cast<BaseAbility>().ToList();
 
         [Header("Keywords and Restrictions")]
         public List<string> printedKeywords = new List<string>();
@@ -916,6 +918,10 @@ namespace L5RGame
             if (attachments != null) attachments.Remove(attachment);
         }
         public virtual int PersonalHonor { get; set; } = 0;
+        public virtual object personalHonor 
+        { 
+            get { return PersonalHonor > 0 ? new { card = this, value = PersonalHonor } : null; }
+        }
         public virtual void MakeOrdinary() { /* stub */ }
         
         // Additional missing methods for compilation

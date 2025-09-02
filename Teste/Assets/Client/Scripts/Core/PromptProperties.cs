@@ -50,7 +50,10 @@ namespace L5RGame
         public bool ordered;
         public string location;
         public System.Action<Player, List<BaseCard>> onSelectAction;
-        public System.Action<Player> onCancel;
+        public System.Func<bool> onCancel;
+        public System.Func<Player, string, bool> onMenuCommand;
+        public BaseCardSelector selector;
+        public List<BaseCard> mustSelect = new List<BaseCard>();
         public bool optional = false;
         public EffectSource source;
     }
