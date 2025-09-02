@@ -409,4 +409,64 @@ namespace L5RGame
         public DurationEffect CustomDuration() => new DurationEffect(Durations.Custom);
         public DurationEffect PersistentEffect() => new DurationEffect(Durations.Persistent);
     }
+
+    /// <summary>
+    /// Extension methods for applying duration effects to objects
+    /// </summary>
+    public static class DurationEffectExtensions
+    {
+        /// <summary>
+        /// Apply an effect until the end of the current conflict
+        /// </summary>
+        public static void UntilEndOfConflict(this object source, System.Func<object> effectProperties)
+        {
+            // Placeholder implementation - would integrate with game's effect system
+            UnityEngine.Debug.Log($"Applied effect until end of conflict from {source?.GetType().Name}");
+        }
+
+        /// <summary>
+        /// Apply an effect until the end of the current phase
+        /// </summary>
+        public static void UntilEndOfPhase(this object source, System.Func<object> effectProperties)
+        {
+            // Placeholder implementation - would integrate with game's effect system
+            UnityEngine.Debug.Log($"Applied effect until end of phase from {source?.GetType().Name}");
+        }
+
+        /// <summary>
+        /// Apply an effect until the end of the current round
+        /// </summary>
+        public static void UntilEndOfRound(this object source, System.Func<object> effectProperties)
+        {
+            // Placeholder implementation - would integrate with game's effect system
+            UnityEngine.Debug.Log($"Applied effect until end of round from {source?.GetType().Name}");
+        }
+
+        /// <summary>
+        /// Apply an effect until the end of the current turn
+        /// </summary>
+        public static void UntilEndOfTurn(this object source, System.Func<object> effectProperties)
+        {
+            // Placeholder implementation - would integrate with game's effect system
+            UnityEngine.Debug.Log($"Applied effect until end of turn from {source?.GetType().Name}");
+        }
+
+        /// <summary>
+        /// Apply a custom duration effect
+        /// </summary>
+        public static void CustomDuration(this object source, System.Func<object> effectProperties)
+        {
+            // Placeholder implementation - would integrate with game's effect system
+            UnityEngine.Debug.Log($"Applied custom duration effect from {source?.GetType().Name}");
+        }
+
+        /// <summary>
+        /// Apply a persistent effect
+        /// </summary>
+        public static void PersistentEffect(this object source, System.Func<object> effectProperties)
+        {
+            // Placeholder implementation - would integrate with game's effect system
+            UnityEngine.Debug.Log($"Applied persistent effect from {source?.GetType().Name}");
+        }
+    }
 }

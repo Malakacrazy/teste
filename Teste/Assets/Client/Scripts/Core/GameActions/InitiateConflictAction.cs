@@ -10,10 +10,16 @@ namespace L5RGame
         string ForcedDeclaredType { get; set; }
     }
 
-    public class InitiateConflictProperties : PlayerActionProperties, IInitiateConflictProperties
+    public class InitiateConflictProperties : GameAction.GameActionProperties, IInitiateConflictProperties
     {
         public bool CanPass { get; set; }
         public string ForcedDeclaredType { get; set; }
+        
+        public new List<object> Target { get; set; } = new List<object>();
+        public new bool CannotBeCancelled { get; set; }
+        public new bool Optional { get; set; }
+        public new GameAction ParentAction { get; set; }
+        public Player PlayerTarget { get; set; }
     }
 
     public partial class InitiateConflictAction : PlayerAction

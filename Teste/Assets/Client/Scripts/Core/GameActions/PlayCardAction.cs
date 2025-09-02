@@ -11,6 +11,8 @@ namespace L5RGame
         public AbilityContext GameActionContext { get; set; }
         public object GameActionProperties { get; set; }
         public bool CancelPressed { get; set; }
+        
+        public bool Cancelled => cancelled;
 
         public PlayCardResolver(Game game, AbilityContext context, PlayCardAction playGameAction, 
                                AbilityContext gameActionContext, object gameActionProperties) 
@@ -62,11 +64,14 @@ namespace L5RGame
         string Location { get; set; }
     }
 
-    public class PlayCardProperties : CardActionProperties, IPlayCardProperties
+    public class PlayCardProperties : CardGameAction.CardActionProperties, IPlayCardProperties
     {
         public bool ResetOnCancel { get; set; }
         public Action<DrawCard> PostHandler { get; set; }
         public string Location { get; set; }
+        
+        public new GameAction ParentAction { get; set; }
+        public BaseCard CardTarget { get; set; }
     }
 
     public partial class PlayCardAction : CardGameAction
@@ -108,7 +113,7 @@ namespace L5RGame
         
         #endregion
 
-        protected IPlayCardProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected IPlayCardProperties GetProperties(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             return base.GetProperties(context, additionalProperties) as IPlayCardProperties;
         }

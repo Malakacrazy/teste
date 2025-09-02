@@ -15,7 +15,7 @@ namespace L5RGame
         /// Properties specific to joint actions
         /// </summary>
         [System.Serializable]
-        public class JointGameProperties : GameActionProperties
+        public class JointGameProperties : GameAction.GameActionProperties
         {
             public List<GameAction> gameActions = new List<GameAction>();
             
@@ -257,8 +257,8 @@ namespace L5RGame
         public static JointGameAction BowAndHonor(BaseCard character)
         {
             return Create(
-                GameActions.Bow(new GameAction.GameActionProperties { target = new List<object> { character } }),
-                GameActions.Honor(new GameAction.GameActionProperties { target = new List<object> { character } })
+                new BowAction(new GameAction.GameActionProperties { target = new List<object> { character } }),
+                new HonorAction(new GameAction.GameActionProperties { target = new List<object> { character } })
             );
         }
         
@@ -268,8 +268,8 @@ namespace L5RGame
         public static JointGameAction ReadyAndPlaceFate(BaseCard character, int fate = 1)
         {
             return Create(
-                GameActions.Ready(new GameAction.GameActionProperties { target = new List<object> { character } }),
-                GameActions.PlaceFate(new PlaceFateAction.PlaceFateProperties(fate) { target = new List<object> { character } })
+                new ReadyAction(new GameAction.GameActionProperties { target = new List<object> { character } }),
+                new PlaceFateAction(new PlaceFateAction.PlaceFateProperties(fate) { target = new List<object> { character } })
             );
         }
         

@@ -8,11 +8,13 @@ namespace L5RGame
     public interface IResolveConflictRingProperties : IRingActionProperties
     {
         bool ResolveAsAttacker { get; set; }
+        Player PlayerTarget { get; set; }
     }
 
     public class ResolveConflictRingProperties : RingActionProperties, IResolveConflictRingProperties
     {
         public bool ResolveAsAttacker { get; set; }
+        public Player PlayerTarget { get; set; }
     }
 
     public partial class ResolveConflictRingAction : RingAction
@@ -42,12 +44,12 @@ namespace L5RGame
             Initialize();
         }
         
-        public ResolveConflictRingAction(GameActionProperties properties) : base(properties)
+        public ResolveConflictRingAction(RingActionProperties properties) : base(properties)
         {
             Initialize();
         }
         
-        public ResolveConflictRingAction(Func<AbilityContext, GameActionProperties> factory) : base(factory)
+        public ResolveConflictRingAction(Func<AbilityContext, RingActionProperties> factory) : base(factory)
         {
             Initialize();
         }

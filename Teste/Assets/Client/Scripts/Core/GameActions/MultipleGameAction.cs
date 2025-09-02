@@ -15,7 +15,7 @@ namespace L5RGame
         /// Properties specific to multiple actions
         /// </summary>
         [System.Serializable]
-        public class MultipleActionProperties : GameActionProperties
+        public class MultipleActionProperties : GameAction.GameActionProperties
         {
             public List<GameAction> gameActions = new List<GameAction>();
             

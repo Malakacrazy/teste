@@ -20,12 +20,12 @@ namespace L5RGame
             Initialize();
         }
         
-        public DiscardStatusAction(GameActionProperties properties) : base(properties)
+        public DiscardStatusAction(TokenActionProperties properties) : base(properties)
         {
             Initialize();
         }
         
-        public DiscardStatusAction(System.Func<AbilityContext, GameActionProperties> factory) : base(factory)
+        public DiscardStatusAction(System.Func<AbilityContext, TokenActionProperties> factory) : base(factory)
         {
             Initialize();
         }
@@ -50,7 +50,7 @@ namespace L5RGame
             var token = gameEvent.GetProperty("token") as StatusToken;
             if (token != null)
             {
-                if (token.Card.PersonalHonor == token)
+                if (token.Card.PersonalHonor != null && token.Card.PersonalHonor.Equals(token))
                 {
                     token.Card.MakeOrdinary();
                 }

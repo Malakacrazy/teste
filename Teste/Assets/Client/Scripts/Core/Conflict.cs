@@ -521,8 +521,30 @@ namespace L5RGame
             }
         }
 
-        // Missing property for compilation
+        // Missing properties and methods for compilation
         public BaseCard attackedProvince { get; set; }
+        
+        /// <summary>
+        /// Gets all participants in the conflict (attackers + defenders)
+        /// </summary>
+        public List<BaseCard> participants => GetParticipants();
+        
+        /// <summary>
+        /// Gets all participants in the conflict
+        /// </summary>
+        /// <returns>Combined list of attackers and defenders</returns>
+        public List<BaseCard> GetParticipants()
+        {
+            var allParticipants = new List<BaseCard>();
+            if (attackers != null) allParticipants.AddRange(attackers);
+            if (defenders != null) allParticipants.AddRange(defenders);
+            return allParticipants;
+        }
+        
+        /// <summary>
+        /// Gets the attacking player (uppercase property alias)
+        /// </summary>
+        public Player AttackingPlayer => attackingPlayer;
 
     }
 

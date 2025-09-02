@@ -15,7 +15,7 @@ namespace L5RGame
         /// Properties for card-targeted actions
         /// </summary>
         [System.Serializable]
-        public class CardActionProperties : GameActionProperties
+        public class CardActionProperties : GameAction.GameActionProperties
         {
             public List<object> Target 
             { 

@@ -14,7 +14,7 @@ namespace L5RGame
         /// Properties specific to conditional actions
         /// </summary>
         [System.Serializable]
-        public class ConditionalActionProperties : GameActionProperties
+        public class ConditionalActionProperties : GameAction.GameActionProperties
         {
             public System.Func<AbilityContext, ConditionalActionProperties, bool> conditionFunction;
             public bool conditionValue;

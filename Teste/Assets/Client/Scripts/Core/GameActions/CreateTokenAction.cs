@@ -141,17 +141,16 @@ namespace L5RGame
             }
             
             // Add delayed effect to discard token when conflict ends
-            var delayedEffect = EffectEngine.CreateDelayedEffect(
-                trigger: new ConflictFinishedTrigger(),
-                effect: GameActions.DiscardFromPlay(),
-                message: "{0} returns to the deep",
-                messageArgs: new object[] { token }
+            var delayedEffect = context.game.EffectEngine.CreateDelayedEffect(
+                new ConflictFinishedTrigger(),
+                GameActions.DiscardFromPlay()
             );
             
-            GameActions.CardLastingEffect(new LastingEffectCardAction.LastingEffectCardProperties
+            var cardEffectAction = new LastingEffectCardAction(new LastingEffectCardProperties
             {
-                effect = delayedEffect
-            }).Resolve(token, context);
+                Effect = delayedEffect
+            });
+            cardEffectAction.Resolve(token, context);
             
             LogExecution("Created token {0} from {1}", token.name, card.name);
             return true;

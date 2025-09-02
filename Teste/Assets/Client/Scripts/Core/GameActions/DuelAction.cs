@@ -167,8 +167,9 @@ namespace L5RGame
             var properties = GetProperties(context, additionalProperties);
             
             // Create mock duel to test game action
+            System.Func<BaseCard, int> baseStatistic = card => card is DrawCard drawCard ? properties.statistic(drawCard) : 0;
             var mockDuel = new Duel(context.game, properties.challenger, new List<DrawCard>(), 
-                properties.type, properties.statistic);
+                properties.type, baseStatistic);
                 
             var gameAction = properties.gameActionFactory?.Invoke(mockDuel, context) ?? properties.gameAction;
             
@@ -193,33 +194,36 @@ namespace L5RGame
             }
             
             // Create the duel
-            var duel = new Duel(context.game, properties.challenger, cards, properties.type, properties.statistic);
+            System.Func<BaseCard, int> baseStatistic = card => card is DrawCard drawCard ? properties.statistic(drawCard) : 0;
+            var duel = new Duel(context.game, properties.challenger, cards, properties.type, baseStatistic);
             
             // Apply lasting effects if specified
             if (properties.challengerEffect != null)
             {
-                GameActions.CardLastingEffect(new LastingEffectCardAction.LastingEffectCardProperties
+                var challengerEffectAction = new LastingEffectCardAction(new LastingEffectCardProperties
                 {
-                    effect = properties.challengerEffect,
-                    duration = Durations.Custom,
-                    until = new Dictionary<string, System.Func<GameEvent, bool>>
+                    Effect = properties.challengerEffect,
+                    Duration = Durations.Custom,
+                    Until = new Dictionary<string, System.Func<GameEvent, bool>>
                     {
                         { "onDuelFinished", evt => evt.GetProperty("duel") == duel }
-                    }
-                }).Resolve(properties.challenger, context);
+                    }.ToString()
+                });
+                challengerEffectAction.Resolve(properties.challenger, context);
             }
             
             if (properties.targetEffect != null)
             {
-                GameActions.CardLastingEffect(new LastingEffectCardAction.LastingEffectCardProperties
+                var targetEffectAction = new LastingEffectCardAction(new LastingEffectCardProperties
                 {
-                    effect = properties.targetEffect,
-                    duration = Durations.Custom,
-                    until = new Dictionary<string, System.Func<GameEvent, bool>>
+                    Effect = properties.targetEffect,
+                    Duration = Durations.Custom,
+                    Until = new Dictionary<string, System.Func<GameEvent, bool>>
                     {
                         { "onDuelFinished", evt => evt.GetProperty("duel") == duel }
-                    }
-                }).Resolve(properties.target, context);
+                    }.ToString()
+                });
+                targetEffectAction.Resolve(properties.target, context);
             }
             
             // Queue duel flow

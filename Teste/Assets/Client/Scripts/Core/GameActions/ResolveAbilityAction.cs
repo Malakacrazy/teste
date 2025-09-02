@@ -7,17 +7,22 @@ namespace L5RGame
 {
     public class NoCostsAbilityResolver : AbilityResolver
     {
+        public AbilityContext Context => context;
+        public bool Cancelled => cancelled;
+        public List<object> Events => events;
+        public bool InitiateAbility => initiateAbility;
+        
         public NoCostsAbilityResolver(Game gameInstance, AbilityContext abilityContext) : base(gameInstance, abilityContext)
         {
         }
         
         public void Initialise()
         {
-            Pipeline.Initialise(new List<BaseStep>
+            Pipeline.Initialize(new List<BaseStep>
             {
-                new SimpleStep(Game, () => CreateSnapshot()),
-                new SimpleStep(Game, () => OpenInitiateAbilityEventWindow()),
-                new SimpleStep(Game, () => RefillProvinces())
+                new SimpleStep(Game, () => { CreateSnapshot(); return true; }),
+                new SimpleStep(Game, () => { OpenInitiateAbilityEventWindow(); return true; }),
+                new SimpleStep(Game, () => { RefillProvinces(); return true; })
             });
         }
 
@@ -29,9 +34,10 @@ namespace L5RGame
                     new { card = Context.Source, ability = Context.Ability, context = Context }, 
                     () =>
                     {
-                        Game.QueueSimpleStep(() => ResolveTargets());
-                        Game.QueueSimpleStep(() => InitiateAbilityEffects());
-                        Game.QueueSimpleStep(() => ExecuteHandler());
+                        Game.QueueSimpleStep(() => { ResolveTargets(); return true; });
+                        Game.QueueSimpleStep(() => { InitiateAbilityEffects(); return true; });
+                        Game.QueueSimpleStep(() => { ExecuteHandler(); return true; });
+                        return true;
                     })
             };
 
@@ -121,7 +127,7 @@ namespace L5RGame
             {
                 Ability = null,
                 SubResolution = false
-            };
+            } as GameAction.GameActionProperties;
         }
         
         #endregion
@@ -129,17 +135,17 @@ namespace L5RGame
         public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context) as IResolveAbilityProperties;
-            return ("resolve {0}'s {1} ability", new object[] { properties.Target, properties.Ability?.Title });
+            return ("resolve {0}'s {1} ability", new object[] { properties.Target, properties.Ability?.ToString() });
         }
 
-        public bool CanAffect(DrawCard card, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(DrawCard card, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IResolveAbilityProperties;
             var ability = properties.Ability as TriggeredAbility;
             var player = properties.Player ?? context.Player;
             var newContextEvent = properties.Event;
 
-            if (!base.CanAffect(card, context) || ability == null || 
+            if (!base.CanAffect(card, context, additionalProperties) || ability == null || 
                 (!properties.SubResolution && player.IsAbilityAtMax(ability.MaxIdentifier)))
             {
                 return false;

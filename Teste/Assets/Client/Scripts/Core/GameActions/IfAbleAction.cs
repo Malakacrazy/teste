@@ -14,7 +14,7 @@ namespace L5RGame
         /// Properties specific to if able actions
         /// </summary>
         [System.Serializable]
-        public class IfAbleActionProperties : GameActionProperties
+        public class IfAbleActionProperties : GameAction.GameActionProperties
         {
             public GameAction ifAbleAction;
             public GameAction otherwiseAction;

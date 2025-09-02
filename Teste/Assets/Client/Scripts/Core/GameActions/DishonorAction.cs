@@ -142,7 +142,7 @@ namespace L5RGame
                 var opposingPlayer = context.player.opponent;
                 return conflict?.GetParticipants()
                     .Where(c => c.controller == opposingPlayer && c.type == CardTypes.Character && !c.IsDishonored())
-                    .ToList() ?? new List<object>();
+                    .ToList() ?? new List<BaseCard>();
             });
             return action;
         }

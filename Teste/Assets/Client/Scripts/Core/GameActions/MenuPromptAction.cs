@@ -14,13 +14,18 @@ namespace L5RGame
         Func<string, bool, IMenuPromptProperties, object> ChoiceHandler { get; set; }
     }
 
-    public class MenuPromptProperties : GameActionProperties, IMenuPromptProperties
+    public class MenuPromptProperties : GameAction.GameActionProperties, IMenuPromptProperties
     {
         public string ActivePromptTitle { get; set; }
         public string Player { get; set; }
         public GameAction GameAction { get; set; }
         public object Choices { get; set; }
         public Func<string, bool, IMenuPromptProperties, object> ChoiceHandler { get; set; }
+        
+        public new List<object> Target { get; set; } = new List<object>();
+        public new bool CannotBeCancelled { get; set; }
+        public new bool Optional { get; set; }
+        public new GameAction ParentAction { get; set; }
     }
 
     public partial class MenuPromptAction : GameAction
@@ -53,7 +58,7 @@ namespace L5RGame
             return ("make a choice for {0}", new object[] { properties.Target });
         }
 
-        protected IMenuPromptProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected IMenuPromptProperties GetProperties(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as IMenuPromptProperties;
             
@@ -65,7 +70,7 @@ namespace L5RGame
             return properties;
         }
 
-        public bool CanAffect(object target, AbilityContext context, object additionalProperties = null)
+        public bool CanAffect(object target, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var choices = properties.Choices as string[];
@@ -75,11 +80,11 @@ namespace L5RGame
             return choices.Any(choice =>
             {
                 var childProperties = properties.ChoiceHandler(choice, false, properties);
-                return properties.GameAction.CanAffect(target, context, childProperties);
+                return properties.GameAction.CanAffect(target, context, childProperties as GameAction.GameActionProperties);
             });
         }
 
-        public bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
+        public bool HasLegalTarget(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var choices = properties.Choices as string[];
@@ -89,11 +94,11 @@ namespace L5RGame
             return choices.Any(choice =>
             {
                 var childProperties = properties.ChoiceHandler(choice, false, properties);
-                return properties.GameAction.HasLegalTarget(context, childProperties);
+                return properties.GameAction.HasLegalTarget(context, childProperties as GameAction.GameActionProperties);
             });
         }
 
-        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<object> events, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var choices = properties.Choices as string[];
@@ -109,7 +114,7 @@ namespace L5RGame
             Action<string> choiceHandler = choice =>
             {
                 var childProperties = properties.ChoiceHandler(choice, true, properties);
-                properties.GameAction.AddEventsToArray(events, context, childProperties);
+                properties.GameAction.AddEventsToArray(events, context, childProperties as GameAction.GameActionProperties);
             };
             
             if (choices.Length == 1)
@@ -130,7 +135,7 @@ namespace L5RGame
             context.Game.PromptWithHandlerMenu(player, promptProperties);
         }
 
-        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, object additionalProperties = null)
+        public bool HasTargetsChosenByInitiatingPlayer(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             return properties.GameAction.HasTargetsChosenByInitiatingPlayer(context);

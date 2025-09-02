@@ -774,22 +774,66 @@ namespace L5RGame
         public Dictionary<string, object> Parameters => properties;
         
         // Additional properties for compilation compatibility
-        public object Recipient => GetProperty("recipient");
-        public string Direction => GetProperty("direction") as string;
-        public int Amount => GetProperty("amount", 0);
-        public int Fate => GetProperty("fate", 0);
-        public object Origin => GetProperty("origin");
-        public StatusToken Token => GetProperty("token") as StatusToken;
-        public int Value => GetProperty("value", 0);
-        public bool AfterBid => GetProperty("afterBid", false);
-        public object Conflict => GetProperty("conflict");
+        public object Recipient 
+        { 
+            get => GetProperty("recipient");
+            set => SetProperty("recipient", value);
+        }
+        public string Direction 
+        { 
+            get => GetProperty("direction") as string;
+            set => SetProperty("direction", value);
+        }
+        public int Amount 
+        { 
+            get => GetProperty("amount", 0);
+            set => SetProperty("amount", value);
+        }
+        public int Fate 
+        { 
+            get => GetProperty("fate", 0);
+            set => SetProperty("fate", value);
+        }
+        public object Origin 
+        { 
+            get => GetProperty("origin");
+            set => SetProperty("origin", value);
+        }
+        public StatusToken Token 
+        { 
+            get => GetProperty("token") as StatusToken;
+            set => SetProperty("token", value);
+        }
+        public int Value 
+        { 
+            get => GetProperty("value", 0);
+            set => SetProperty("value", value);
+        }
+        public bool AfterBid 
+        { 
+            get => GetProperty("afterBid", false);
+            set => SetProperty("afterBid", value);
+        }
+        public object Conflict 
+        { 
+            get => GetProperty("conflict");
+            set => SetProperty("conflict", value);
+        }
         public Player Player
         {
             get => GetProperty("player") as Player;
             set => SetProperty("player", value);
         }
-        public object PhysicalRing => GetProperty("physicalRing");
-        public bool Optional => GetProperty("optional", false);
+        public object PhysicalRing 
+        { 
+            get => GetProperty("physicalRing");
+            set => SetProperty("physicalRing", value);
+        }
+        public bool Optional 
+        { 
+            get => GetProperty("optional", false);
+            set => SetProperty("optional", value);
+        }
         // cancelled property already defined above
         public bool IsCancelled() => isCancelled;
         public bool IsResolved() => isResolved;

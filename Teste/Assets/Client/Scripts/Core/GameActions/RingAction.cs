@@ -8,8 +8,12 @@ namespace L5RGame
     {
     }
 
-    public class RingActionProperties : GameActionProperties, IRingActionProperties
+    public class RingActionProperties : GameAction.GameActionProperties, IRingActionProperties
     {
+        public new List<object> Target { get; set; } = new List<object>();
+        public new bool CannotBeCancelled { get; set; }
+        public new bool Optional { get; set; }
+        public new GameAction ParentAction { get; set; }
     }
 
     public class RingAction : GameAction

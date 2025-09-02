@@ -15,6 +15,8 @@ namespace L5RGame
         // Missing properties for compilation
         public BaseCard Card { get; set; }
         public bool Honored { get; set; }
+        public bool Dishonored { get; set; }
+        public string Type { get; set; }
         
         public StatusToken() { }
         public StatusToken(string tokenName, object tokenValue, Player tokenOwner = null)

@@ -69,7 +69,7 @@ namespace L5RGame
         protected override void Initialize()
         {
             base.Initialize();
-            actionName = GameActionBase.SelectCard;
+            actionName = GameActionTypes.SelectCard;
             eventName = EventNames.OnGameStateChanged;
         }
 

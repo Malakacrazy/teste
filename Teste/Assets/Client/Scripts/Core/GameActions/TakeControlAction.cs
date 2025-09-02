@@ -80,7 +80,7 @@ namespace L5RGame
                 // Set default effect if not specified
                 if (controlProps.effect == null)
                 {
-                    controlProps.effect = EffectEngine.TakeControl(context.player);
+                    controlProps.effect = EffectEngine.TakeControl(controlProps.target, context.player);
                 }
                 return controlProps;
             }
@@ -92,7 +92,7 @@ namespace L5RGame
                 cannotBeCancelled = baseProps.cannotBeCancelled,
                 optional = baseProps.optional,
                 parentAction = baseProps.parentAction,
-                effect = EffectEngine.TakeControl(context.player)
+                effect = EffectEngine.TakeControl(baseProps.target, context.player)
             };
         }
         

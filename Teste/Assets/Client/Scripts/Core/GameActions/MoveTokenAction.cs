@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -45,25 +46,25 @@ namespace L5RGame
         
         #endregion
 
-        public (string, object[]) GetEffectMessage(AbilityContext context, object additionalProperties = null)
+        public (string, object[]) GetEffectMessage(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties) as IMoveTokenProperties;
-            var target = properties.Target as StatusToken;
+            var target = properties.Target?.FirstOrDefault() as StatusToken;
             return ("move {0}'s status token to {1}", new object[] { target?.Card, properties.Recipient });
         }
 
-        public override bool CanAffect(StatusToken token, AbilityContext context, object additionalProperties = null)
+        public virtual bool CanAffect(StatusToken token, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context) as IMoveTokenProperties;
             if (properties.Recipient == null || properties.Recipient.Location != Locations.PlayArea)
             {
                 return false;
             }
-            else if (token.Honored && (properties.Recipient.IsHonored || !properties.Recipient.CheckRestrictions("receiveHonorToken", context)))
+            else if (token.Honored && (properties.Recipient.IsHonored() || !properties.Recipient.CheckRestrictions("receiveHonorToken", context)))
             {
                 return false;
             }
-            else if (token.Dishonored && (properties.Recipient.IsDishonored || !properties.Recipient.CheckRestrictions("receiveDishonorToken", context)))
+            else if (token.Dishonored && (properties.Recipient.IsDishonored() || !properties.Recipient.CheckRestrictions("receiveDishonorToken", context)))
             {
                 return false;
             }
@@ -88,18 +89,18 @@ namespace L5RGame
             
             if (token != null && recipient != null)
             {
-                if (token.Card.PersonalHonor == token)
+                if (token.Card.PersonalHonor != null && token.Card.PersonalHonor.Equals(token))
                 {
                     token.Card.MakeOrdinary();
                     
-                    if ((recipient.IsHonored && token.Dishonored) || 
-                        (recipient.IsDishonored && token.Honored))
+                    if ((recipient.IsHonored() && token.Dishonored) || 
+                        (recipient.IsDishonored() && token.Honored))
                     {
                         recipient.MakeOrdinary();
                     }
                     else if (recipient.PersonalHonor == null)
                     {
-                        recipient.SetPersonalHonor(token);
+                        recipient.SetPersonalHonor(token.Honored ? 1 : -1);
                     }
                 }
                 LogExecution("Moved {0} token from {1} to {2}", token.Honored ? "honor" : "dishonor", token.Card.name, recipient.name);

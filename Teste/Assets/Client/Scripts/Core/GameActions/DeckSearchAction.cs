@@ -167,7 +167,7 @@ namespace L5RGame
                 return false;
                 
             var amount = requestedAmount > -1 ? requestedAmount : player.conflictDeck.Count;
-            var cards = player.conflictDeck.Take(amount).ToList();
+            var cards = player.conflictDeck.Take(amount).OfType<DrawCard>().ToList();
             
             // Filter by condition if searching entire deck
             if (requestedAmount == -1)
@@ -181,9 +181,9 @@ namespace L5RGame
             {
                 activePromptTitle = $"Select a card to {revealText}put in your hand",
                 context = context,
-                cards = cards,
-                cardCondition = properties.cardCondition,
-                choices = new List<string> { "Take nothing" },
+                cards = cards.Cast<BaseCard>().ToList(),
+                cardCondition = (card, ctx) => card is DrawCard drawCard && properties.cardCondition(drawCard, ctx),
+                choices = new List<MenuOption> { new MenuOption { text = "Take nothing" } },
                 handlers = new List<System.Action>
                 {
                     () =>

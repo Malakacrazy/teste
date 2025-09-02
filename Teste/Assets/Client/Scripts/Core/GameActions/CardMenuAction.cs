@@ -20,7 +20,7 @@ namespace L5RGame
         Func<AbilityContext, bool> GameActionHasLegalTarget { get; set; }
     }
 
-    public class CardMenuProperties : CardActionProperties, ICardMenuProperties
+    public class CardMenuProperties : CardGameAction.CardActionProperties, ICardMenuProperties
     {
         public string ActivePromptTitle { get; set; }
         public string Player { get; set; }
@@ -34,6 +34,9 @@ namespace L5RGame
         public Func<BaseCard, object> SubActionProperties { get; set; }
         public GameAction GameAction { get; set; }
         public Func<AbilityContext, bool> GameActionHasLegalTarget { get; set; }
+        
+        public new GameAction ParentAction { get; set; }
+        public BaseCard CardTarget { get; set; }
     }
 
     public partial class CardMenuAction : CardGameAction
@@ -77,25 +80,25 @@ namespace L5RGame
         
         #endregion
 
-        protected ICardMenuProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected ICardMenuProperties GetProperties(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ICardMenuProperties;
-            properties.GameAction?.SetDefaultTarget(() => properties.Target);
+            properties.GameAction?.SetDefaultTarget((ctx) => properties.Target);
             return properties;
         }
 
-        public override bool CanAffect(object target, AbilityContext context, GameActionProperties additionalProperties = null)
+        public override bool CanAffect(object target, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var card = target as BaseCard;
             if (card == null) return false;
             
             var properties = GetProperties(context, additionalProperties);
             return properties.Cards.Any(c =>
-                properties.GameAction.CanAffect(card, context, MergeProperties(additionalProperties, properties.SubActionProperties(c)))
+                properties.GameAction.CanAffect(card, context, MergeProperties(additionalProperties, properties.SubActionProperties(c)) as GameAction.GameActionProperties)
             );
         }
 
-        public override bool HasLegalTarget(AbilityContext context, GameActionProperties additionalProperties = null)
+        public override bool HasLegalTarget(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             
@@ -110,16 +113,16 @@ namespace L5RGame
             }
             
             return properties.Cards.Any(card =>
-                properties.GameAction.HasLegalTarget(context, MergeProperties(additionalProperties, properties.SubActionProperties(card)) as GameActionProperties)
+                properties.GameAction.HasLegalTarget(context, MergeProperties(additionalProperties, properties.SubActionProperties(card)) as GameAction.GameActionProperties)
             );
         }
 
-        public override void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameActionProperties additionalProperties = null)
+        public override void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             
             Func<BaseCard, AbilityContext, bool> cardCondition = (card, ctx) =>
-                properties.GameAction.HasLegalTarget(ctx, MergeProperties(additionalProperties, properties.SubActionProperties(card))) &&
+                properties.GameAction.HasLegalTarget(ctx, MergeProperties(additionalProperties, properties.SubActionProperties(card)) as GameAction.GameActionProperties) &&
                 properties.CardCondition(card, ctx);
 
             if ((properties.Cards.Count == 0 && properties.Choices.Count == 0) || 
@@ -136,7 +139,7 @@ namespace L5RGame
 
             Action<BaseCard> cardHandler = (card) =>
             {
-                properties.GameAction.AddEventsToArray(events, context, MergeProperties(additionalProperties, properties.SubActionProperties(card)));
+                properties.GameAction.AddEventsToArray(events, context, MergeProperties(additionalProperties, properties.SubActionProperties(card)) as GameAction.GameActionProperties);
                 if (!string.IsNullOrEmpty(properties.Message))
                 {
                     var cards = properties.Cards.Where(c => cardCondition(c, context)).ToList();

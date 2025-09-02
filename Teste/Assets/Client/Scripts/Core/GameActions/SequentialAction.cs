@@ -15,7 +15,7 @@ namespace L5RGame
         /// Properties specific to sequential actions
         /// </summary>
         [System.Serializable]
-        public class SequentialProperties : GameActionProperties
+        public class SequentialProperties : GameAction.GameActionProperties
         {
             public List<GameAction> gameActions = new List<GameAction>();
             

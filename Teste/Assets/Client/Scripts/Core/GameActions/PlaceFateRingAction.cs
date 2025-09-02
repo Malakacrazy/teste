@@ -99,7 +99,7 @@ namespace L5RGame
                 }
             }
             
-            return properties.Amount > 0 && base.CanAffect(ring, context);
+            return properties.Amount > 0 && base.CanAffect(ring, context, additionalProperties);
         }
 
         protected override void AddPropertiesToEvent(object eventObj, Ring ring, AbilityContext context, object additionalProperties)

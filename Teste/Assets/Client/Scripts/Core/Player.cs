@@ -1138,7 +1138,7 @@ namespace L5RGame
         // Additional missing methods and properties for compilation
         public int HonorBidModifier { get; set; } = 0;
         public Game Game => game;
-        public string Name => playerName;
+        public string Name => id;
         public bool FirstPlayer => game?.firstPlayer == this;
         
     }

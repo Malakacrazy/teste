@@ -65,7 +65,7 @@ namespace L5RGame
         public (string, object[]) GetEffectMessage(AbilityContext context)
         {
             var properties = GetProperties(context);
-            return ("choose a ring for {0}", new object[] { properties.Target });
+            return ("choose a ring for {0}", new object[] { properties.target });
         }
 
         public override bool CanAffect(Ring ring, AbilityContext context, object additionalProperties = null)

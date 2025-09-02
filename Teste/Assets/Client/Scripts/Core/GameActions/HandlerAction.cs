@@ -14,7 +14,7 @@ namespace L5RGame
         /// Properties specific to handler actions
         /// </summary>
         [System.Serializable]
-        public class HandlerProperties : GameActionProperties
+        public class HandlerProperties : GameAction.GameActionProperties
         {
             [System.NonSerialized]
             public System.Action<AbilityContext> handler;
@@ -240,7 +240,7 @@ namespace L5RGame
             {
                 // Add delayed effect logic here
                 // This would integrate with the effect engine
-                LogExecution("Added delayed effect for {0}", triggerEvent);
+                UnityEngine.Debug.Log($"Added delayed effect for {triggerEvent}");
             });
         }
         

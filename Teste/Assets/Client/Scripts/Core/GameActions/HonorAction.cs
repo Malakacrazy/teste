@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -148,7 +149,7 @@ namespace L5RGame
             action.SetDefaultTarget(context =>
             {
                 var conflict = context.game.currentConflict;
-                return conflict?.participants?.Where(c => c.type == CardTypes.Character && !c.IsHonored()).ToList() ?? new List<object>();
+                return conflict?.participants?.Where(c => c.type == CardTypes.Character && !c.IsHonored()).ToList() ?? new List<BaseCard>();
             });
             return action;
         }

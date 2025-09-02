@@ -160,6 +160,21 @@ namespace L5RGame
         public GameActions Actions => gameActions;
         
         /// <summary>
+        /// Gets the first player in the game
+        /// </summary>
+        public Player firstPlayer => GetFirstPlayer();
+        
+        /// <summary>
+        /// Gets all rings in the game (uppercase property alias)
+        /// </summary>
+        public Dictionary<string, Ring> Rings => rings;
+        
+        /// <summary>
+        /// Gets the effect engine (uppercase property alias)
+        /// </summary>
+        public EffectEngine EffectEngine => effectEngine;
+        
+        /// <summary>
         /// Property aliases with capital letters for API compatibility
         /// </summary>
         public Conflict CurrentConflict 
@@ -235,7 +250,7 @@ namespace L5RGame
         private Ring CreateRing(string element, ConflictType conflictType)
         {
             var ring = new Ring();
-            ring.Initialize(this, element, conflictType);
+            ring.Initialize(this, element, conflictType.ToString().ToLower());
             return ring;
         }
 

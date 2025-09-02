@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -139,7 +140,7 @@ namespace L5RGame
             action.SetDefaultTarget(context =>
             {
                 var conflict = context.game.currentConflict;
-                return conflict?.attackers?.ToList() ?? new List<object>();
+                return conflict?.attackers?.ToList() ?? new List<BaseCard>();
             });
             return action;
         }
@@ -153,7 +154,7 @@ namespace L5RGame
             action.SetDefaultTarget(context =>
             {
                 var conflict = context.game.currentConflict;
-                return conflict?.defenders?.ToList() ?? new List<object>();
+                return conflict?.defenders?.ToList() ?? new List<BaseCard>();
             });
             return action;
         }
@@ -167,7 +168,7 @@ namespace L5RGame
             action.SetDefaultTarget(context =>
             {
                 var conflict = context.game.currentConflict;
-                return conflict?.participants?.ToList() ?? new List<object>();
+                return conflict?.participants?.ToList() ?? new List<BaseCard>();
             });
             return action;
         }
@@ -184,7 +185,7 @@ namespace L5RGame
                 var participants = conflict?.participants?.Where(c => c.IsParticipating())
                     .OrderBy(c => c.cost).ToList();
                     
-                return participants?.Any() == true ? new List<object> { participants.First() } : new List<object>();
+                return participants?.Any() == true ? new List<BaseCard> { participants.First() } : new List<BaseCard>();
             });
             return action;
         }
@@ -201,7 +202,7 @@ namespace L5RGame
                 var participants = conflict?.participants?.Where(c => c.IsParticipating())
                     .OrderByDescending(c => c.cost).ToList();
                     
-                return participants?.Any() == true ? new List<object> { participants.First() } : new List<object>();
+                return participants?.Any() == true ? new List<BaseCard> { participants.First() } : new List<BaseCard>();
             });
             return action;
         }
@@ -218,7 +219,7 @@ namespace L5RGame
                 var opponents = context.player.opponent;
                 
                 return conflict?.participants?.Where(c => c.controller == opponents && c.IsParticipating())
-                    .ToList() ?? new List<object>();
+                    .ToList() ?? new List<BaseCard>();
             });
             return action;
         }

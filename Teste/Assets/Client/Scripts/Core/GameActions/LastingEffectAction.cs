@@ -18,12 +18,17 @@ namespace L5RGame
         string TargetController { get; set; }
     }
 
-    public class LastingEffectGeneralProperties : GameActionProperties, ILastingEffectGeneralProperties
+    public class LastingEffectGeneralProperties : GameAction.GameActionProperties, ILastingEffectGeneralProperties
     {
         public string Duration { get; set; }
         public Func<AbilityContext, bool> Condition { get; set; }
         public string Until { get; set; }
         public object Effect { get; set; }
+        
+        public new List<object> Target { get; set; } = new List<object>();
+        public new bool CannotBeCancelled { get; set; }
+        public new bool Optional { get; set; }
+        public new GameAction ParentAction { get; set; }
     }
 
     public class LastingEffectProperties : LastingEffectGeneralProperties, ILastingEffectProperties
@@ -70,7 +75,7 @@ namespace L5RGame
         
         #endregion
 
-        protected ILastingEffectProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected ILastingEffectProperties GetProperties(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ILastingEffectProperties;
             
@@ -82,14 +87,14 @@ namespace L5RGame
             return properties;
         }
 
-        public bool HasLegalTarget(AbilityContext context, object additionalProperties = null)
+        public bool HasLegalTarget(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = GetProperties(context, additionalProperties);
             var effectList = properties.Effect as IList<object>;
             return effectList != null && effectList.Count > 0;
         }
 
-        public void AddEventsToArray(List<object> events, AbilityContext context, object additionalProperties = null)
+        public void AddEventsToArray(List<object> events, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             if (HasLegalTarget(context, additionalProperties))
             {

@@ -20,10 +20,16 @@ namespace L5RGame
         Direction Direction { get; set; }
     }
 
-    public class ModifyBidProperties : PlayerActionProperties, IModifyBidProperties
+    public class ModifyBidProperties : GameAction.GameActionProperties, IModifyBidProperties
     {
         public int Amount { get; set; }
         public Direction Direction { get; set; }
+        
+        public new List<object> Target { get; set; } = new List<object>();
+        public new bool CannotBeCancelled { get; set; }
+        public new bool Optional { get; set; }
+        public new GameAction ParentAction { get; set; }
+        public Player PlayerTarget { get; set; }
     }
 
     public partial class ModifyBidAction : PlayerAction
@@ -111,7 +117,7 @@ namespace L5RGame
                         var gameEvent = GetEvent(player, context, additionalProperties) as GameEvent;
                         if (gameEvent != null)
                         {
-                            gameEvent.Direction = Direction.Increase;
+                            gameEvent.Direction = Direction.Increase.ToString().ToLower();
                             context.Game.AddMessage("{0} chooses to increase their honor bid", player);
                             events.Add(gameEvent);
                         }
@@ -127,12 +133,12 @@ namespace L5RGame
                                 if (choice == "Increase honor bid")
                                 {
                                     context.Game.AddMessage("{0} chooses to increase their honor bid", player);
-                                    gameEvent.Direction = Direction.Increase;
+                                    gameEvent.Direction = Direction.Increase.ToString().ToLower();
                                 }
                                 else
                                 {
                                     context.Game.AddMessage("{0} chooses to decrease their honor bid", player);
-                                    gameEvent.Direction = Direction.Decrease;
+                                    gameEvent.Direction = Direction.Decrease.ToString().ToLower();
                                 }
                                 events.Add(gameEvent);
                             }
@@ -151,7 +157,7 @@ namespace L5RGame
             }
         }
 
-        protected void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, object additionalProperties)
+        protected void AddPropertiesToEvent(object eventObj, Player player, AbilityContext context, GameAction.GameActionProperties additionalProperties)
         {
             var properties = GetProperties(context, additionalProperties) as IModifyBidProperties;
             base.AddPropertiesToEvent(eventObj, player, context, additionalProperties);
@@ -159,7 +165,7 @@ namespace L5RGame
             if (eventObj is GameEvent gameEvent)
             {
                 gameEvent.Amount = properties.Amount;
-                gameEvent.Direction = properties.Direction;
+                gameEvent.Direction = properties.Direction.ToString().ToLower();
             }
         }
 

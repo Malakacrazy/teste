@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -220,7 +221,7 @@ namespace L5RGame
         {
             var action = new ReturnToHandAction();
             action.SetDefaultTarget(context => 
-                parentCard.attachments?.Where(a => a.location == Locations.PlayArea).ToList() ?? new List<object>());
+                parentCard.attachments?.Where(a => a.location == Locations.PlayArea).ToList() ?? new List<BaseCard>());
             return action;
         }
         
@@ -238,7 +239,7 @@ namespace L5RGame
                     .OrderBy(c => c.cost)
                     .ToList();
                     
-                return eligibleCharacters.Any() ? new List<object> { eligibleCharacters.First() } : new List<object>();
+                return eligibleCharacters.Any() ? new List<object> { eligibleCharacters.First() } : new List<BaseCard>();
             });
             return action;
         }

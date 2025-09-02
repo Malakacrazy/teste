@@ -14,7 +14,7 @@ namespace L5RGame
         /// Properties specific to cancel actions
         /// </summary>
         [System.Serializable]
-        public class CancelActionProperties : GameActionProperties
+        public class CancelActionProperties : GameAction.GameActionProperties
         {
             public GameAction replacementGameAction;
             
@@ -185,7 +185,7 @@ namespace L5RGame
         {
             var gameEvent = CreateEvent(null, context, additionalProperties);
             AddPropertiesToEvent(gameEvent, null, context, additionalProperties);
-            gameEvent.SetHandler(eventInstance => EventHandler(eventInstance, additionalProperties));
+            gameEvent.SetHandler(() => EventHandler(gameEvent, additionalProperties));
             events.Add(gameEvent);
         }
         

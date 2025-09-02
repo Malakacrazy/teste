@@ -37,10 +37,10 @@ namespace L5RGame
         /// <param name="gameInstance">Game instance</param>
         /// <param name="ringElement">Element name (air, earth, fire, void, water)</param>
         /// <param name="initialConflictType">Initial conflict type (military or political)</param>
-        public void Initialize(Game gameInstance, string ringElement, ConflictType initialConflictType)
+        public void Initialize(Game gameInstance, string ringElement, string initialConflictType)
         {
             element = ringElement;
-            conflictType = initialConflictType == ConflictType.Military ? "military" : "political";
+            conflictType = initialConflictType;
             
             string ringName = char.ToUpper(ringElement[0]) + ringElement.Substring(1) + " Ring";
             base.Initialize(gameInstance, ringName);
@@ -583,6 +583,34 @@ namespace L5RGame
         { 
             get => fate; 
             set => fate = value; 
+        }
+
+        // Missing properties for compilation compatibility
+        /// <summary>
+        /// Gets or sets the conflict type (uppercase property alias)
+        /// </summary>
+        public string ConflictType 
+        { 
+            get => conflictType;
+            set => conflictType = value;
+        }
+        
+        /// <summary>
+        /// Gets or sets the claimed by player (uppercase property alias)
+        /// </summary>
+        public string ClaimedBy 
+        { 
+            get => claimedBy;
+            set => claimedBy = value;
+        }
+        
+        /// <summary>
+        /// Gets or sets whether the ring is contested (uppercase property alias)
+        /// </summary>
+        public bool Contested 
+        { 
+            get => contested;
+            set => contested = value;
         }
 
         protected override void OnDestroy()

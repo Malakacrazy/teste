@@ -14,7 +14,7 @@ namespace L5RGame
         /// Properties for player-targeted actions
         /// </summary>
         [System.Serializable]
-        public class PlayerActionProperties : GameActionProperties
+        public class PlayerActionProperties : GameAction.GameActionProperties
         {
             public PlayerActionProperties() : base() { }
             

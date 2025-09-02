@@ -252,7 +252,7 @@ namespace L5RGame
         {
             var action = new RemoveFromGameAction();
             action.SetDefaultTarget(context => 
-                parentCard.attachments?.Where(a => a.location == Locations.PlayArea).ToList() ?? new List<object>());
+                parentCard.attachments?.Where(a => a.location == Locations.PlayArea).ToList() ?? new List<BaseCard>());
             return action;
         }
         

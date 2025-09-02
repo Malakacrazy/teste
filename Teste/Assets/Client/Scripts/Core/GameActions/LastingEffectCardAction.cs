@@ -10,9 +10,17 @@ namespace L5RGame
         object TargetLocation { get; set; } // Can be Locations or Locations[]
     }
 
-    public class LastingEffectCardProperties : LastingEffectGeneralProperties, ILastingEffectCardProperties
+    public class LastingEffectCardProperties : CardGameAction.CardActionProperties, ILastingEffectCardProperties
     {
         public object TargetLocation { get; set; } // Can be Locations or Locations[]
+        
+        // Properties from LastingEffectGeneralProperties
+        public string Duration { get; set; }
+        public Func<AbilityContext, bool> Condition { get; set; }
+        public string Until { get; set; }
+        public object Effect { get; set; }
+        
+        public new GameAction ParentAction { get; set; }
     }
 
     public partial class LastingEffectCardAction : CardGameAction
@@ -24,12 +32,12 @@ namespace L5RGame
             Initialize();
         }
         
-        public LastingEffectCardAction(CardActionProperties properties) : base(properties)
+        public LastingEffectCardAction(CardGameAction.CardActionProperties properties) : base(properties)
         {
             Initialize();
         }
         
-        public LastingEffectCardAction(System.Func<AbilityContext, CardActionProperties> factory) : base(factory)
+        public LastingEffectCardAction(System.Func<AbilityContext, CardGameAction.CardActionProperties> factory) : base(factory)
         {
             Initialize();
         }
@@ -54,7 +62,7 @@ namespace L5RGame
         
         #endregion
 
-        protected ILastingEffectCardProperties GetProperties(AbilityContext context, object additionalProperties = null)
+        protected ILastingEffectCardProperties GetProperties(AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var properties = base.GetProperties(context, additionalProperties) as ILastingEffectCardProperties;
             
@@ -66,7 +74,7 @@ namespace L5RGame
             return properties;
         }
 
-        public override bool CanAffect(object target, AbilityContext context, GameActionProperties additionalProperties = null)
+        public override bool CanAffect(object target, AbilityContext context, GameAction.GameActionProperties additionalProperties = null)
         {
             var card = target as BaseCard;
             if (card == null) return false;
@@ -81,7 +89,7 @@ namespace L5RGame
                 {
                     if (factory is Func<Game, EffectSource, object, object> effectFactory)
                     {
-                        return effectFactory(context.Game, context.Source, properties);
+                        return effectFactory(context.Game, context.Source as EffectSource, properties);
                     }
                     return factory;
                 }).ToList();
@@ -96,7 +104,7 @@ namespace L5RGame
                    {
                        // Assuming props has an Effect property that can be checked
                        var effect = GetEffectFromProps(props);
-                       return effect?.CanBeApplied(card) == true && 
+                       return (effect as dynamic)?.CanBeApplied(card) == true && 
                               !lastingEffectRestrictions.Any(condition => 
                               {
                                   if (condition is Func<object, bool> conditionFunc)
@@ -133,7 +141,7 @@ namespace L5RGame
                     {
                         if (factory is Func<Game, EffectSource, object, object> effectFactory)
                         {
-                            return effectFactory(gameEvent.context.Game, gameEvent.context.Source, effectProperties);
+                            return effectFactory(gameEvent.context.Game, gameEvent.context.Source as EffectSource, effectProperties);
                         }
                         return factory;
                     }).ToList();
@@ -141,7 +149,7 @@ namespace L5RGame
                     var filteredEffects = effects.Where(props =>
                     {
                         var effect = GetEffectFromProps(props);
-                        return effect?.CanBeApplied(card) == true &&
+                        return (effect as dynamic)?.CanBeApplied(card) == true &&
                                !lastingEffectRestrictions.Any(condition =>
                                {
                                    if (condition is Func<object, bool> conditionFunc)
@@ -157,7 +165,7 @@ namespace L5RGame
                         gameEvent.context.Game.EffectEngine.Add(effect);
                     }
                     
-                    LogExecution("Applied {0} lasting effects to {1} for duration {2}", filteredEffects.Count, card.name, properties.Duration);
+                    LogExecution("Applied {0} lasting effects to {1} for duration {2}", filteredEffects.Count(), card.name, properties.Duration);
                     return filteredEffects.Count > 0;
                 }
             }
