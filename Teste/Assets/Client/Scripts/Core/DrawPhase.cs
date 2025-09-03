@@ -403,7 +403,6 @@ namespace L5RGame
             // Cleanup
             if (currentHonorBidPrompt != null)
             {
-                currentHonorBidPrompt.Cleanup();
                 currentHonorBidPrompt = null;
             }
 

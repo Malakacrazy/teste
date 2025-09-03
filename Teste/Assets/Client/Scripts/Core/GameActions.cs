@@ -86,6 +86,46 @@ namespace L5RGame
             return new DrawCardsAction(player, amount);
         }
         
+        /// <summary>
+        /// Creates a discard at random action
+        /// </summary>
+        public RandomDiscardAction DiscardAtRandom(Dictionary<string, object> properties)
+        {
+            var props = new RandomDiscardAction.RandomDiscardProperties();
+            if (properties.ContainsKey("amount") && properties["amount"] is int amount)
+            {
+                props.amount = amount;
+            }
+            return new RandomDiscardAction(props);
+        }
+        
+        /// <summary>
+        /// Creates a move card action with dictionary properties
+        /// </summary>
+        public object MoveCard(Dictionary<string, object> properties)
+        {
+            BaseCard target = null;
+            string destination = "";
+            bool bottom = false;
+            
+            if (properties.ContainsKey("target") && properties["target"] is BaseCard card)
+            {
+                target = card;
+            }
+            
+            if (properties.ContainsKey("destination") && properties["destination"] is string dest)
+            {
+                destination = dest;
+            }
+            
+            if (properties.ContainsKey("bottom") && properties["bottom"] is bool isBottom)
+            {
+                bottom = isBottom;
+            }
+            
+            return new MoveCardAction(target, destination, bottom);
+        }
+        
     }
     
     public partial class GameAction
@@ -93,6 +133,7 @@ namespace L5RGame
         public void AddEventsToArray(List<GameEvent> events, AbilityContext context) { }
         public void ResolveWithPlayer(Player player, object context) { } // Renamed to avoid ambiguity
     }
+    
     
     
     /// <summary>

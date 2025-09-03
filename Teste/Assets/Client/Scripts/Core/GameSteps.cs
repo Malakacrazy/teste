@@ -29,15 +29,15 @@ namespace L5RGame
         }
     }
 
-    public class HonorBidPrompt : BaseStep, IGameStep
+    public class GameStepHonorBidPrompt : BaseStep, IGameStep
     {
         private string activePromptTitle;
         private System.Action<int> costHandler;
         private List<int> prohibitedBids;
         private Duel duel;
 
-        public HonorBidPrompt(Game game) : base(game) { }
-        public HonorBidPrompt(Game game, string title, System.Action<int> handler, List<int> prohibited, Duel associatedDuel = null) : base(game)
+        public GameStepHonorBidPrompt(Game game) : base(game) { }
+        public GameStepHonorBidPrompt(Game game, string title, System.Action<int> handler, List<int> prohibited, Duel associatedDuel = null) : base(game)
         {
             activePromptTitle = title;
             costHandler = handler;
@@ -56,26 +56,6 @@ namespace L5RGame
         }
     }
 
-    public class GameWonPrompt : BaseStep, IGameStep
-    {
-        private Player winner;
-
-        public GameWonPrompt(Game game) : base(game) { }
-        public GameWonPrompt(Game game, Player winnerPlayer) : base(game)
-        {
-            winner = winnerPlayer;
-        }
-
-        public override bool Continue()
-        {
-            return true; // Immediately complete
-        }
-
-        public override string GetDebugInfo()
-        {
-            return $"GameWonPrompt - Winner: {winner?.name ?? "Unknown"}";
-        }
-    }
 
 
     public class HandlerMenuPrompt : BaseStep, IGameStep

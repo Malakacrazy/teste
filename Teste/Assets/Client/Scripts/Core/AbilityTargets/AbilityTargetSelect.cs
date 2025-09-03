@@ -188,13 +188,12 @@ namespace L5RGame
                     }
                 }
                 
-                context.game.PromptWithHandlerMenu(player, new AbilityTargetMenuPromptProperties
+                context.game.PromptWithHandlerMenu(player, new HandlerMenuPromptProperties
                 {
                     waitingPromptTitle = waitingPromptTitle,
                     activePromptTitle = promptTitle,
                     context = context,
-                    source = properties.source ?? context.source,
-                    choices = choiceList,
+                    choices = choiceList.Select(choice => new MenuOption { text = choice, arg = choice }).ToList(),
                     handlers = handlers
                 });
             }

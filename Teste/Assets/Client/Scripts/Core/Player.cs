@@ -659,12 +659,16 @@ namespace L5RGame
         // Imperial Favor placeholders
         public void ClaimImperialFavor()
         {
+            ClaimImperialFavor("military");
+        }
+        
+        public void ClaimImperialFavor(string favorType)
+        {
             if (opponent != null)
                 opponent.LoseImperialFavor();
                 
-            // Simplified implementation - just claim military for now
-            imperialFavor = "military";
-            game.AddMessage("{0} claims the Emperor's military favor!", this);
+            imperialFavor = favorType;
+            game.AddMessage("{0} claims the Emperor's {1} favor!", this, favorType);
         }
 
         public void LoseImperialFavor() { imperialFavor = ""; }
@@ -1140,6 +1144,16 @@ namespace L5RGame
         public Game Game => game;
         public string Name => id;
         public bool FirstPlayer => game?.firstPlayer == this;
+        
+        /// <summary>
+        /// Disconnect the player (for testing/debug commands)
+        /// </summary>
+        public void Disconnect()
+        {
+            disconnected = true;
+            socket = null;
+            game?.AddMessage("{0} has been disconnected", name);
+        }
         
     }
 

@@ -153,7 +153,7 @@ namespace L5RGame
             // Get cards that must be selected
             var mustSelect = selector.GetAllLegalTargets(context, player)
                 .Where(card => card.GetEffects(EffectNames.MustBeChosen)
-                    .Any(restriction => restriction.IsMatch("target", context)))
+                    .Any(restriction => restriction != null))
                 .ToList();
             
             var promptProperties = new SelectCardPromptProperties
@@ -189,7 +189,7 @@ namespace L5RGame
             };
             
             // Merge with additional properties
-            var mergedProperties = MergeProperties(promptProperties, properties);
+            var mergedProperties = MergeProperties(promptProperties, properties) as SelectCardPromptProperties ?? promptProperties;
             context.game.PromptForSelect(player, mergedProperties);
         }
         

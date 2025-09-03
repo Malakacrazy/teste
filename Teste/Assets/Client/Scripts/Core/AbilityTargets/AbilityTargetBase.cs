@@ -89,5 +89,6 @@ namespace L5RGame
         public string activePromptTitle;
         public string waitingPromptTitle;
         public bool noCostsFirstButton = false;
+        public object source;
     }
 }

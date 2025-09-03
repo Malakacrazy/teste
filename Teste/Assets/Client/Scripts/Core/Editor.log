@@ -1,33 +1,16 @@
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetToken.cs(52,41): error CS0266: Cannot implicitly convert type 'object' to 'L5RGame.StatusToken'. An explicit conversion exists (are you missing a cast?)
-
-Assets\Client\Scripts\Core\AbilityResolver.cs(324,22): error CS0266: Cannot implicitly convert type 'object' to 'bool'. An explicit conversion exists (are you missing a cast?)
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetToken.cs(147,41): error CS0266: Cannot implicitly convert type 'object' to 'L5RGame.StatusToken'. An explicit conversion exists (are you missing a cast?)
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetToken.cs(169,50): error CS1503: Argument 2: cannot convert from 'object' to 'L5RGame.SelectCardPromptProperties'
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetRing.cs(131,27): error CS0029: Cannot implicitly convert type 'System.Collections.Generic.List<L5RGame.MenuOption>' to 'System.Collections.Generic.List<object>'
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetRing.cs(159,54): error CS1503: Argument 2: cannot convert from 'object' to 'System.Collections.Generic.Dictionary<string, object>'
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetRing.cs(185,81): error CS1503: Argument 1: cannot convert from 'object' to 'L5RGame.Ring'
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetSelect.cs(196,41): error CS1061: 'AbilityTargetProperties' does not contain a definition for 'source' and no accessible extension method 'source' accepting a first argument of type 'AbilityTargetProperties' could be found (are you missing a using directive or an assembly reference?)
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetCard.cs(156,53): error CS1061: 'object' does not contain a definition for 'IsMatch' and no accessible extension method 'IsMatch' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetCard.cs(193,50): error CS1503: Argument 2: cannot convert from 'object' to 'L5RGame.SelectCardPromptProperties'
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetAbility.cs(172,39): error CS0029: Cannot implicitly convert type 'System.Collections.Generic.List<string>' to 'System.Collections.Generic.List<L5RGame.MenuOption>'
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetAbility.cs(207,50): error CS1503: Argument 2: cannot convert from 'object' to 'L5RGame.SelectCardPromptProperties'
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetAbility.cs(218,71): error CS1061: 'object' does not contain a definition for 'card' and no accessible extension method 'card' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetAbility.cs(219,104): error CS1061: 'object' does not contain a definition for 'card' and no accessible extension method 'card' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
-
-Assets\Client\Scripts\Core\AbilityTargets\AbilityTargetAbility.cs(220,37): error CS1503: Argument 1: cannot convert from 'object' to 'L5RGame.BaseAbility'
-
-Assets\Client\Scripts\Core\GameActions\RandomDiscardAction.cs(178,32): error CS1593: Delegate 'Func<bool>' does not take 1 arguments
-
-Assets\Client\Scripts\Core\GameActions\SelectCardAction.cs(180,28): error CS1593: Delegate 'Func<bool>' does not take 1 arguments
+Assets\Client\Scripts\Core\ChatCommands.cs(240,36): error CS1061: 'object' does not contain a definition for 'Resolve' and no accessible extension method 'Resolve' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\EffectEngine.cs(119,38): error CS7036: There is no argument given that corresponds to the required formal parameter 'effectType' of 'Effect.Effect(string, object, EffectSource)'
+Assets\Client\Scripts\Core\EffectEngine.cs(369,50): error CS1061: 'object' does not contain a definition for 'name' and no accessible extension method 'name' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\EventWindow.cs(322,105): error CS1503: Argument 1: cannot convert from 'object' to 'L5RGame.GameEvent'
+Assets\Client\Scripts\Core\GameActions.cs(70,35): error CS1503: Argument 1: cannot convert from 'System.Collections.Generic.Dictionary<string, object>' to 'L5RGame.DuelAction.DuelProperties'
+Assets\Client\Scripts\Core\Game.cs(441,26): error CS1061: 'ChatCommands' does not contain a definition for 'Initialize' and no accessible extension method 'Initialize' accepting a first argument of type 'ChatCommands' could be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\GameActions\CreateTokenAction.cs(145,21): error CS0246: The type or namespace name 'ConflictFinishedTrigger' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\GameActions\CreateTokenAction.cs(144,59): error CS1061: 'EffectEngine' does not contain a definition for 'CreateDelayedEffect' and no accessible extension method 'CreateDelayedEffect' accepting a first argument of type 'EffectEngine' could be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\GameActions\MoveCardAction.cs(57,13): error CS0103: The name 'SetProperties' does not exist in the current context
+Assets\Client\Scripts\Core\GameActions\MoveCardAction.cs(67,13): error CS0103: The name 'SetProperties' does not exist in the current context
+Assets\Client\Scripts\Core\Game.cs(905,34): error CS1501: No overload for method 'ExecuteCommand' takes 3 arguments
+Assets\Client\Scripts\Core\GameActions\TakeControlAction.cs(83,56): error CS0117: 'EffectEngine' does not contain a definition for 'TakeControl'
+Assets\Client\Scripts\Core\GameActions\TakeControlAction.cs(95,39): error CS0117: 'EffectEngine' does not contain a definition for 'TakeControl'
+Assets\Client\Scripts\Core\Game.cs(1081,26): error CS1061: 'ChatCommands' does not contain a definition for 'Manual' and no accessible extension method 'Manual' accepting a first argument of type 'ChatCommands' could be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\InitiateAbilityEventWindow.cs(117,59): error CS1061: 'GameEvent' does not contain a definition for 'GetProperties' and no accessible extension method 'GetProperties' accepting a first argument of type 'GameEvent' could be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\GameChat.cs(566,34): error CS1501: No overload for method 'ExecuteCommand' takes 3 arguments

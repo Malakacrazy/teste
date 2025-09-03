@@ -96,5 +96,6 @@ namespace L5RGame
         public const string WouldInterrupt = "wouldinterrupt";
         public const string CancelInterrupt = "cancelinterrupt";
         public const string Persistent = "persistent";
+        public const string OtherEffects = "othereffects";
     }
 }

@@ -601,6 +601,27 @@ namespace L5RGame
         }
 
         /// <summary>
+        /// Creates a context for ability execution
+        /// </summary>
+        /// <param name="ability">The ability being executed</param>
+        /// <param name="contextPlayer">Player executing the ability</param>
+        /// <returns>Ability context</returns>
+        public static AbilityContext CreateContext(BaseAbility ability, Player contextPlayer)
+        {
+            var contextGO = new UnityEngine.GameObject("AbilityContext");
+            var context = contextGO.AddComponent<AbilityContext>();
+            context.Initialize(new AbilityContextProperties
+            {
+                game = ability.game,
+                source = ability.source ?? ability.card,
+                player = contextPlayer,
+                ability = ability,
+                stage = Stages.PreTarget
+            });
+            return context;
+        }
+
+        /// <summary>
         /// Debug method to log context information
         /// </summary>
         [System.Diagnostics.Conditional("UNITY_EDITOR")]
@@ -635,8 +656,6 @@ namespace L5RGame
         public Player player;
         public string location;
     }
-
-
 
     /// <summary>
     /// Game action base class (placeholder)

@@ -295,6 +295,16 @@ namespace L5RGame
             return !string.IsNullOrEmpty(title) ? title : "Untitled Ability";
         }
         
+        /// <summary>
+        /// Create a new ability context for this ability
+        /// </summary>
+        /// <param name="player">Player triggering the ability</param>
+        /// <returns>New ability context</returns>
+        public virtual AbilityContext CreateContext(Player player)
+        {
+            return AbilityContext.CreateContext(this, player);
+        }
+        
         public override string ToString()
         {
             return $"BaseAbility[{abilityType}]: {GetTitle()}";

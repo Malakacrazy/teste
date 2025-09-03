@@ -175,7 +175,7 @@ namespace L5RGame
                     source = gameEvent.context.source as EffectSource,
                     cardCondition = card => cardsToDiscard.Contains(card),
                     onSelect = (p, card) => { /* Card selection logic handled elsewhere */ return true; },
-                    onCancel = (p) => handler(player, null)
+                    onCancel = () => { handler(player, null); return true; }
                 });
             }
             

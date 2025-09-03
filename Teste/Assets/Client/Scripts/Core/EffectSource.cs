@@ -468,7 +468,6 @@ namespace L5RGame
     public static partial class EventNames
     {
         public const string OnGameStateChanged = "onGameStateChanged";
-        public const string OnRoundEnded = "onRoundEnded";
         public const string OnPassPriority = "onPassPriority";
         public const string OnDuelEnded = "onDuelEnded";
     }

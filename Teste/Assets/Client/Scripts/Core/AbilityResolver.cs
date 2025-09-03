@@ -321,7 +321,7 @@ namespace L5RGame
                                context.player.name, GetSourceName());
                 cancelled = true;
             }
-            else if (targetResults.delayTargeting)
+            else if ((bool?)targetResults.delayTargeting == true)
             {
                 targetResults = context.ability.ResolveRemainingTargets(context, targetResults);
             }

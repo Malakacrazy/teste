@@ -1769,7 +1769,6 @@ def on_trigger(card, event_name, event_data):
         public const string OnCardPlayed = "onCardPlayed";
         public const string OnCardAbilityTriggered = "onCardAbilityTriggered";
         public const string OnDefendersDeclared = "onDefendersDeclared";
-        public const string OnConflictFinished = "onConflictFinished";
         public const string AfterConflict = "afterConflict";
         public const string OnCovertResolved = "onCovertResolved";
         public const string OnClaimRing = "onClaimRing";
@@ -1941,6 +1940,40 @@ def on_trigger(card, event_name, event_data):
         public void QueueSimpleStep(System.Action action)
         {
             action?.Invoke(); // Simple immediate execution for now
+        }
+        
+        /// <summary>
+        /// Current player property for API compatibility
+        /// </summary>
+        public Player currentPlayer
+        {
+            get
+            {
+                return activePlayer ?? GetFirstPlayer();
+            }
+        }
+        
+        /// <summary>
+        /// Event system methods for registration
+        /// </summary>
+        public void on(string eventName, System.Action<GameEvent> handler)
+        {
+            // Placeholder for event registration - would connect to actual event system
+            Debug.Log($"Registering handler for event: {eventName}");
+        }
+        
+        public void removeListener(string eventName, System.Action<GameEvent> handler)
+        {
+            // Placeholder for event removal - would connect to actual event system
+            Debug.Log($"Removing handler for event: {eventName}");
+        }
+        
+        /// <summary>
+        /// EmitEvent method with GameEvent parameter
+        /// </summary>
+        public void EmitEvent(string eventName, GameEvent gameEvent)
+        {
+            OnEventTriggered?.Invoke(gameEvent, currentPhase);
         }
     }
 

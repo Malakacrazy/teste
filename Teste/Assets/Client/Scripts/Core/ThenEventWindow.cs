@@ -66,13 +66,13 @@ namespace L5RGame
             // This is important for maintaining event continuity in the event chain
             if (previousEventWindow != null)
             {
-                foreach (var gameEvent in events)
+                foreach (var gameEvent in Events) // Use public property instead of protected field
                 {
                     previousEventWindow.AddEvent(gameEvent);
                     Debug.Log($"🔄 ThenEventWindow: Transferred event '{gameEvent.name}' back to previous window");
                 }
                 
-                Debug.Log($"🔄 ThenEventWindow: Transferred {events.Count} events to previous window");
+                Debug.Log($"🔄 ThenEventWindow: Transferred {Events.Count} events to previous window");
             }
             else
             {
@@ -93,7 +93,7 @@ namespace L5RGame
         /// <returns>Debug info string</returns>
         public override string GetDebugInfo()
         {
-            return $"ThenEventWindow: {events.Count} events, " +
+            return $"ThenEventWindow: {Events.Count} events, " +
                    $"Previous: {(previousEventWindow != null ? previousEventWindow.GetType().Name : "None")}";
         }
         

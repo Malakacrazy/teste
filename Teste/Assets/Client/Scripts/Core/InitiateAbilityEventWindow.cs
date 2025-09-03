@@ -79,7 +79,7 @@ namespace L5RGame
 
         public virtual void OpenWindow(string abilityType)
         {
-            if (events?.Count > 0 && abilityType == AbilityTypes.Interrupt)
+            if (Events?.Count > 0 && abilityType == AbilityTypes.Interrupt)
             {
                 // Create interrupt window but don't queue it as a step since it's a UI window
                 var interruptWindow = new InitiateAbilityInterruptWindow(game, abilityType, this);
@@ -94,12 +94,12 @@ namespace L5RGame
         public virtual void ExecuteHandler()
         {
             // Sort events by order
-            events = events?.OrderBy(eventObj => eventObj.Order).ToList();
+            var eventsList = Events?.OrderBy(eventObj => eventObj.Order).ToList() ?? new List<GameEvent>();
             
-            foreach (var gameEvent in events ?? new List<GameEvent>())
+            foreach (var gameEvent in eventsList)
             {
                 gameEvent.CheckCondition();
-                if (!gameEvent.Cancelled)
+                if (!gameEvent.IsCancelled())
                 {
                     gameEvent.ExecuteHandler();
                 }
@@ -112,9 +112,9 @@ namespace L5RGame
 
         private void EmitEvents()
         {
-            foreach (var gameEvent in events ?? new List<GameEvent>())
+            foreach (var gameEvent in Events ?? new List<GameEvent>())
             {
-                game.RaiseEvent(gameEvent.name, gameEvent.Properties?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) ?? new Dictionary<string, object>());
+                game.RaiseEvent(gameEvent.name, gameEvent.GetProperties() ?? new Dictionary<string, object>());
             }
         }
     }

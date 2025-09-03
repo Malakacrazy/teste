@@ -61,16 +61,6 @@ namespace L5RGame
             Initialize();
         }
         
-        public DuelAction(Dictionary<string, object> properties) : base(new DuelProperties())
-        {
-            // Convert dictionary properties to DuelProperties
-            if (properties.ContainsKey("type")) 
-            {
-                var props = GetProperties(null) as DuelProperties;
-                if (props != null) props.type = properties["type"] as string;
-            }
-            Initialize();
-        }
         
         #endregion
         

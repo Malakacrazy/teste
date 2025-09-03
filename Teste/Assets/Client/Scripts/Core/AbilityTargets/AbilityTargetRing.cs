@@ -128,7 +128,7 @@ namespace L5RGame
             {
                 waitingPromptTitle = waitingPromptTitle,
                 context = context,
-                buttons = buttons,
+                buttons = buttons.Cast<object>().ToList(),
                 onSelect = (selectedPlayer, ring) =>
                 {
                     context.rings[name] = ring;
@@ -156,7 +156,7 @@ namespace L5RGame
             
             // Merge with additional properties
             var mergedProperties = MergeProperties(promptProperties, properties);
-            context.game.PromptForRingSelect(player, mergedProperties);
+            context.game.PromptForRingSelect(player, mergedProperties as Dictionary<string, object>);
         }
         
         public override bool CheckTarget(AbilityContext context)
@@ -182,7 +182,7 @@ namespace L5RGame
             if (rings == null)
                 return false;
             
-            return properties.ringCondition == null || properties.ringCondition(rings, context);
+            return properties.ringCondition == null || properties.ringCondition(rings as Ring, context);
         }
         
         public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context)

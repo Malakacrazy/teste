@@ -162,8 +162,8 @@ namespace L5RGame
                     }
                     else if (validAbilities.Count > 1)
                     {
-                        var choices = validAbilities.Select(ability => ability.title).ToList();
-                        choices.Add("Back");
+                        var choices = validAbilities.Select(ability => new MenuOption { text = ability.title, arg = ability.title }).ToList();
+                        choices.Add(new MenuOption { text = "Back", arg = "Back" });
                         
                         context.game.PromptWithHandlerMenu(selectedPlayer, new HandlerMenuPromptProperties
                         {
@@ -203,21 +203,24 @@ namespace L5RGame
             };
             
             // Merge with additional properties
-            var mergedProperties = MergeProperties(promptProperties, properties);
+            var mergedProperties = MergeProperties(promptProperties, properties) as SelectCardPromptProperties ?? promptProperties;
             context.game.PromptForSelect(player, mergedProperties);
         }
         
         public override bool CheckTarget(AbilityContext context)
         {
-            if (context.targetAbility == null || 
-                (context.choosingPlayerOverride != null && GetChoosingPlayer(context) == context.player))
+            if (context.choosingPlayerOverride != null && GetChoosingPlayer(context) == context.player)
             {
                 return false;
             }
             
-            return properties.cardType.Contains(context.targetAbility.card.GetCardType()) &&
-                   (properties.cardCondition == null || properties.cardCondition(context.targetAbility.card, context)) &&
-                   abilityCondition(context.targetAbility);
+            var targetAbility = context.targetAbility as BaseAbility;
+            if (targetAbility?.card == null)
+                return false;
+                
+            return properties.cardType.Contains(targetAbility.card.GetCardType()) &&
+                   (properties.cardCondition == null || properties.cardCondition(targetAbility.card, context)) &&
+                   abilityCondition(targetAbility);
         }
         
         public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context)

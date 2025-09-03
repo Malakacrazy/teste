@@ -49,7 +49,7 @@ namespace L5RGame
                 
                 if (name == "target")
                 {
-                    contextCopy.token = token;
+                    contextCopy.token = token as StatusToken;
                 }
                 
                 // Check dependent cost at PreTarget stage
@@ -144,7 +144,7 @@ namespace L5RGame
                     context.tokens[name] = card.personalHonor;
                     if (name == "target")
                     {
-                        context.token = card.personalHonor;
+                        context.token = card.personalHonor as StatusToken;
                     }
                     return true;
                 },
@@ -166,7 +166,7 @@ namespace L5RGame
             
             // Merge with additional properties
             var mergedProperties = MergeProperties(promptProperties, properties);
-            context.game.PromptForSelect(player, mergedProperties);
+            context.game.PromptForSelect(player, mergedProperties as SelectCardPromptProperties);
         }
         
         public override bool CheckTarget(AbilityContext context)

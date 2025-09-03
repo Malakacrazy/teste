@@ -177,7 +177,7 @@ namespace L5RGame
                 location = properties.Location?.ToString(),
                 cardCondition = (card) => (properties.CardCondition?.Invoke(card, context) ?? false),
                 onSelectAction = onSelect,
-                onCancel = (player) => properties.CancelHandler?.Invoke(),
+                onCancel = () => { properties.CancelHandler?.Invoke(); return true; },
                 optional = true
             };
             
