@@ -1,15 +1,2 @@
-Assets\Client\Scripts\Core\Effect.cs(616,25): error CS0260: Missing partial modifier on declaration of type 'Durations'; another partial declaration of this type exists
-Assets\Client\Scripts\Core\GameConstants.cs(383,29): error CS0102: The type 'EffectNames' already contains a definition for 'SetConflictTotalSkill'
-Assets\Client\Scripts\Core\GameConstants.cs(384,29): error CS0102: The type 'EffectNames' already contains a definition for 'ChangeConflictSkillFunction'
-Assets\Client\Scripts\Core\GameConstants.cs(385,29): error CS0102: The type 'EffectNames' already contains a definition for 'CannotContribute'
-Assets\Client\Scripts\Core\GameAction.cs(14,48): error CS0535: 'GameAction' does not implement interface member 'IGameAction.HasLegalTarget(AbilityContext, GameActionProperties)'
-Assets\Client\Scripts\Core\GameAction.cs(14,48): error CS0535: 'GameAction' does not implement interface member 'IGameAction.AddEventsToArray(List<GameEvent>, AbilityContext, GameActionProperties)'
-Assets\Client\Scripts\Core\EffectSource.cs(438,29): error CS0102: The type 'Durations' already contains a definition for 'Persistent'
-Assets\Client\Scripts\Core\EffectSource.cs(439,29): error CS0102: The type 'Durations' already contains a definition for 'UntilEndOfConflict'
-Assets\Client\Scripts\Core\EffectSource.cs(440,29): error CS0102: The type 'Durations' already contains a definition for 'UntilEndOfPhase'
-Assets\Client\Scripts\Core\EffectSource.cs(441,29): error CS0102: The type 'Durations' already contains a definition for 'UntilEndOfRound'
-Assets\Client\Scripts\Core\EffectSource.cs(442,29): error CS0102: The type 'Durations' already contains a definition for 'UntilEndOfDuel'
-Assets\Client\Scripts\Core\EffectSource.cs(443,29): error CS0102: The type 'Durations' already contains a definition for 'UntilPassPriority'
-Assets\Client\Scripts\Core\EffectSource.cs(444,29): error CS0102: The type 'Durations' already contains a definition for 'UntilOpponentPassPriority'
-Assets\Client\Scripts\Core\EffectSource.cs(445,29): error CS0102: The type 'Durations' already contains a definition for 'UntilNextPassPriority'
-Assets\Client\Scripts\Core\EffectSource.cs(446,29): error CS0102: The type 'Durations' already contains a definition for 'Custom'
+Assets\Client\Scripts\Core\Effects\CopyCharacter.cs(111,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'PersistentEffectProperties'
+Assets\Client\Scripts\Core\Effects\SuppressEffect.cs(38,30): error CS0115: 'SuppressEffect.Recalculate()': no suitable method found to override

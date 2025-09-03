@@ -129,7 +129,7 @@ namespace L5RGame
     /// <summary>
     /// Base clock implementation with core timing functionality
     /// </summary>
-    public class Clock : MonoBehaviour, IClock
+    public class Clock : IClock
     {
         [Header("Clock Properties")]
         public Player Player { get; protected set; }

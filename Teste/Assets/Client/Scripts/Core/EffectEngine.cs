@@ -374,7 +374,7 @@ namespace L5RGame
                     Handler = () =>
                     {
                         // Set default targets
-                        delayedEffect.gameAction.SetDefaultTarget(() => targets);
+                        delayedEffect.gameAction.SetDefaultTarget(context => targets);
 
                         // Show message if applicable
                         if (!string.IsNullOrEmpty(delayedEffect.message) && 
@@ -751,6 +751,23 @@ namespace L5RGame
             ClearAllEffects();
             Debug.Log("🔮 EffectEngine destroyed");
         }
+
+        /// <summary>
+        /// Create a take control effect
+        /// </summary>
+        /// <param name="target">Target to take control of</param>
+        /// <param name="controller">New controller</param>
+        /// <returns>Take control effect</returns>
+        public static object TakeControl(object target, Player controller)
+        {
+            return new
+            {
+                type = "takeControl",
+                target = target,
+                controller = controller,
+                originalController = target is BaseCard card ? card.controller : null
+            };
+        }
     }
 
     /// <summary>
@@ -779,8 +796,8 @@ namespace L5RGame
     {
         void SetDefaultTarget(System.Func<AbilityContext, object> targetFunc);
         void SetDefaultTarget(System.Func<AbilityContext, List<object>> targetFunc);
-        bool HasLegalTarget(AbilityContext context, GameActionProperties additionalProperties = null);
-        void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameActionProperties additionalProperties = null);
+        bool HasLegalTarget(AbilityContext context, GameAction.GameActionProperties additionalProperties = null);
+        void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameAction.GameActionProperties additionalProperties = null);
     }
 
     /// <summary>
@@ -1076,7 +1093,7 @@ namespace L5RGame
         /// </summary>
         /// <param name="gameObject">Target GameObject</param>
         /// <param name="effect">Effect to add</param>
-        public static void AddEffect(this GameObject gameObject, object effect)
+        public static void AddEffect(this UnityEngine.GameObject gameObject, object effect)
         {
             // Get or add EffectContainer component
             var effectContainer = gameObject.GetComponent<EffectContainer>();

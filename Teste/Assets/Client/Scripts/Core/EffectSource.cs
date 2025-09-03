@@ -14,6 +14,12 @@ namespace L5RGame
         [Header("Effect Source")]
         public List<object> activeEffects = new List<object>();
         protected Game game;
+        public Game Game => game;
+        
+        [Header("Card Properties")]
+        public Player controller;
+        public List<object> persistentEffects = new List<object>();
+        public bool facedown = false;
         
         /// <summary>
         /// Initialize the EffectSource
@@ -430,21 +436,6 @@ namespace L5RGame
     public class AttachmentTarget { }
     public class RingTarget { }
 
-    /// <summary>
-    /// Additional duration constants for EffectSource
-    /// </summary>
-    public static partial class Durations
-    {
-        public const string Persistent = "persistent";
-        public const string UntilEndOfConflict = "untilEndOfConflict";
-        public const string UntilEndOfPhase = "untilEndOfPhase";
-        public const string UntilEndOfRound = "untilEndOfRound";
-        public const string UntilEndOfDuel = "untilEndOfDuel";
-        public const string UntilPassPriority = "untilPassPriority";
-        public const string UntilOpponentPassPriority = "untilOpponentPassPriority";
-        public const string UntilNextPassPriority = "untilNextPassPriority";
-        public const string Custom = "custom";
-    }
 
     /// <summary>
     /// Additional event names for EffectSource

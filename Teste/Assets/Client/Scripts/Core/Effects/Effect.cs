@@ -19,7 +19,7 @@ namespace L5RGame
         
         [Header("Effect Configuration")]
         public Game game;
-        public BaseCard source;
+        public EffectSource source;
         public string duration;
         public string location;
         public bool canChangeZoneOnce;
@@ -85,13 +85,13 @@ namespace L5RGame
         /// <param name="source">Effect source</param>
         public Effect(string effectType, object value, EffectSource source)
         {
-            if (source?.game == null)
+            if (source?.Game == null)
             {
                 Debug.LogError($"Cannot create effect {effectType}: source game is null");
                 return;
             }
 
-            game = source.game;
+            game = source.Game;
             this.source = source;
             type = effectType;
             duration = "persistent";
@@ -114,13 +114,13 @@ namespace L5RGame
         /// <param name="source">Effect source</param>
         public Effect(string effectType, System.Func<GameObject, object> valueFunc, EffectSource source)
         {
-            if (source?.game == null)
+            if (source?.Game == null)
             {
                 Debug.LogError($"Cannot create effect {effectType}: source game is null");
                 return;
             }
 
-            game = source.game;
+            game = source.Game;
             this.source = source;
             type = effectType;
             duration = "persistent";
@@ -331,7 +331,7 @@ namespace L5RGame
             
             // Check if source has persistent effect that includes this effect
             bool effectOnSource = source.persistentEffects.Any(persistentEffect => 
-                persistentEffect.reference != null && persistentEffect.reference.Contains(this));
+                persistentEffect is Effect effect && effect == this);
             
             return !source.facedown && effectOnSource;
         }
@@ -500,6 +500,23 @@ namespace L5RGame
         }
         
         #endregion
+        
+        /// <summary>
+        /// Get the resolved value of this effect for a specific target
+        /// </summary>
+        /// <param name="target">Target object</param>
+        /// <returns>Resolved effect value</returns>
+        public object GetValue(object target)
+        {
+            // If effect implementation exists, use it
+            if (effect is IEffectImplementation impl)
+            {
+                return impl.GetValue(target);
+            }
+            
+            // Return static value
+            return effect;
+        }
     }
     
     /// <summary>
@@ -547,6 +564,7 @@ namespace L5RGame
         void Unapply(object target);
         bool Recalculate(object target);
         object GetDebugInfo();
+        object GetValue(object target);
     }
 
     /// <summary>
@@ -608,12 +626,23 @@ namespace L5RGame
             }
             return wrappedEffect?.GetType().Name ?? "UnknownEffect";
         }
+
+        public object GetValue(object target)
+        {
+            // Try to get value from wrapped effect if it has GetValue method
+            var getValueMethod = wrappedEffect?.GetType().GetMethod("GetValue");
+            if (getValueMethod != null)
+            {
+                return getValueMethod.Invoke(wrappedEffect, new object[] { target });
+            }
+            return wrappedEffect;
+        }
     }
 
     /// <summary>
     /// Constants for effect durations
     /// </summary>
-    public static class Durations
+    public static partial class Durations
     {
         public const string Persistent = "persistent";
         public const string UntilEndOfConflict = "untilEndOfConflict";
@@ -673,6 +702,8 @@ namespace L5RGame
         public bool Recalculate(object target) => false;
 
         public object GetDebugInfo() => new { type = effectType, value = value };
+
+        public object GetValue(object target) => value;
     }
 
     /// <summary>
@@ -736,6 +767,15 @@ namespace L5RGame
         }
 
         public object GetDebugInfo() => new { type = effectType, hasValueFunc = valueFunc != null };
+
+        public object GetValue(object target)
+        {
+            if (target is GameObject go && valueFunc != null)
+            {
+                return valueFunc(go);
+            }
+            return null;
+        }
     }
 
     /// <summary>

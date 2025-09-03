@@ -380,9 +380,6 @@ namespace L5RGame
         public const string AttachmentTraitRestriction = "attachmentTraitRestriction";
         public const string AdditionalTriggerCost = "additionalTriggerCost";
         public const string AdditionalPlayCost = "additionalPlayCost";
-        public const string SetConflictTotalSkill = "setConflictTotalSkill";
-        public const string ChangeConflictSkillFunction = "changeConflictSkillFunction";
-        public const string CannotContribute = "cannotContribute";
         public const string ShowTopConflictCard = "showTopConflictCard";
         public const string EventsCannotBeCancelled = "eventsCannotBeCancelled";
         public const string ShowTopDynastyCard = "showTopDynastyCard";
