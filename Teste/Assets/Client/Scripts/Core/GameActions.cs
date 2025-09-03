@@ -67,7 +67,18 @@ namespace L5RGame
         /// </summary>
         public object Duel(Dictionary<string, object> properties)
         {
-            return new DuelAction(properties);
+            var duelProperties = new DuelAction.DuelProperties();
+            
+            if (properties.ContainsKey("type") && properties["type"] is string type)
+                duelProperties.type = type;
+            if (properties.ContainsKey("challenger") && properties["challenger"] is DrawCard challenger)
+                duelProperties.challenger = challenger;
+            if (properties.ContainsKey("gameAction") && properties["gameAction"] is GameAction gameAction)
+                duelProperties.gameAction = gameAction;
+            if (properties.ContainsKey("message") && properties["message"] is string message)
+                duelProperties.message = message;
+                
+            return new DuelAction(duelProperties);
         }
         
         /// <summary>

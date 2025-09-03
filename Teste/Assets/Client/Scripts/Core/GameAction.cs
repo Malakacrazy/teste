@@ -11,7 +11,7 @@ namespace L5RGame
     /// Game actions represent atomic operations that can affect players, cards, rings, or tokens.
     /// </summary>
     [System.Serializable]
-    public abstract partial class GameAction
+    public abstract partial class GameAction : IGameAction
     {
         [Header("Game Action Configuration")]
         [SerializeField] protected string actionName = "";

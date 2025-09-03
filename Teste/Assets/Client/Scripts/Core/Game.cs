@@ -899,10 +899,9 @@ def on_trigger(card, event_name, event_data):
             if (!IsSpectator(player))
             {
                 // Handle chat commands with proper parameter passing
-                var commandName = args.Length > 0 ? args[0] : "";
-                var commandArgs = args.Length > 1 ? args.Skip(1).ToArray() : new string[0];
+                var fullCommand = string.Join(" ", args);
                 
-                if (chatCommands.ExecuteCommand(player as Player, commandName, commandArgs))
+                if (chatCommands.ExecuteCommand(player as Player, fullCommand))
                 {
                     CheckGameState(true);
                     return;

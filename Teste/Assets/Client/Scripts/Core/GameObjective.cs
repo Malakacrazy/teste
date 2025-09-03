@@ -452,63 +452,6 @@ namespace L5RGame
         }
     }
 
-    /// <summary>
-    /// Represents an effect applied to a GameObject
-    /// </summary>
-    [System.Serializable]
-    public class Effect
-    {
-        public string type;
-        public object value;
-        public EffectSource source;
-        public Dictionary<string, object> context;
-        public DateTime appliedAt;
-
-        public Effect(string effectType, object effectValue, EffectSource effectSource = null)
-        {
-            type = effectType;
-            value = effectValue;
-            source = effectSource;
-            context = new Dictionary<string, object>();
-            appliedAt = DateTime.Now;
-        }
-
-        /// <summary>
-        /// Get the resolved value of this effect for a specific target
-        /// </summary>
-        /// <param name="target">Target object</param>
-        /// <returns>Resolved effect value</returns>
-        public object GetValue(GameObject target)
-        {
-            // If value is a function, evaluate it
-            if (value is System.Func<GameObject, object> func)
-            {
-                return func(target);
-            }
-
-            // If value is a conditional function, evaluate it
-            if (value is System.Func<GameObject, Dictionary<string, object>, object> conditionalFunc)
-            {
-                return conditionalFunc(target, context);
-            }
-
-            // Return static value
-            return value;
-        }
-
-        /// <summary>
-        /// Check if this effect matches specific criteria
-        /// </summary>
-        /// <param name="targetType">Type to match</param>
-        /// <param name="targetSource">Source to match (optional)</param>
-        /// <returns>True if effect matches</returns>
-        public bool Matches(string targetType, EffectSource targetSource = null)
-        {
-            if (type != targetType) return false;
-            if (targetSource != null && source != targetSource) return false;
-            return true;
-        }
-    }
 
     /// <summary>
     /// Interface for restriction effects

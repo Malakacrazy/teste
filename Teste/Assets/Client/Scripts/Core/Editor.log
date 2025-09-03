@@ -1,16 +1,15 @@
-Assets\Client\Scripts\Core\ChatCommands.cs(240,36): error CS1061: 'object' does not contain a definition for 'Resolve' and no accessible extension method 'Resolve' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
-Assets\Client\Scripts\Core\EffectEngine.cs(119,38): error CS7036: There is no argument given that corresponds to the required formal parameter 'effectType' of 'Effect.Effect(string, object, EffectSource)'
-Assets\Client\Scripts\Core\EffectEngine.cs(369,50): error CS1061: 'object' does not contain a definition for 'name' and no accessible extension method 'name' accepting a first argument of type 'object' could be found (are you missing a using directive or an assembly reference?)
-Assets\Client\Scripts\Core\EventWindow.cs(322,105): error CS1503: Argument 1: cannot convert from 'object' to 'L5RGame.GameEvent'
-Assets\Client\Scripts\Core\GameActions.cs(70,35): error CS1503: Argument 1: cannot convert from 'System.Collections.Generic.Dictionary<string, object>' to 'L5RGame.DuelAction.DuelProperties'
-Assets\Client\Scripts\Core\Game.cs(441,26): error CS1061: 'ChatCommands' does not contain a definition for 'Initialize' and no accessible extension method 'Initialize' accepting a first argument of type 'ChatCommands' could be found (are you missing a using directive or an assembly reference?)
-Assets\Client\Scripts\Core\GameActions\CreateTokenAction.cs(145,21): error CS0246: The type or namespace name 'ConflictFinishedTrigger' could not be found (are you missing a using directive or an assembly reference?)
-Assets\Client\Scripts\Core\GameActions\CreateTokenAction.cs(144,59): error CS1061: 'EffectEngine' does not contain a definition for 'CreateDelayedEffect' and no accessible extension method 'CreateDelayedEffect' accepting a first argument of type 'EffectEngine' could be found (are you missing a using directive or an assembly reference?)
-Assets\Client\Scripts\Core\GameActions\MoveCardAction.cs(57,13): error CS0103: The name 'SetProperties' does not exist in the current context
-Assets\Client\Scripts\Core\GameActions\MoveCardAction.cs(67,13): error CS0103: The name 'SetProperties' does not exist in the current context
-Assets\Client\Scripts\Core\Game.cs(905,34): error CS1501: No overload for method 'ExecuteCommand' takes 3 arguments
-Assets\Client\Scripts\Core\GameActions\TakeControlAction.cs(83,56): error CS0117: 'EffectEngine' does not contain a definition for 'TakeControl'
-Assets\Client\Scripts\Core\GameActions\TakeControlAction.cs(95,39): error CS0117: 'EffectEngine' does not contain a definition for 'TakeControl'
-Assets\Client\Scripts\Core\Game.cs(1081,26): error CS1061: 'ChatCommands' does not contain a definition for 'Manual' and no accessible extension method 'Manual' accepting a first argument of type 'ChatCommands' could be found (are you missing a using directive or an assembly reference?)
-Assets\Client\Scripts\Core\InitiateAbilityEventWindow.cs(117,59): error CS1061: 'GameEvent' does not contain a definition for 'GetProperties' and no accessible extension method 'GetProperties' accepting a first argument of type 'GameEvent' could be found (are you missing a using directive or an assembly reference?)
-Assets\Client\Scripts\Core\GameChat.cs(566,34): error CS1501: No overload for method 'ExecuteCommand' takes 3 arguments
+Assets\Client\Scripts\Core\Effect.cs(616,25): error CS0260: Missing partial modifier on declaration of type 'Durations'; another partial declaration of this type exists
+Assets\Client\Scripts\Core\GameConstants.cs(383,29): error CS0102: The type 'EffectNames' already contains a definition for 'SetConflictTotalSkill'
+Assets\Client\Scripts\Core\GameConstants.cs(384,29): error CS0102: The type 'EffectNames' already contains a definition for 'ChangeConflictSkillFunction'
+Assets\Client\Scripts\Core\GameConstants.cs(385,29): error CS0102: The type 'EffectNames' already contains a definition for 'CannotContribute'
+Assets\Client\Scripts\Core\GameAction.cs(14,48): error CS0535: 'GameAction' does not implement interface member 'IGameAction.HasLegalTarget(AbilityContext, GameActionProperties)'
+Assets\Client\Scripts\Core\GameAction.cs(14,48): error CS0535: 'GameAction' does not implement interface member 'IGameAction.AddEventsToArray(List<GameEvent>, AbilityContext, GameActionProperties)'
+Assets\Client\Scripts\Core\EffectSource.cs(438,29): error CS0102: The type 'Durations' already contains a definition for 'Persistent'
+Assets\Client\Scripts\Core\EffectSource.cs(439,29): error CS0102: The type 'Durations' already contains a definition for 'UntilEndOfConflict'
+Assets\Client\Scripts\Core\EffectSource.cs(440,29): error CS0102: The type 'Durations' already contains a definition for 'UntilEndOfPhase'
+Assets\Client\Scripts\Core\EffectSource.cs(441,29): error CS0102: The type 'Durations' already contains a definition for 'UntilEndOfRound'
+Assets\Client\Scripts\Core\EffectSource.cs(442,29): error CS0102: The type 'Durations' already contains a definition for 'UntilEndOfDuel'
+Assets\Client\Scripts\Core\EffectSource.cs(443,29): error CS0102: The type 'Durations' already contains a definition for 'UntilPassPriority'
+Assets\Client\Scripts\Core\EffectSource.cs(444,29): error CS0102: The type 'Durations' already contains a definition for 'UntilOpponentPassPriority'
+Assets\Client\Scripts\Core\EffectSource.cs(445,29): error CS0102: The type 'Durations' already contains a definition for 'UntilNextPassPriority'
+Assets\Client\Scripts\Core\EffectSource.cs(446,29): error CS0102: The type 'Durations' already contains a definition for 'Custom'

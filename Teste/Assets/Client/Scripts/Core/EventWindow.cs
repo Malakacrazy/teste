@@ -319,7 +319,7 @@ namespace L5RGame
             foreach (var thenAbility in thenAbilities)
             {
                 // Check if all events in the context meet the condition
-                bool allEventsMeetCondition = thenAbility.context.events.All(e => thenAbility.condition(e));
+                bool allEventsMeetCondition = thenAbility.context.events.OfType<GameEvent>().All(e => thenAbility.condition(e));
                 
                 if (allEventsMeetCondition)
                 {

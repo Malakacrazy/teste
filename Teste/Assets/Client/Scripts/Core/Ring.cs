@@ -174,6 +174,15 @@ namespace L5RGame
         }
 
         /// <summary>
+        /// Gets the primary element of this ring
+        /// </summary>
+        /// <returns>Primary element name</returns>
+        public string GetElement()
+        {
+            return element;
+        }
+
+        /// <summary>
         /// Gets all elements associated with this ring (including added elements)
         /// </summary>
         /// <returns>List of all elements this ring has</returns>

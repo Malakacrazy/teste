@@ -49,23 +49,29 @@ namespace L5RGame
             Initialize();
         }
         
-        public MoveCardAction(BaseCard card, string destination) : base()
+        public MoveCardAction(BaseCard card, string destination) : this(CreateProperties(card, destination))
+        {
+        }
+        
+        private static MoveCardProperties CreateProperties(BaseCard card, string destination)
         {
             var properties = new MoveCardProperties(destination);
             if (card != null)
                 properties.target.Add(card);
-            SetProperties(properties);
-            Initialize();
+            return properties;
         }
         
-        public MoveCardAction(BaseCard card, string destination, bool bottom) : base()
+        public MoveCardAction(BaseCard card, string destination, bool bottom) : this(CreatePropertiesWithBottom(card, destination, bottom))
+        {
+        }
+        
+        private static MoveCardProperties CreatePropertiesWithBottom(BaseCard card, string destination, bool bottom)
         {
             var properties = new MoveCardProperties(destination);
             properties.bottom = bottom;
             if (card != null)
                 properties.target.Add(card);
-            SetProperties(properties);
-            Initialize();
+            return properties;
         }
         
         #endregion

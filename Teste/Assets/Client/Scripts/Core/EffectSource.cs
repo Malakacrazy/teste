@@ -332,22 +332,6 @@ namespace L5RGame
         }
     }
 
-    /// <summary>
-    /// Properties for creating effects
-    /// </summary>
-    [System.Serializable]
-    public class EffectProperties
-    {
-        public string duration = Durations.Persistent;
-        public string location = Locations.Any;
-        public object effect;
-        public object condition;
-        public object match;
-        public string targetController = Players.Any;
-        public Dictionary<string, object> until;
-        public bool multipleTrigger = false;
-        public object when;
-    }
 
     /// <summary>
     /// Interface for effect factories

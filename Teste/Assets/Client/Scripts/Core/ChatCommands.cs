@@ -32,6 +32,22 @@ namespace L5RGame
             InitializeValidTokens();
         }
 
+        /// <summary>
+        /// Initialize chat commands system with game reference
+        /// </summary>
+        public void Initialize(Game gameInstance)
+        {
+            game = gameInstance;
+            if (commands == null)
+            {
+                InitializeCommands();
+            }
+            if (validTokens == null)
+            {
+                InitializeValidTokens();
+            }
+        }
+
         #region Command Initialization
 
         /// <summary>
@@ -851,6 +867,18 @@ namespace L5RGame
         public List<string> GetAvailableCommands()
         {
             return commands.Keys.ToList();
+        }
+
+        /// <summary>
+        /// Toggle manual mode for a specific player
+        /// </summary>
+        public void Manual(string playerName)
+        {
+            Player player = game.GetPlayerByName(playerName);
+            if (player != null)
+            {
+                ToggleManualMode(player, new string[0]);
+            }
         }
 
         /// <summary>

@@ -360,8 +360,13 @@ namespace L5RGame
         public const string GainCovert = EffectNamesConstants.GainCovert;
         public const string TakeControl = EffectNamesConstants.TakeControl;
         public const string Blank = EffectNamesConstants.Blank;
-        public const string ModifyConflictElementsToResolve = "modifyConflictElementsToResolve";
+        
+        // Additional effect names for compilation
         public const string RestrictNumberOfDefenders = "restrictNumberOfDefenders";
+        public const string SetConflictTotalSkill = "setConflictTotalSkill";
+        public const string ChangeConflictSkillFunction = "changeConflictSkillFunction";
+        public const string CannotContribute = "cannotContribute";
+        public const string ModifyConflictElementsToResolve = "modifyConflictElementsToResolve";
         public const string AttachmentLimit = "attachmentLimit";
         public const string AttachmentMyControlOnly = "attachmentMyControlOnly";
         public const string RestrictHonorBid = "restrictHonorBid";

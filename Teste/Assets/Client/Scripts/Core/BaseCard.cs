@@ -97,6 +97,7 @@ namespace L5RGame
         public CardAbilities abilities = new CardAbilities();
         public List<BaseAbility> actions => abilities.actions.Cast<BaseAbility>().ToList();
         public List<BaseAbility> reactions => abilities.reactions.Cast<BaseAbility>().ToList();
+        public List<PersistentEffect> persistentEffects => abilities.persistentEffects;
 
         [Header("Keywords and Restrictions")]
         public List<string> printedKeywords = new List<string>();

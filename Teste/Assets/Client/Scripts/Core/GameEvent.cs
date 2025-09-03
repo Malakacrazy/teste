@@ -530,6 +530,15 @@ namespace L5RGame
         }
         
         /// <summary>
+        /// Get all properties for this event
+        /// </summary>
+        /// <returns>Dictionary of all event properties</returns>
+        public virtual Dictionary<string, object> GetProperties()
+        {
+            return new Dictionary<string, object>(properties);
+        }
+        
+        /// <summary>
         /// Set a property value
         /// </summary>
         /// <param name="key">Property key</param>

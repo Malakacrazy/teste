@@ -115,15 +115,11 @@ namespace L5RGame
             {
                 if (target != null)
                 {
-                    // Convert GameEffect to Effect for removal
-                    var effect = new Effect 
-                    { 
-                        type = id, 
-                        source = source,
-                        value = this,
-                        context = new Dictionary<string, object>()
-                    };
-                    target.RemoveEffect(effect);
+                    // Remove effect from target if supported
+                    if (target is IEffectTarget effectTarget)
+                    {
+                        effectTarget.RemoveEffect(this);
+                    }
                 }
             }
             
@@ -366,7 +362,7 @@ namespace L5RGame
                 var context = effect.context;
                 var targets = effect.targets;
 
-                string title = $"{context.source.name}'s effect";
+                string title = $"{(context.source as EffectSource)?.name ?? "Unknown"}'s effect";
                 if (targets.Count == 1)
                 {
                     title += $" on {targets[0].objectName}";
@@ -697,6 +693,34 @@ namespace L5RGame
         }
 
         /// <summary>
+        /// Create a delayed effect that triggers on specific conditions
+        /// </summary>
+        /// <param name="trigger">Trigger object that determines when effect fires</param>
+        /// <param name="gameAction">Action to execute when triggered</param>
+        /// <returns>Created delayed effect</returns>
+        public DelayedEffect CreateDelayedEffect(object trigger, IGameAction gameAction)
+        {
+            var delayedEffect = new DelayedEffect
+            {
+                type = EffectNames.DelayedEffect,
+                gameAction = gameAction,
+                multipleTrigger = false
+            };
+
+            // Convert trigger to condition function
+            if (trigger is ConflictFinishedTrigger)
+            {
+                delayedEffect.when = new Dictionary<string, System.Func<GameEvent, AbilityContext, bool>>
+                {
+                    { EventNames.OnConflictFinished, (gameEvent, context) => true }
+                };
+            }
+            // Add other trigger types as needed
+
+            return delayedEffect;
+        }
+
+        /// <summary>
         /// Clear all effects (for cleanup)
         /// </summary>
         public void ClearAllEffects()
@@ -753,9 +777,10 @@ namespace L5RGame
     /// </summary>
     public interface IGameAction
     {
-        void SetDefaultTarget(System.Func<List<GameObject>> targetFunc);
-        bool HasLegalTarget(AbilityContext context);
-        void AddEventsToArray(List<GameEvent> events, AbilityContext context);
+        void SetDefaultTarget(System.Func<AbilityContext, object> targetFunc);
+        void SetDefaultTarget(System.Func<AbilityContext, List<object>> targetFunc);
+        bool HasLegalTarget(AbilityContext context, GameActionProperties additionalProperties = null);
+        void AddEventsToArray(List<GameEvent> events, AbilityContext context, GameActionProperties additionalProperties = null);
     }
 
     /// <summary>
@@ -829,6 +854,16 @@ namespace L5RGame
     }
 
     /// <summary>
+    /// Trigger that fires when a conflict finishes
+    /// </summary>
+    public class ConflictFinishedTrigger
+    {
+        public string EventName => EventNames.OnConflictFinished;
+        
+        public ConflictFinishedTrigger() { }
+    }
+
+    /// <summary>
     /// Extension methods for effect engine
     /// </summary>
     public static class EffectEngineExtensions
@@ -870,5 +905,196 @@ namespace L5RGame
         {
             return engine.GetDebugInfo().Any(); // Would need actual effects list access
         }
+
+        /// <summary>
+        /// Creates a take control effect for a target
+        /// </summary>
+        /// <param name="target">Target to take control of</param>
+        /// <param name="controller">New controller</param>
+        /// <returns>Take control effect</returns>
+        public static object TakeControl(object target, Player controller)
+        {
+            return new
+            {
+                type = "takeControl",
+                target = target,
+                controller = controller,
+                action = new System.Func<AbilityContext, bool>((context) =>
+                {
+                    if (target is BaseCard card && controller != null)
+                    {
+                        var previousController = card.controller;
+                        card.controller = controller;
+                        return true;
+                    }
+                    return false;
+                })
+            };
+        }
     }
+
+    /// <summary>
+    /// Static methods for EffectEngine
+    /// </summary>
+    public static class EffectEngineStatic
+    {
+        /// <summary>
+        /// Creates a take control effect for a target
+        /// </summary>
+        /// <param name="target">Target to take control of</param>
+        /// <param name="controller">New controller</param>
+        /// <returns>Take control effect</returns>
+        public static object TakeControl(object target, Player controller)
+        {
+            return new
+            {
+                type = "takeControl",
+                target = target,
+                controller = controller,
+                Apply = new System.Action<object>((t) =>
+                {
+                    if (t is BaseCard card && controller != null)
+                    {
+                        card.controller = controller;
+                    }
+                }),
+                Unapply = new System.Action<object>((t) =>
+                {
+                    if (t is BaseCard card)
+                    {
+                        card.controller = card.owner; // Restore original controller
+                    }
+                })
+            };
+        }
+
+        /// <summary>
+        /// Creates a take control effect with a condition
+        /// </summary>
+        /// <param name="target">Target to take control of</param>
+        /// <param name="controller">New controller</param>
+        /// <param name="condition">Condition for the effect</param>
+        /// <returns>Take control effect</returns>
+        public static object TakeControl(object target, Player controller, System.Func<AbilityContext, bool> condition)
+        {
+            return new
+            {
+                type = "takeControl",
+                target = target,
+                controller = controller,
+                condition = condition,
+                Apply = new System.Action<object>((t) =>
+                {
+                    if (t is BaseCard card && controller != null)
+                    {
+                        card.controller = controller;
+                    }
+                }),
+                Unapply = new System.Action<object>((t) =>
+                {
+                    if (t is BaseCard card)
+                    {
+                        card.controller = card.owner; // Restore original controller
+                    }
+                })
+            };
+        }
+    }
+
+    /// <summary>
+    /// Interface for objects that can have effects applied to them
+    /// </summary>
+    public interface IEffectTarget
+    {
+        void RemoveEffect(object effect);
+        void ApplyEffect(object effect);
+    }
+
+    /// <summary>
+    /// Extension methods for GameObjects to handle effects
+    /// </summary>
+    public static class GameObjectEffectExtensions
+    {
+        /// <summary>
+        /// Remove an effect from a GameObject
+        /// </summary>
+        /// <param name="gameObject">Target GameObject</param>
+        /// <param name="effect">Effect to remove</param>
+        public static void RemoveEffect(this GameObject gameObject, object effect)
+        {
+            // Try to get IEffectTarget component
+            var effectTarget = gameObject.GetComponent<IEffectTarget>();
+            if (effectTarget != null)
+            {
+                effectTarget.RemoveEffect(effect);
+                return;
+            }
+
+            // Try to get BaseCard component
+            var baseCard = gameObject.GetComponent<BaseCard>();
+            if (baseCard != null)
+            {
+                // Handle BaseCard effect removal
+                // This would integrate with the card's effect system
+                return;
+            }
+
+            // Default handling for other GameObjects
+            Debug.Log($"RemoveEffect called on {gameObject.name} but no effect handling found");
+        }
+
+        /// <summary>
+        /// Apply an effect to a GameObject
+        /// </summary>
+        /// <param name="gameObject">Target GameObject</param>
+        /// <param name="effect">Effect to apply</param>
+        public static void ApplyEffect(this GameObject gameObject, object effect)
+        {
+            // Try to get IEffectTarget component
+            var effectTarget = gameObject.GetComponent<IEffectTarget>();
+            if (effectTarget != null)
+            {
+                effectTarget.ApplyEffect(effect);
+                return;
+            }
+
+            // Try to get BaseCard component
+            var baseCard = gameObject.GetComponent<BaseCard>();
+            if (baseCard != null)
+            {
+                // Handle BaseCard effect application
+                // This would integrate with the card's effect system
+                return;
+            }
+
+            // Default handling for other GameObjects
+            Debug.Log($"ApplyEffect called on {gameObject.name} but no effect handling found");
+        }
+
+        /// <summary>
+        /// Add an effect to a GameObject
+        /// </summary>
+        /// <param name="gameObject">Target GameObject</param>
+        /// <param name="effect">Effect to add</param>
+        public static void AddEffect(this GameObject gameObject, object effect)
+        {
+            // Get or add EffectContainer component
+            var effectContainer = gameObject.GetComponent<EffectContainer>();
+            if (effectContainer == null)
+            {
+                effectContainer = gameObject.AddComponent<EffectContainer>();
+            }
+
+            // Try to determine effect type and value from the effect object
+            if (effect is Effect eff)
+            {
+                effectContainer.AddEffect(eff.type, eff);
+            }
+            else
+            {
+                effectContainer.AddEffect(effect.GetType().Name, effect);
+            }
+        }
+    }
+    
 }
