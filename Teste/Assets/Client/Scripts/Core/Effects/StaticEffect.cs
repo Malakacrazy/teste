@@ -55,23 +55,23 @@ namespace L5RGame
             new Dictionary<string, Func<object, object, IEffect[]>>
             {
                 { "modifyBaseMilitarySkillMultiplier", (target, value) => 
-                    ((BaseCard)target).Effects.Where(effect => effect.Type == EffectNames.SetBaseMilitarySkill).ToArray() },
+                    ((BaseCard)target).Effects.Where(effect => effect is IEffect && ((IEffect)effect).Type == EffectNames.SetBaseMilitarySkill).Cast<IEffect>().ToArray() },
                 { "modifyBasePoliticalSkillMultiplier", (target, value) => 
-                    ((BaseCard)target).Effects.Where(effect => effect.Type == EffectNames.SetBasePoliticalSkill).ToArray() },
+                    ((BaseCard)target).Effects.Where(effect => effect is IEffect && ((IEffect)effect).Type == EffectNames.SetBasePoliticalSkill).Cast<IEffect>().ToArray() },
                 { "modifyGlory", (target, value) => 
-                    ((BaseCard)target).Effects.Where(effect => effect.Type == EffectNames.SetGlory).ToArray() },
+                    ((BaseCard)target).Effects.Where(effect => effect is IEffect && ((IEffect)effect).Type == EffectNames.SetGlory).Cast<IEffect>().ToArray() },
                 { "modifyMilitarySkill", (target, value) => 
-                    ((BaseCard)target).Effects.Where(effect => effect.Type == EffectNames.SetMilitarySkill).ToArray() },
+                    ((BaseCard)target).Effects.Where(effect => effect is IEffect && ((IEffect)effect).Type == EffectNames.SetMilitarySkill).Cast<IEffect>().ToArray() },
                 { "modifyMilitarySkillMultiplier", (target, value) => 
-                    ((BaseCard)target).Effects.Where(effect => effect.Type == EffectNames.SetMilitarySkill).ToArray() },
+                    ((BaseCard)target).Effects.Where(effect => effect is IEffect && ((IEffect)effect).Type == EffectNames.SetMilitarySkill).Cast<IEffect>().ToArray() },
                 { "modifyPoliticalSkill", (target, value) => 
-                    ((BaseCard)target).Effects.Where(effect => effect.Type == EffectNames.SetPoliticalSkill).ToArray() },
+                    ((BaseCard)target).Effects.Where(effect => effect is IEffect && ((IEffect)effect).Type == EffectNames.SetPoliticalSkill).Cast<IEffect>().ToArray() },
                 { "modifyPoliticalSkillMultiplier", (target, value) => 
-                    ((BaseCard)target).Effects.Where(effect => effect.Type == EffectNames.SetPoliticalSkill).ToArray() },
+                    ((BaseCard)target).Effects.Where(effect => effect is IEffect && ((IEffect)effect).Type == EffectNames.SetPoliticalSkill).Cast<IEffect>().ToArray() },
                 { "setBaseMilitarySkill", (target, value) => 
-                    ((BaseCard)target).Effects.Where(effect => effect.Type == EffectNames.SetMilitarySkill).ToArray() },
+                    ((BaseCard)target).Effects.Where(effect => effect is IEffect && ((IEffect)effect).Type == EffectNames.SetMilitarySkill).Cast<IEffect>().ToArray() },
                 { "setBasePoliticalSkill", (target, value) => 
-                    ((BaseCard)target).Effects.Where(effect => effect.Type == EffectNames.SetPoliticalSkill).ToArray() }
+                    ((BaseCard)target).Effects.Where(effect => effect is IEffect && ((IEffect)effect).Type == EffectNames.SetPoliticalSkill).Cast<IEffect>().ToArray() }
             };
 
         public string Type { get; protected set; }
@@ -159,13 +159,13 @@ namespace L5RGame
                 var card = target as BaseCard;
                 if (card == null) return true;
 
-                var matchingEffects = card.Effects.Where(effect => effect.Type == type);
+                var matchingEffects = card.Effects.Where(effect => effect is IEffect && ((IEffect)effect).Type == type).Cast<IEffect>();
                 return matchingEffects.All(effect => HasLongerDuration(effect) || effect.IsConditional);
             }
 
             if (ConflictingEffectsChecks.ContainsKey(type))
             {
-                var matchingEffects = ConflictingEffectsChecks[type](target, GetValue());
+                var matchingEffects = ConflictingEffectsChecks[type](target, GetValue()).Where(effect => effect != null);
                 return matchingEffects.All(effect => HasLongerDuration(effect) || effect.IsConditional);
             }
 

@@ -66,6 +66,22 @@ namespace L5RGame
         public object condition;
         public object match;
         public string targetController;
+        public object Ref; // Reference for tracking effect in engine
+        
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public PersistentEffectProperties()
+        {
+        }
+        
+        /// <summary>
+        /// Constructor that takes a single effect argument
+        /// </summary>
+        public PersistentEffectProperties(object effectArg)
+        {
+            effect = effectArg;
+        }
     }
     
     /// <summary>

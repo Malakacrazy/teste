@@ -83,19 +83,4 @@ namespace L5RGame
         public bool disabled = false;
     }
 
-    /// <summary>
-    /// Ability types for triggered abilities
-    /// </summary>
-    public static class AbilityTypes
-    {
-        public const string Action = "action";
-        public const string Reaction = "reaction";
-        public const string Interrupt = "interrupt";
-        public const string ForcedReaction = "forcedreaction";
-        public const string ForcedInterrupt = "forcedinterrupt";
-        public const string WouldInterrupt = "wouldinterrupt";
-        public const string CancelInterrupt = "cancelinterrupt";
-        public const string Persistent = "persistent";
-        public const string OtherEffects = "othereffects";
-    }
 }

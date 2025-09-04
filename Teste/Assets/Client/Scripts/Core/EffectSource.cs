@@ -230,10 +230,13 @@ namespace L5RGame
         /// </summary>
         public void RemoveLastingEffects()
         {
-            game.effectEngine.RemoveLastingEffects(this);
+            if (game?.effectEngine != null)
+            {
+                game.effectEngine.RemoveLastingEffects(this);
+            }
             
             // Clear our tracking list since all effects from this source are removed
-            activeEffects.Clear();
+            activeEffects?.Clear();
         }
 
         /// <summary>

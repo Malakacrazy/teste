@@ -12,7 +12,7 @@ namespace L5RGame
     /// Manages effect application, target validation, condition checking,
     /// and automatic cleanup when conditions change.
     /// </summary>
-    [Serializable]
+    [System.Serializable]
     public class Effect
     {
         #region Fields
@@ -549,6 +549,24 @@ namespace L5RGame
         public Func<object, bool> TargetValidation;
         public object MatchTarget;
         public Dictionary<string, object> Until;
+        
+        /// <summary>
+        /// Match method for determining if targets match conditions
+        /// </summary>
+        public Func<object, AbilityContext, bool> Match
+        {
+            get { return MatchCondition ?? ((target, context) => true); }
+            set { MatchCondition = value; }
+        }
+        
+        /// <summary>
+        /// Location property for compatibility
+        /// </summary>
+        public string Location
+        {
+            get { return location ?? SourceLocation; }
+            set { location = value; SourceLocation = value; }
+        }
     }
 
     /// <summary>

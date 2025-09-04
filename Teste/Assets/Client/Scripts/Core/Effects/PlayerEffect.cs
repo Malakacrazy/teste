@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,8 +8,20 @@ namespace L5RGame
     public class PlayerEffect : Effect
     {
         public string TargetController { get; protected set; }
+        
+        // Add missing properties and methods for compatibility
+        protected Func<object, AbilityContext, bool> MatchFunction => GetMatchFunction();
+        protected AbilityContext ContextValue => context;
+        protected BaseCard SourceCard => source as BaseCard;
+        protected Game GameInstance => game;
+        
+        private Func<object, AbilityContext, bool> GetMatchFunction()
+        {
+            // Return the match function from the base class or a default one
+            return (target, ctx) => target != null;
+        }
 
-        public PlayerEffect(Game game, BaseCard source, EffectProperties properties, IEffect effect) 
+        public PlayerEffect(Game game, BaseCard source, EffectProperties properties, object effect) 
             : base(game, source, properties, effect)
         {
             TargetController = properties.TargetController ?? Players.Self;
@@ -24,11 +37,11 @@ namespace L5RGame
             var player = target as Player;
             if (player == null) return false;
 
-            if (TargetController == Players.Self && player == Source.Controller.Opponent)
+            if (TargetController == Players.Self && player == SourceCard.Controller.Opponent)
             {
                 return false;
             }
-            else if (TargetController == Players.Opponent && player == Source.Controller)
+            else if (TargetController == Players.Opponent && player == SourceCard.Controller)
             {
                 return false;
             }
@@ -37,8 +50,8 @@ namespace L5RGame
 
         public override List<object> GetTargets()
         {
-            return Game.GetPlayers()
-                .Where(player => Match(player, Context))
+            return GameInstance.GetPlayers()
+                .Where(player => MatchFunction(player, ContextValue))
                 .Cast<object>()
                 .ToList();
         }

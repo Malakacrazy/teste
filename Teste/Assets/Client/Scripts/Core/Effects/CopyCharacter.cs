@@ -13,13 +13,13 @@ namespace L5RGame
 
         public CopyCharacter(BaseCard card) : base(card)
         {
-            actions = card.Abilities.Actions?.Select(action => 
-                new GainAbility(AbilityTypes.Action, action)).ToList() ?? new List<GainAbility>();
+            actions = card.Abilities.actions?.Select(action => 
+                new GainAbility("action", ConvertToAbilityProperties(action))).ToList() ?? new List<GainAbility>();
             
-            reactions = card.Abilities.Reactions?.Select(ability => 
-                new GainAbility(ability.AbilityType, ability)).ToList() ?? new List<GainAbility>();
+            reactions = card.Abilities.reactions?.Select(ability => 
+                new GainAbility("reaction", ConvertToAbilityProperties(ability))).ToList() ?? new List<GainAbility>();
             
-            persistentEffects = card.Abilities.PersistentEffects?.Select(effect => 
+            persistentEffects = card.Abilities.persistentEffects?.Select(effect => 
                 new PersistentEffectProperties(effect)).ToList() ?? new List<PersistentEffectProperties>();
             
             abilitiesForTargets = new Dictionary<string, CharacterAbilities>();
@@ -49,7 +49,7 @@ namespace L5RGame
 
             foreach (var effect in persistentEffects)
             {
-                if (effect.Location == Locations.PlayArea || effect.Location == Locations.Any)
+                if (effect.location == Locations.PlayArea || effect.location == Locations.Any)
                 {
                     effect.Ref = card.AddEffectToEngine(effect);
                 }
@@ -63,7 +63,10 @@ namespace L5RGame
 
             foreach (var value in abilitiesForTargets[card.Uuid].Reactions)
             {
-                value.UnregisterEvents();
+                if (value is ITriggeredAbility triggeredAbility)
+                {
+                    triggeredAbility.UnregisterEvents();
+                }
             }
 
             foreach (var effect in persistentEffects)
@@ -101,6 +104,30 @@ namespace L5RGame
             return persistentEffects;
         }
 
+        private AbilityProperties ConvertToAbilityProperties(object abilityObject)
+        {
+            if (abilityObject is CardAction cardAction)
+            {
+                return new AbilityProperties
+                {
+                    AbilityType = AbilityTypes.Action,
+                    Card = cardAction.card
+                };
+            }
+            
+            if (abilityObject is TriggeredAbility triggeredAbility)
+            {
+                return new AbilityProperties
+                {
+                    AbilityType = triggeredAbility.abilityType,
+                    Card = triggeredAbility.card
+                };
+            }
+            
+            // Fallback for unknown types
+            return new AbilityProperties();
+        }
+
         private class CharacterAbilities
         {
             public List<object> Actions { get; set; }
@@ -108,15 +135,4 @@ namespace L5RGame
         }
     }
 
-    public class PersistentEffectProperties
-    {
-        public string Location { get; set; }
-        public object Ref { get; set; }
-
-        public PersistentEffectProperties(object sourceEffect)
-        {
-            // Copy properties from source effect
-            // Implementation depends on the structure of the source effect
-        }
-    }
 }

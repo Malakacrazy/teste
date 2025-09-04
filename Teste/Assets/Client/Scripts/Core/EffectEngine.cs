@@ -170,7 +170,7 @@ namespace L5RGame
     public class EffectEngine : MonoBehaviour
     {
         [Header("Effect Engine")]
-        [SerializeField] private List<GameEffect> effects = new List<GameEffect>();
+        [SerializeField] public List<GameEffect> effects = new List<GameEffect>();
         [SerializeField] private List<CustomDurationEvent> customDurationEvents = new List<CustomDurationEvent>();
         [SerializeField] private bool newEffect = false;
 

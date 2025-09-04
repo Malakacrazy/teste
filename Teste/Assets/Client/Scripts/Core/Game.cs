@@ -192,6 +192,26 @@ namespace L5RGame
         
         // Network reference
         public IGameRouter router;
+        
+        // Static access for compatibility with existing code
+        private static Game _instance;
+        public static Game Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    _instance = FindObjectOfType<Game>();
+                return _instance;
+            }
+        }
+        
+        public static object TurnManager => Instance?.pipeline;
+        public static object GameState => Instance?.currentPhase;
+        
+        public static void TriggerEvent(string eventName, object eventData = null)
+        {
+            Instance?.OnEventTriggered?.Invoke(eventData, eventName);
+        }
 
         // IronPython Integration
         [Header("IronPython Settings")]
@@ -205,6 +225,18 @@ namespace L5RGame
 
         private void Awake()
         {
+            // Set static instance
+            if (_instance == null)
+            {
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (_instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            
             InitializeComponents();
         }
 
@@ -477,6 +509,27 @@ def on_trigger(card, event_name, event_data):
             string formattedMessage = gameChat.FormatMessage(message, args);
             gameChat.AddMessage(formattedMessage);
             OnGameMessage?.Invoke(formattedMessage);
+        }
+        
+        // Missing UI methods for compilation
+        public object GetChoiceWindow(string title, List<object> choices, object defaultChoice = null)
+        {
+            // Placeholder implementation - would show UI choice window
+            Debug.Log($"Choice window: {title} with {choices?.Count ?? 0} choices");
+            return defaultChoice ?? choices?.FirstOrDefault();
+        }
+        
+        public object GetTargetSelectionWindow(string title, List<BaseCard> targets, object context = null)
+        {
+            // Placeholder implementation - would show UI target selection
+            Debug.Log($"Target selection: {title} with {targets?.Count ?? 0} targets");
+            return targets?.FirstOrDefault();
+        }
+        
+        public void LogEvent(string eventName, object eventData = null)
+        {
+            Debug.Log($"Game Event: {eventName} - {eventData}");
+            OnEventTriggered?.Invoke(eventData, eventName);
         }
 
         public void AddAlert(string type, string message, params object[] args)
@@ -1868,9 +1921,25 @@ def on_trigger(card, event_name, event_data):
         public System.Func<bool> handler;
     }
 
+    // Properties missing from errors
+    public static class GameUI 
+    {
+        public static object Instance { get; set; } // Static placeholder for UI access
+    }
+    
+    public static class GameAnalytics 
+    {
+        public static object Instance { get; set; } // Static placeholder for Analytics
+    }
+    
     // Additional methods needed for compilation
     public partial class Game
     {
+        public object GameState => GetState("system"); // Return current game state
+        
+        // Static properties for compatibility with errors
+        public static object UI => GameUI.Instance;
+        public static object Analytics => GameAnalytics.Instance;
         /// <summary>
         /// Get all cards currently in play from all players
         /// </summary>
@@ -1898,6 +1967,11 @@ def on_trigger(card, event_name, event_data):
             }
             return allCards;
         }
+        
+        /// <summary>
+        /// Property alias for GetAllCards method (compatibility)
+        /// </summary>
+        public List<BaseCard> AllCards => GetAllCards();
 
         /// <summary>
         /// Get all rings in the game

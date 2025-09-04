@@ -37,10 +37,27 @@ namespace L5RGame
         public string MaxIdentifier => maxIdentifier;
         public int Max => max;
         
+        // Virtual properties that can be overridden
+        public virtual string Title => title;
+        public virtual bool CannotTargetFirst => cannotTargetFirst;
+        public virtual int DefaultPriority => Priority;
+        
         // Methods
         public virtual void DisplayMessage(AbilityContext context, string message)
         {
             context?.Game?.AddMessage($"{title}: {message}");
+        }
+        
+        // Missing methods for compilation
+        public virtual void SetTargetConfiguration(TargetConfiguration config)
+        {
+            // Placeholder implementation for target configuration
+        }
+        
+        public virtual void CompleteExecution(AbilityContext context)
+        {
+            // Placeholder implementation for completing ability execution
+            DisplayMessage(context, "Ability execution completed");
         }
 
         
@@ -140,10 +157,23 @@ namespace L5RGame
                 handler = properties["handler"] as Action<AbilityContext>;
         }
         
+        public virtual void Initialize(BaseCard card, Game game)
+        {
+            this.card = card;
+            this.game = game;
+            this.source = card;
+        }
+        
+        public virtual void ExecuteAbility(AbilityContext context)
+        {
+            Execute(context);
+        }
+        
         // Virtual methods that can be overridden
         public virtual bool IsCardAbility() { return true; }
         public virtual bool IsCardPlayed() { return false; }
         public virtual bool IsTriggeredAbility() { return abilityType != AbilityTypes.Action; }
+        public virtual bool IsKeywordAbility() { return title?.ToLower().Contains("keyword") ?? false; }
         public virtual bool HasLegalTargets(AbilityContext context) { return true; }
         public virtual bool CheckAllTargets(AbilityContext context) { return true; }
         public virtual bool IsInValidLocation(AbilityContext context) 

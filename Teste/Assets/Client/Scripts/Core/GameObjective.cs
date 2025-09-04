@@ -487,7 +487,6 @@ namespace L5RGame
     public static partial class EffectNames
     {
         public const string SuppressEffects = "suppressEffects";
-        public const string AbilityRestrictions = "abilityRestrictions";
         public const string ChangeType = "changeType";
     }
 

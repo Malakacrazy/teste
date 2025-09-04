@@ -15,7 +15,7 @@ namespace L5RGame
 
         public override List<object> GetTargets()
         {
-            return Game.CurrentConflict != null ? new List<object> { Game.CurrentConflict } : new List<object>();
+            return game.CurrentConflict != null ? new List<object> { game.CurrentConflict } : new List<object>();
         }
     }
 }

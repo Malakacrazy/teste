@@ -198,7 +198,7 @@ namespace L5RGame
             game = gameInstance;
             
             // Initialize clock - placeholder
-            clock = gameObject.AddComponent<Clock>();
+            clock = new Clock(this, clockSettings?.mainTime ?? 300);
             
             // Initialize prompt state
             promptState = new object();
@@ -930,6 +930,10 @@ namespace L5RGame
         {
             Initialize();
         }
+        
+        // Missing properties for compilation
+        public List<BaseCard> Hand => hand; // Capital H version of hand
+        public List<BaseCard> Deck => conflictDeck; // Default deck reference
     }
 
     // Supporting classes
@@ -1144,6 +1148,10 @@ namespace L5RGame
         public Game Game => game;
         public string Name => id;
         public bool FirstPlayer => game?.firstPlayer == this;
+        
+        // Properties missing from errors
+        public int Honor { get => honor; set => honor = value; }
+        public string PlayerId => id;
         
         /// <summary>
         /// Disconnect the player (for testing/debug commands)

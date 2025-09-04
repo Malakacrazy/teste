@@ -19,6 +19,9 @@ namespace L5RGame
     /// </summary>
     public class PythonManager : MonoBehaviour
     {
+        // Singleton instance for static access
+        public static PythonManager Instance { get; private set; }
+        
         [Header("Python Engine Settings")]
         public bool enablePythonScripting = true;
         public bool enableHotReload = true;
@@ -69,6 +72,18 @@ namespace L5RGame
         #region Unity Lifecycle
         private void Awake()
         {
+            // Set up singleton
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+                return;
+            }
+            
             if (enablePythonScripting)
             {
                 InitializePythonEngine();
@@ -103,7 +118,7 @@ namespace L5RGame
 
             // Handle F5 for manual reload in editor
             #if UNITY_EDITOR
-            if (Input.GetKeyDown(KeyCode.F5))
+            if (UnityEngine.InputSystem.Keyboard.current?.f5Key?.wasPressedThisFrame == true)
             {
                 ReloadAllScripts();
             }
@@ -933,6 +948,54 @@ def get_cheapest_card_in_hand(player):
         #endregion
 
         #region Public Utility Methods
+        public bool IsEnabled
+        {
+            get { return enablePythonScripting; }
+        }
+
+        public bool LoadScript(string scriptPath)
+        {
+            if (!enablePythonScripting) return false;
+            
+            try
+            {
+                var scriptName = Path.GetFileName(scriptPath);
+                CompileScript(scriptName, scriptPath);
+                LogDebug($"Script loaded: {scriptName}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to load script {scriptPath}: {ex.Message}");
+                return false;
+            }
+        }
+
+        public object ExecuteFunction(string functionName, params object[] parameters)
+        {
+            if (!enablePythonScripting) return null;
+            
+            try
+            {
+                if (globalScope.ContainsVariable(functionName))
+                {
+                    var function = globalScope.GetVariable(functionName);
+                    var operation = pythonEngine.Operations;
+                    return operation.Invoke(function, parameters);
+                }
+                else
+                {
+                    LogDebug($"Function {functionName} not found in global scope");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error executing function {functionName}: {ex.Message}");
+                return null;
+            }
+        }
+
         public bool IsScriptAvailable(string scriptName)
         {
             var cardScriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Cards", scriptName);

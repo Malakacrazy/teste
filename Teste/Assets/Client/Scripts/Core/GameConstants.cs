@@ -260,6 +260,7 @@ namespace L5RGame
         public const string ProvinceDeck = "province deck";
         public const string UnderneathStronghold = "underneath stronghold";
         public const string Limbo = "limbo";
+        public const string None = "none";
     }
 
     /// <summary>
@@ -333,6 +334,22 @@ namespace L5RGame
         public const string Select = "select";
     }
 
+    /// <summary>
+    /// Ability types for different ability classifications
+    /// </summary>
+    public static class AbilityTypes
+    {
+        public const string Action = "action";
+        public const string Reaction = "reaction";
+        public const string Interrupt = "interrupt";
+        public const string ForcedReaction = "forcedReaction";
+        public const string ForcedInterrupt = "forcedInterrupt";
+        public const string WouldInterrupt = "wouldInterrupt";
+        public const string CancelInterrupt = "cancelInterrupt";
+        public const string Persistent = "persistent";
+        public const string OtherEffects = "otherEffects";
+    }
+
     // Backward compatibility aliases
     public static class CardTypes
     {
@@ -385,6 +402,40 @@ namespace L5RGame
         public const string ShowTopDynastyCard = "showTopDynastyCard";
         public const string CannotApplyLastingEffects = "cannotApplyLastingEffects";
         public const string MustBeChosen = "mustBeChosen";
+        
+        // Additional effect names for StaticEffect class
+        public const string CanBeSeenWhenFacedown = "canBeSeenWhenFacedown";
+        public const string CannotParticipateAsAttacker = "cannotParticipateAsAttacker";
+        public const string CannotParticipateAsDefender = "cannotParticipateAsDefender";
+        public const string AbilityRestrictions = "abilityRestrictions";
+        public const string DoesNotBow = "doesNotBow";
+        public const string DoesNotReady = "doesNotReady";
+        public const string ModifyBaseMilitarySkillMultiplier = "modifyBaseMilitarySkillMultiplier";
+        public const string ModifyMilitarySkillMultiplier = "modifyMilitarySkillMultiplier";
+        public const string ModifyBothSkills = "modifyBothSkills";
+        public const string ModifyBasePoliticalSkillMultiplier = "modifyBasePoliticalSkillMultiplier";
+        public const string ModifyPoliticalSkillMultiplier = "modifyPoliticalSkillMultiplier";
+        public const string SetBaseMilitarySkill = "setBaseMilitarySkill";
+        public const string SetBasePoliticalSkill = "setBasePoliticalSkill";
+        public const string SetGlory = "setGlory";
+        public const string SetMilitarySkill = "setMilitarySkill";
+        public const string SetPoliticalSkill = "setPoliticalSkill";
+        public const string HonorStatusDoesNotModifySkill = "honorStatusDoesNotModifySkill";
+        public const string HonorStatusReverseModifySkill = "honorStatusReverseModifySkill";
+        
+        // Additional missing effect names for compilation
+        public const string CannotBeCancelled = "cannotBeCancelled";
+        public const string CannotHaveFateRemoved = "cannotHaveFateRemoved";
+        public const string CannotBeDiscarded = "cannotBeDiscarded";
+        public const string CannotBeBowed = "cannotBeBowed";
+        public const string CannotBeTargeted = "cannotBeTargeted";
+        public const string CannotBeMovedToConflict = "cannotBeMovedToConflict";
+        public const string CannotLeavePlay = "cannotLeavePlay";
+        public const string CannotPlay = "cannotPlay";
+        public const string CannotTriggerAbilities = "cannotTriggerAbilities";
+        public const string CannotInitiateKeywords = "cannotInitiateKeywords";
+        public const string Dishonored = "dishonored";
+        public const string Honored = "honored";
     }
 
     /// <summary>
@@ -478,6 +529,57 @@ namespace L5RGame
         {
             // Placeholder implementation - would integrate with game's effect system
             UnityEngine.Debug.Log($"Applied persistent effect from {source?.GetType().Name}");
+        }
+    }
+
+    /// <summary>
+    /// Missing constants for compilation
+    /// </summary>
+    public static class AbilityId
+    {
+        public const string WaterRing = "water_ring";
+        public const string AirRing = "air_ring";
+        public const string EarthRing = "earth_ring";
+        public const string FireRing = "fire_ring";
+        public const string VoidRing = "void_ring";
+    }
+
+    public static class CardLocation
+    {
+        public const string Hand = Locations.Hand;
+        public const string PlayArea = Locations.PlayArea;
+        public const string ConflictDeck = Locations.ConflictDeck;
+        public const string DynastyDeck = Locations.DynastyDeck;
+        public const string ConflictDiscardPile = Locations.ConflictDiscardPile;
+        public const string DynastyDiscardPile = Locations.DynastyDiscardPile;
+        public const string RemovedFromGame = Locations.RemovedFromGame;
+    }
+
+    public static class AbilityTrigger
+    {
+        public const string LeavesPlay = "leavesPlay";
+        public const string EntersPlay = "entersPlay";
+        public const string OnBowed = "onBowed";
+        public const string OnReadied = "onReadied";
+        public const string OnHonored = "onHonored";
+        public const string OnDishonored = "onDishonored";
+        public const string AfterConflict = "afterConflict";
+        public const string DuringConflict = "duringConflict";
+    }
+
+    public static class TargetConfiguration
+    {
+        public static string CardTypeFilter { get; set; } = "";
+    }
+    
+    /// <summary>
+    /// Global helper functions for compilation
+    /// </summary>
+    public static class GlobalHelpers
+    {
+        public static string GetImplementationStatus(string context = "default")
+        {
+            return $"Implementation status for {context}: Active";
         }
     }
 }

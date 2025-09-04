@@ -20,6 +20,10 @@ namespace L5RGame
         public static GainFateAction GainFate(Player player, int amount) => new GainFateAction(player, amount);
         public static GainHonorAction GainHonor(Player player, int amount) => new GainHonorAction(player, amount);
         
+        // Missing methods for compilation
+        public static GainHonorAction CreateGainHonorAction(Player player, int amount) => new GainHonorAction(player, amount);
+        public static GameAction CreateTakeHonorAction(Player player, Player target, int amount) => new TakeHonorAction(player, target, amount);
+        
         public GameAction GetAction(string actionName, object value) => null; // Cannot instantiate abstract GameAction
 
         /// <summary>

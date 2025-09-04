@@ -28,13 +28,13 @@ namespace L5RGame
                 if (ability.Properties.Limit != null)
                 {
                     // If the copied ability has a limit, we need to create a new instantiation of it
-                    newProps.Limit = AbilityLimit.Repeatable(ability.Properties.Limit.Max, ability.Properties.Limit.EventName);
+                    newProps.Limit = AbilityLimit.Repeatable;
                 }
 
                 if (ability.Properties.Max != null)
                 {
                     // Same for max
-                    newProps.Max = AbilityLimit.Repeatable(ability.Properties.Max.Max, ability.Properties.Max.EventName);
+                    newProps.Max = AbilityLimit.Repeatable;
                 }
 
                 // Merge properties
@@ -61,11 +61,11 @@ namespace L5RGame
             var card = target as BaseCard;
             if (card == null) return;
 
-            var properties = MergeProperties(this.properties, new AbilityProperties { Origin = Context.Source });
+            var properties = MergeProperties(this.properties, new AbilityProperties { Origin = Context?.Source as BaseCard });
 
             if (abilityType == AbilityTypes.Persistent)
             {
-                var activeLocations = new Dictionary<string, Locations[]>
+                var activeLocations = new Dictionary<string, string[]>
                 {
                     { "play area", new[] { Locations.PlayArea } },
                     { "province", new[] { 
@@ -79,7 +79,7 @@ namespace L5RGame
                 
                 if (properties.Location != null && 
                     activeLocations.ContainsKey(properties.Location.ToString().ToLower()) &&
-                    activeLocations[properties.Location.ToString().ToLower()].Contains(card.Location))
+                    activeLocations[properties.Location.ToString().ToLower()].Contains(card.location))
                 {
                     var persistentProps = properties as PersistentAbilityProperties;
                     if (persistentProps != null)

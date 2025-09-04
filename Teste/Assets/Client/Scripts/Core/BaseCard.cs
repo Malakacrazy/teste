@@ -98,6 +98,16 @@ namespace L5RGame
         public List<BaseAbility> actions => abilities.actions.Cast<BaseAbility>().ToList();
         public List<BaseAbility> reactions => abilities.reactions.Cast<BaseAbility>().ToList();
         public List<PersistentEffect> persistentEffects => abilities.persistentEffects;
+        
+        /// <summary>
+        /// Alternative name for abilities property (compatibility)
+        /// </summary>
+        public CardAbilities Abilities => abilities;
+        
+        /// <summary>
+        /// Alternative name for type property (compatibility)
+        /// </summary>
+        public string Type => type;
 
         [Header("Keywords and Restrictions")]
         public List<string> printedKeywords = new List<string>();
@@ -668,6 +678,11 @@ namespace L5RGame
         /// Get the unique identifier for this card instance
         /// </summary>
         public string uuid => GetInstanceID().ToString();
+        
+        /// <summary>
+        /// Alternative name for uuid property (compatibility)
+        /// </summary>
+        public string Uuid => uuid;
 
         /// <summary>
         /// Get the display name of this card
@@ -887,6 +902,15 @@ namespace L5RGame
         public string Location => location;
         public int Fate => tokens.ContainsKey("fate") ? tokens["fate"] : 0;
         
+        // Properties missing from errors
+        public bool IsBowed => bowed;
+        public Player Owner => owner;
+        public int Power => cardData?.military ?? 0; // Using military as power
+        public int FateTokens => GetTokenCount("fate");
+        public bool HasActionAbilities => actions?.Count > 0;
+        public bool IsParticipatingInConflict => inConflict;
+        public bool HasBowTriggeredAbilities => reactions?.Count > 0; // Simplified
+        
         public void Honor() { /* TODO: Implement honor logic */ }
         public void Dishonor() { /* TODO: Implement dishonor logic */ }
         public void SetDefaultController(Player newController) { controller = newController; }
@@ -936,5 +960,121 @@ namespace L5RGame
         public virtual bool IsConflictProvince() => type == "province" && isConflict;
         public virtual bool InConflict() => inConflict;
         public virtual void SetPersonalHonor(int value) => PersonalHonor = value;
+        
+        /// <summary>
+        /// Create an action from this card (stub)
+        /// </summary>
+        public virtual GameAction CreateAction(object actionProps = null)
+        {
+            return new SequentialAction();
+        }
+        
+        /// <summary>
+        /// Create a triggered ability from this card (stub)
+        /// </summary>
+        public virtual BaseAbility CreateTriggeredAbility(object abilityProps = null)
+        {
+            return new BaseAbility();
+        }
+        
+        /// <summary>
+        /// Create a triggered ability from this card with specific type (stub)
+        /// </summary>
+        public virtual BaseAbility CreateTriggeredAbility(string abilityType, object abilityProps = null)
+        {
+            return new BaseAbility();
+        }
+        
+        /// <summary>
+        /// Add an effect to this card
+        /// </summary>
+        public virtual void AddEffect(object effect)
+        {
+            // Stub implementation - would integrate with effect engine
+        }
+        
+        /// <summary>
+        /// Remove an effect from this card
+        /// </summary>
+        public virtual void RemoveEffect(object effect)
+        {
+            // Stub implementation - would integrate with effect engine
+        }
+        
+        /// <summary>
+        /// Get all effects on this card
+        /// </summary>
+        public virtual List<object> Effects => new List<object>(); // Stub
+        
+        /// <summary>
+        /// Add effect to game engine
+        /// </summary>
+        public virtual object AddEffectToEngine(object effect)
+        {
+            // Stub implementation - would integrate with effect engine
+            return effect;
+        }
+        
+        /// <summary>
+        /// Remove effect from game engine
+        /// </summary>
+        public virtual void RemoveEffectFromEngine(object effectRef)
+        {
+            // Stub implementation - would integrate with effect engine
+        }
+        
+        /// <summary>
+        /// Get the printed faction of this card
+        /// </summary>
+        public virtual string GetPrintedFaction()
+        {
+            return printedFaction ?? cardData?.clan ?? "neutral";
+        }
+        
+        /// <summary>
+        /// Check if this card has a specific trait
+        /// </summary>
+        public virtual bool HasTrait(string trait)
+        {
+            return traits?.Contains(trait) ?? false;
+        }
+        
+        /// <summary>
+        /// Check if this card belongs to a specific faction
+        /// </summary>
+        public virtual bool IsFaction(string faction)
+        {
+            return GetPrintedFaction() == faction;
+        }
+        
+        /// <summary>
+        /// Get the printed cost of this card
+        /// </summary>
+        public virtual int printedCost => cardData?.fate ?? 0;
+
+        // Missing properties from compilation errors
+        public virtual string Name => printedName;
+        public virtual string CardId => id;
+        public virtual bool CanBeHonored => type == CardTypes.Character && !IsHonored();
+        public virtual bool CanBeDishonored => type == CardTypes.Character && !IsDishonored();
+        public virtual bool HasAbilities => (actions?.Count > 0) || (reactions?.Count > 0) || (persistentEffects?.Count > 0);
+        public virtual bool HasLeavesPlayAbilities => reactions?.Any(r => r.Title.Contains("leaves play")) ?? false;
+        public virtual bool HasSpecialAbilities => HasAbilities;
+        public virtual int Cost => GetCost();
+
+        /// <summary>
+        /// Get abilities with a specific trigger
+        /// </summary>
+        public virtual List<BaseAbility> GetAbilitiesWithTrigger(string trigger)
+        {
+            var matchingAbilities = new List<BaseAbility>();
+            
+            if (reactions != null)
+            {
+                matchingAbilities.AddRange(reactions.Where(r => r.Title.Contains(trigger)));
+            }
+            
+            return matchingAbilities;
+        }
     }
 }

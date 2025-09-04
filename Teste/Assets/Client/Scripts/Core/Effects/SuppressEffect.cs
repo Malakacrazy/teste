@@ -35,7 +35,7 @@ namespace L5RGame
         /// Perfect port of the JavaScript recalculate method
         /// </summary>
         /// <returns>True if the suppressed effects list changed</returns>
-        public override bool Recalculate()
+        public virtual bool Recalculate()
         {
             if (predicate == null)
             {
@@ -47,11 +47,11 @@ namespace L5RGame
             // Get all effects from the effect engine that match the predicate
             var suppressedEffects = new List<IEffectImplementation>();
             
-            if (context?.game?.effectEngine?.effects != null)
+            if (Context?.game?.effectEngine?.effects != null)
             {
-                suppressedEffects = context.game.effectEngine.effects
-                    .Where(effect => effect?.effect != null && predicate(effect.effect))
-                    .Select(effect => effect.effect)
+                suppressedEffects = Context.game.effectEngine.effects
+                    .Where(effect => effect?.effect != null && effect.effect is IEffectImplementation && predicate(effect.effect as IEffectImplementation))
+                    .Select(effect => effect.effect as IEffectImplementation)
                     .ToList();
             }
             
@@ -139,7 +139,7 @@ namespace L5RGame
         public override string ToString()
         {
             var count = GetSuppressedCount();
-            var sourceName = context?.source?.name ?? "Unknown";
+            var sourceName = (Context?.source as BaseCard)?.name ?? "Unknown";
             return $"SuppressEffect from {sourceName}: suppressing {count} effect(s)";
         }
     }

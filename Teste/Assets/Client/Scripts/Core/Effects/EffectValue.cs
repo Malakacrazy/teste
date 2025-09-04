@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +12,20 @@ namespace L5RGame
         public EffectValue(object value = null)
         {
             this.value = value ?? true;
-            Context = new AbilityContext();
+            // Create a dummy context properties object to satisfy constructor
+            var dummyProps = new AbilityContextProperties
+            {
+                game = null,
+                source = null,
+                player = null,
+                ability = null,
+                costs = new Dictionary<string, object>(),
+                targets = new Dictionary<string, object>(),
+                rings = new Dictionary<string, object>(),
+                selects = new Dictionary<string, object>(),
+                tokens = new Dictionary<string, object>()
+            };
+            Context = new AbilityContext(dummyProps);
         }
 
         public virtual void SetValue(object value)

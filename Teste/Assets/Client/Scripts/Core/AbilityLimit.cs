@@ -46,6 +46,8 @@ namespace L5RGame
         {
             return new AbilityLimit { limitType = "perPhase", maxUses = max };
         }
+        
+        public static AbilityLimit Repeatable => new AbilityLimit { limitType = "unlimited", maxUses = int.MaxValue };
 
         public void RegisterEvents(Game game)
         {

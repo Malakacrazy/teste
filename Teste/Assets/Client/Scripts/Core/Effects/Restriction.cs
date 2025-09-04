@@ -44,65 +44,65 @@ namespace L5RGame
             new Dictionary<string, Func<AbilityContext, Restriction, BaseCard, bool>>
             {
                 ["abilitiesTriggeredByOpponents"] = (context, effect, card) =>
-                    context.player == effect.context.player.Opponent && 
+                    context.player == effect.Context.player.Opponent && 
                     context.ability.IsTriggeredAbility() && 
                     context.ability.abilityType != AbilityTypes.ForcedReaction && 
                     context.ability.abilityType != AbilityTypes.ForcedInterrupt,
                     
                 ["attachmentsWithSameClan"] = (context, effect, card) =>
-                    context.source.GetCardType() == CardTypes.Attachment &&
-                    context.source.GetPrintedFaction() != "neutral" && 
-                    card.IsFaction(context.source.GetPrintedFaction()),
+                    (context.source as BaseCard)?.GetCardType() == CardTypes.Attachment &&
+                    (context.source as BaseCard)?.GetPrintedFaction() != "neutral" && 
+                    card.IsFaction((context.source as BaseCard)?.GetPrintedFaction()),
                     
                 ["characters"] = (context, effect, card) => 
-                    context.source.GetCardType() == CardTypes.Character,
+                    (context.source as BaseCard)?.GetCardType() == CardTypes.Character,
                     
                 ["copiesOfDiscardEvents"] = (context, effect, card) =>
-                    context.source.GetCardType() == CardTypes.Event && 
-                    context.player.conflictDiscardPile.Any(discardCard => discardCard.name == context.source.name),
+                    (context.source as BaseCard)?.GetCardType() == CardTypes.Event && 
+                    context.player.conflictDiscardPile.Any(discardCard => discardCard.name == (context.source as BaseCard)?.name),
                     
                 ["copiesOfX"] = (context, effect, card) => 
-                    context.source.name == effect.parameters?.ToString(),
+                    (context.source as BaseCard)?.name == effect.parameters?.ToString(),
                     
                 ["events"] = (context, effect, card) => 
-                    context.source.GetCardType() == CardTypes.Event,
+                    (context.source as BaseCard)?.GetCardType() == CardTypes.Event,
                     
                 ["eventsWithSameClan"] = (context, effect, card) =>
-                    context.source.GetCardType() == CardTypes.Event &&
-                    context.source.GetPrintedFaction() != "neutral" && 
-                    card.IsFaction(context.source.GetPrintedFaction()),
+                    (context.source as BaseCard)?.GetCardType() == CardTypes.Event &&
+                    (context.source as BaseCard)?.GetPrintedFaction() != "neutral" && 
+                    card.IsFaction((context.source as BaseCard)?.GetPrintedFaction()),
                     
                 ["nonSpellEvents"] = (context, effect, card) => 
-                    context.source.GetCardType() == CardTypes.Event && !context.source.HasTrait("spell"),
+                    (context.source as BaseCard)?.GetCardType() == CardTypes.Event && !((context.source as BaseCard)?.HasTrait("spell") ?? false),
                     
                 ["opponentsCardEffects"] = (context, effect, card) =>
                 {
                     var cardTypes = new[] { CardTypes.Event, CardTypes.Character, CardTypes.Holding, 
                                           CardTypes.Attachment, CardTypes.Stronghold, CardTypes.Province, CardTypes.Role };
-                    return context.player == effect.context.player.Opponent && 
+                    return context.player == effect.Context.player.Opponent && 
                            (context.ability.IsCardAbility() || !context.ability.IsCardPlayed()) &&
-                           cardTypes.Contains(context.source.GetCardType());
+                           cardTypes.Contains((context.source as BaseCard)?.GetCardType());
                 },
                 
                 ["opponentsEvents"] = (context, effect, card) =>
-                    context.player != null && context.player == effect.context.player.Opponent && 
-                    context.source.GetCardType() == CardTypes.Event,
+                    context.player != null && context.player == effect.Context.player.Opponent && 
+                    (context.source as BaseCard)?.GetCardType() == CardTypes.Event,
                     
                 ["opponentsRingEffects"] = (context, effect, card) =>
-                    context.player != null && context.player == effect.context.player.Opponent && 
-                    context.source.GetCardType() == "ring",
+                    context.player != null && context.player == effect.Context.player.Opponent && 
+                    (context.source as BaseCard)?.GetCardType() == "ring",
                     
                 ["opponentsTriggeredAbilities"] = (context, effect, card) =>
-                    context.player == effect.context.player.Opponent && context.ability.IsTriggeredAbility(),
+                    context.player == effect.Context.player.Opponent && context.ability.IsTriggeredAbility(),
                     
                 ["opponentsCardAbilities"] = (context, effect, card) =>
-                    context.player == effect.context.player.Opponent && context.ability.IsCardAbility(),
+                    context.player == effect.Context.player.Opponent && context.ability.IsCardAbility(),
                     
                 ["reactions"] = (context, effect, card) => 
                     context.ability.abilityType == AbilityTypes.Reaction,
                     
                 ["source"] = (context, effect, card) => 
-                    context.source == effect.context.source,
+                    context.source == effect.Context.source,
                     
                 ["keywordAbilities"] = (context, effect, card) => 
                     context.ability.IsKeywordAbility(),
@@ -116,14 +116,14 @@ namespace L5RGame
                     context.ability.abilityType != AbilityTypes.ForcedInterrupt,
                     
                 ["equalOrMoreExpensiveCharacterTriggeredAbilities"] = (context, effect, card) => 
-                    context.source.GetCardType() == CardTypes.Character && 
+                    (context.source as BaseCard)?.GetCardType() == CardTypes.Character && 
                     !context.ability.IsKeywordAbility() && 
-                    context.source.printedCost >= card.printedCost,
+                    ((context.source as BaseCard)?.printedCost ?? 0) >= (card?.printedCost ?? 0),
                     
                 ["equalOrMoreExpensiveCharacterKeywords"] = (context, effect, card) => 
-                    context.source.GetCardType() == CardTypes.Character && 
+                    (context.source as BaseCard)?.GetCardType() == CardTypes.Character && 
                     context.ability.IsKeywordAbility() && 
-                    context.source.printedCost >= card.printedCost
+                    ((context.source as BaseCard)?.printedCost ?? 0) >= (card?.printedCost ?? 0)
             };
         
         #endregion
@@ -152,6 +152,11 @@ namespace L5RGame
             restriction = properties.restricts;
             parameters = properties.parameters;
         }
+        
+        /// <summary>
+        /// Property to access the context from the base EffectValue class
+        /// </summary>
+        public AbilityContext context => Context;
         
         /// <summary>
         /// Constructor with property object (flexible)
@@ -242,7 +247,7 @@ namespace L5RGame
             if (!CheckRestrictions.ContainsKey(restriction))
             {
                 // Fallback to trait checking
-                return context.source.HasTrait(restriction);
+                return (context.source as BaseCard)?.HasTrait(restriction) ?? false;
             }
             
             try
