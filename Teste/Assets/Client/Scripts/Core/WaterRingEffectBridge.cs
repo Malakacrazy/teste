@@ -954,6 +954,37 @@ namespace L5RGame
         }
 
         #endregion
+        
+        #region Target Recommendation
+        
+        /// <summary>
+        /// Get the best target recommendation
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <returns>Best target or null</returns>
+        public BaseCard GetBestTargetRecommendation(AbilityContext context)
+        {
+            var targets = GetPythonValidTargets(context);
+            if (targets.Count == 0)
+                return null;
+                
+            BaseCard bestTarget = null;
+            float bestValue = -1f;
+            
+            foreach (var target in targets)
+            {
+                float value = GetTargetStrategicValue(target, context);
+                if (value > bestValue)
+                {
+                    bestValue = value;
+                    bestTarget = target;
+                }
+            }
+            
+            return bestTarget;
+        }
+        
+        #endregion
 
     }
 }

@@ -58,13 +58,13 @@ namespace L5RGame.Events
             AddEventData("defending_player", defendingPlayer.PlayerId);
             AddEventData("conflict_type", conflictType);
             AddEventData("target_ring", targetRing?.element);
-            AddEventData("conflict_id", conflict?.conflictId ?? Guid.NewGuid().ToString());
+            AddEventData("conflict_id", conflict?.GetHashCode().ToString() ?? Guid.NewGuid().ToString());
         }
         
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             return $"{AttackingPlayer.Name} starts {ConflictType} conflict against {DefendingPlayer.Name} targeting {TargetRing?.element} ring";
         }

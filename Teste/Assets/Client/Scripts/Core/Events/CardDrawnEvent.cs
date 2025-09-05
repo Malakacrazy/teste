@@ -9,6 +9,11 @@ namespace L5RGame.Events
     public class CardDrawnEvent : GameEvent
     {
         /// <summary>
+        /// Parameterless constructor for object pooling
+        /// </summary>
+        public CardDrawnEvent() : base() { }
+        
+        /// <summary>
         /// Card that was drawn
         /// </summary>
         public BaseCard Card { get; private set; }
@@ -27,6 +32,16 @@ namespace L5RGame.Events
         /// Player's hand size after drawing
         /// </summary>
         public int HandSizeAfterDraw { get; private set; }
+        
+        /// <summary>
+        /// Player who drew the card (Compatibility property)
+        /// </summary>
+        public Player DrawingPlayer => TriggeredBy;
+        
+        /// <summary>
+        /// Location the card was drawn from (Compatibility property)
+        /// </summary>
+        public string DrawnFrom => DeckType;
         
         /// <summary>
         /// Initialize card drawn event
@@ -59,7 +74,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             string batchText = CardsDrawnCount > 1 ? $" ({CardsDrawnCount} cards)" : "";
             return $"{TriggeredBy?.Name ?? "Unknown"} draws {Card.Name} from {DeckType} deck{batchText}";

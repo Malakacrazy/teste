@@ -6,7 +6,7 @@ namespace L5RGame.Events
     /// Event published when Air Ring effect is used to gain honor
     /// </summary>
     [Serializable]
-    public class AirRingGainHonorEvent : GameEvent
+    public class AirRingGainHonorEvent : L5RGame.GameEvent
     {
         /// <summary>
         /// Amount of honor gained
@@ -43,7 +43,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             return $"{TriggeredBy.Name} resolves the air ring, gaining {HonorGained} honor (total: {TotalHonorAfter})";
         }

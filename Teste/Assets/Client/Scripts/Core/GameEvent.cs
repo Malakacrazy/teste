@@ -212,6 +212,17 @@ namespace L5RGame
         #region Constructors
         
         /// <summary>
+        /// Parameterless constructor for object pooling
+        /// </summary>
+        public GameEvent()
+        {
+            this.eventName = EventNames.Unnamed;
+            this.properties = new Dictionary<string, object>();
+            this.createdTime = DateTime.UtcNow;
+            InitializeDefaults();
+        }
+        
+        /// <summary>
         /// Create a new game event
         /// </summary>
         /// <param name="eventName">Name of the event</param>
@@ -223,6 +234,26 @@ namespace L5RGame
             this.handler = handler;
             this.properties = properties ?? new Dictionary<string, object>();
             this.createdTime = DateTime.UtcNow;
+            
+            InitializeDefaults();
+        }
+        
+        /// <summary>
+        /// Constructor for new event system compatibility
+        /// </summary>
+        /// <param name="game">Game instance</param>
+        /// <param name="triggeredBy">Player who triggered the event</param>
+        /// <param name="source">Source object of the event</param>
+        public GameEvent(Game game, Player triggeredBy, object source = null)
+        {
+            this.eventName = this.GetType().Name;
+            this.properties = new Dictionary<string, object>();
+            this.createdTime = DateTime.UtcNow;
+            
+            // Store new event system properties
+            if (game != null) AddProperty("game", game);
+            if (triggeredBy != null) AddProperty("triggered_by", triggeredBy);
+            if (source != null) AddProperty("source", source);
             
             InitializeDefaults();
         }
@@ -893,6 +924,74 @@ namespace L5RGame
         
         #endregion
         
+        #region Event Data Management
+        
+        /// <summary>
+        /// Add event data (compatibility method for new event system)
+        /// </summary>
+        /// <param name="key">Data key</param>
+        /// <param name="value">Data value</param>
+        public virtual void AddEventData(string key, object value)
+        {
+            AddProperty(key, value);
+        }
+        
+        /// <summary>
+        /// Get all event data (compatibility method for new event system)
+        /// </summary>
+        /// <returns>All event data</returns>
+        public virtual Dictionary<string, object> GetAllEventData()
+        {
+            return new Dictionary<string, object>(properties);
+        }
+        
+        /// <summary>
+        /// Event name for new event system compatibility
+        /// </summary>
+        public virtual string EventName => name;
+        
+        /// <summary>
+        /// Event ID for new event system compatibility
+        /// </summary>
+        public virtual string EventId => $"{name}_{createdTime.Ticks}";
+        
+        /// <summary>
+        /// Timestamp for new event system compatibility
+        /// </summary>
+        public virtual DateTime Timestamp => createdTime;
+        
+        /// <summary>
+        /// Game instance for new event system compatibility
+        /// </summary>
+        public virtual Game Game => GetProperty("game") as Game;
+        
+        /// <summary>
+        /// TriggeredBy player for new event system compatibility
+        /// </summary>
+        public virtual Player TriggeredBy => GetProperty("triggered_by") as Player;
+        
+        /// <summary>
+        /// Source object for new event system compatibility
+        /// </summary>
+        public virtual object Source => GetProperty("source");
+        
+        /// <summary>
+        /// Get event type name for new event system compatibility
+        /// </summary>
+        public virtual string GetEventTypeName() => GetType().Name;
+        
+        /// <summary>
+        /// Get description for new event system compatibility
+        /// </summary>
+        public virtual string GetDescription() => ToString();
+        
+        /// <summary>
+        /// Event data for new event system compatibility
+        /// </summary>
+        public virtual Dictionary<string, object> EventData => GetAllEventData();
+        
+        #endregion
+        
         #region Static Factory Methods
         
         /// <summary>
@@ -937,6 +1036,89 @@ namespace L5RGame
         public static GameEvent Create(string eventName, Dictionary<string, object> properties, System.Action<GameEvent> handler)
         {
             return new GameEvent(eventName, properties, handler);
+        }
+        
+        #endregion
+        
+        #region Analytics and Data Access
+        
+        /// <summary>
+        /// Get analytics data for this event
+        /// </summary>
+        /// <returns>Dictionary of analytics data</returns>
+        public virtual Dictionary<string, object> GetData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            // Add basic event data
+            data["event_name"] = eventName ?? this.GetType().Name;
+            data["event_id"] = EventId;
+            data["timestamp"] = Timestamp;
+            data["is_cancelled"] = isCancelled;
+            data["is_resolved"] = isResolved;
+            data["execution_order"] = executionOrder;
+            
+            // Add triggered by data if available
+            if (TriggeredBy != null)
+            {
+                data["triggered_by_id"] = TriggeredBy.PlayerId;
+                data["triggered_by_name"] = TriggeredBy.Name;
+            }
+            
+            // Add source data if available
+            if (Source != null)
+            {
+                data["source_type"] = Source.GetType().Name;
+                if (Source is BaseCard card)
+                {
+                    data["source_card_id"] = card.CardId;
+                    data["source_card_name"] = card.Name;
+                }
+            }
+            
+            // Add all properties
+            foreach (var prop in properties)
+            {
+                if (!data.ContainsKey(prop.Key))
+                {
+                    data[prop.Key] = prop.Value;
+                }
+            }
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// Get a specific data value with type casting and optional default value
+        /// </summary>
+        /// <typeparam name="T">Expected type</typeparam>
+        /// <param name="key">Property key</param>
+        /// <param name="defaultValue">Default value if not found or can't cast</param>
+        /// <returns>Typed value</returns>
+        public T GetData<T>(string key, T defaultValue = default(T))
+        {
+            if (properties.TryGetValue(key, out var value))
+            {
+                try
+                {
+                    if (value is T typedValue)
+                        return typedValue;
+                    
+                    // Try conversion for common cases
+                    if (typeof(T) == typeof(string))
+                        return (T)(object)(value?.ToString() ?? defaultValue?.ToString() ?? "");
+                    
+                    // Try Convert.ChangeType for primitives
+                    if (value != null && typeof(T).IsPrimitive || typeof(T) == typeof(string))
+                        return (T)Convert.ChangeType(value, typeof(T));
+                }
+                catch
+                {
+                    // Conversion failed, return default
+                }
+            }
+            
+            return defaultValue;
         }
         
         #endregion

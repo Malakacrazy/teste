@@ -35,7 +35,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             string reasonText = !string.IsNullOrEmpty(Reason) ? $" ({Reason})" : "";
             return $"{TriggeredBy.Name} chooses not to resolve the earth ring{reasonText}";

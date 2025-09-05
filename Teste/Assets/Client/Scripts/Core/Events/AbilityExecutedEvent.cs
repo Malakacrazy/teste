@@ -34,6 +34,11 @@ namespace L5RGame.Events
         public string FailureReason { get; private set; }
         
         /// <summary>
+        /// Was the ability execution successful? (Compatibility property)
+        /// </summary>
+        public bool Successful => WasSuccessful;
+        
+        /// <summary>
         /// Initialize ability executed event
         /// </summary>
         /// <param name="game">Game instance</param>
@@ -82,7 +87,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             string result = WasSuccessful ? "executed" : $"failed ({FailureReason})";
             string targetText = "";

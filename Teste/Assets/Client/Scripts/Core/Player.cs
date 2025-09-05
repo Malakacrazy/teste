@@ -1178,6 +1178,20 @@ namespace L5RGame
             game?.AddMessage("{0} has been disconnected", name);
         }
         
+        /// <summary>
+        /// Discard a card from hand
+        /// </summary>
+        public virtual void DiscardCard(BaseCard card)
+        {
+            if (card != null && hand.Contains(card))
+            {
+                hand.Remove(card);
+                conflictDiscardPile.Add(card);
+                card.location = "conflict discard pile";
+                Debug.Log($"{Name} discards {card.Name} from hand");
+            }
+        }
+        
     }
 
 

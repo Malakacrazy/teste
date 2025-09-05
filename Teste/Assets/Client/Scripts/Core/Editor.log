@@ -1,1 +1,16 @@
-Assets\Client\Scripts\Core\GameActions\EventDrivenGameAction.cs(46,16): error CS0246: The type or namespace name 'IEventBus' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\Events\BaseEventHandler.cs(170,54): error CS0023: Operator '!' cannot be applied to operand of type 'method group'
+Assets\Client\Scripts\Core\EventWindow.cs(253,82): error CS1503: Argument 2: cannot convert from 'L5RGame.GameEvent' to 'System.Collections.Generic.Dictionary<string, object>'
+Assets\Client\Scripts\Core\EventWindow.cs(292,52): error CS1503: Argument 2: cannot convert from 'L5RGame.GameEvent' to 'System.Collections.Generic.Dictionary<string, object>'
+Assets\Client\Scripts\Core\Events\Handlers\UIEventHandler.cs(274,55): error CS1503: Argument 2: cannot convert from 'string' to 'L5RGame.CardLocation'
+Assets\Client\Scripts\Core\Events\Handlers\UIEventHandler.cs(312,24): error CS0070: The event 'Game.OnGameStateChanged' can only appear on the left hand side of += or -= (except when used from within the type 'Game')
+Assets\Client\Scripts\Core\Events\Handlers\GameMessageHandler.cs(247,38): error CS0019: Operator '!=' cannot be applied to operands of type 'string' and 'CardLocation'
+Assets\Client\Scripts\Core\EventSystem\EventLogger.cs(294,30): error CS0308: The non-generic method 'IEventBus.Unsubscribe(IEventSubscription)' cannot be used with type arguments
+Assets\Client\Scripts\Core\EventSystem\EventLogger.cs(296,30): error CS0308: The non-generic method 'IEventBus.Unsubscribe(IEventSubscription)' cannot be used with type arguments
+Assets\Client\Scripts\Core\EventSystem\EventLogger.cs(299,30): error CS0308: The non-generic method 'IEventBus.Unsubscribe(IEventSubscription)' cannot be used with type arguments
+Assets\Client\Scripts\Core\EventSystem\EventLogger.cs(300,30): error CS0308: The non-generic method 'IEventBus.Unsubscribe(IEventSubscription)' cannot be used with type arguments
+Assets\Client\Scripts\Core\EventSystem\EventLogger.cs(301,30): error CS0308: The non-generic method 'IEventBus.Unsubscribe(IEventSubscription)' cannot be used with type arguments
+Assets\Client\Scripts\Core\EventSystem\EventLogger.cs(304,30): error CS0308: The non-generic method 'IEventBus.Unsubscribe(IEventSubscription)' cannot be used with type arguments
+Assets\Client\Scripts\Core\EventSystem\EventLogger.cs(306,30): error CS0308: The non-generic method 'IEventBus.Unsubscribe(IEventSubscription)' cannot be used with type arguments
+Assets\Client\Scripts\Core\Events\EventStore.cs(417,36): error CS0122: 'JsonSerializer' is inaccessible due to its protection level
+Assets\Client\Scripts\Core\Events\EventStore.cs(417,76): error CS0122: 'JsonSerializerOptions' is inaccessible due to its protection level
+Assets\Client\Scripts\Core\Events\EventStore.cs(448,33): error CS0122: 'JsonSerializer' is inaccessible due to its protection level

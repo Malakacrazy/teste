@@ -82,7 +82,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             var playerInfo = IsPlayerTimer && TriggeredBy != null ? $" for {TriggeredBy.Name}" : "";
             return $"{TimerType} timer '{TimerId}' {TimerAction}{playerInfo} ({RemainingTime:F1}s remaining)";

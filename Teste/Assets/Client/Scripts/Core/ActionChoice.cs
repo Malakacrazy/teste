@@ -29,6 +29,31 @@ namespace L5RGame
         public object Data { get; set; }
         
         /// <summary>
+        /// Value property (for compatibility)
+        /// </summary>
+        public object Value { get; set; }
+        
+        /// <summary>
+        /// Description property (for compatibility) 
+        /// </summary>
+        public string Description { get; set; }
+        
+        /// <summary>
+        /// IsAvailable property (for compatibility)
+        /// </summary>
+        public bool IsAvailable { get; set; } = true;
+        
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public ActionChoice()
+        {
+            Id = Guid.NewGuid().ToString();
+            Enabled = true;
+            IsAvailable = true;
+        }
+        
+        /// <summary>
         /// Initialize an action choice
         /// </summary>
         /// <param name="text">Display text</param>
@@ -41,6 +66,7 @@ namespace L5RGame
             Id = id ?? Guid.NewGuid().ToString();
             Enabled = enabled;
             Data = data;
+            IsAvailable = enabled;
         }
         
         /// <summary>

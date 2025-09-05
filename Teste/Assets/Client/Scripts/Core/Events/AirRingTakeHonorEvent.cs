@@ -83,7 +83,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             return $"{TriggeredBy.Name} resolves the air ring, taking {HonorTaken} honor from {Target.Name} (swing: {HonorSwing})";
         }

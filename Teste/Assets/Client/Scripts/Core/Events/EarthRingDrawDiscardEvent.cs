@@ -72,7 +72,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             string description = $"{TriggeredBy.Name} resolves the earth ring, drawing {CardsDrawn} card(s)";
             

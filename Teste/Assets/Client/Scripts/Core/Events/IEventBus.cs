@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using L5RGame.Events;
 
 namespace L5RGame.EventSystem
 {
@@ -17,7 +16,7 @@ namespace L5RGame.EventSystem
         /// <typeparam name="T">Event type to subscribe to</typeparam>
         /// <param name="handler">Event handler function</param>
         /// <returns>Subscription token for unsubscribing</returns>
-        IEventSubscription Subscribe<T>(Action<T> handler) where T : GameEvent;
+        IEventSubscription Subscribe<T>(Action<T> handler) where T : L5RGame.GameEvent;
         
         /// <summary>
         /// Subscribe to a specific event type with async handler
@@ -25,7 +24,7 @@ namespace L5RGame.EventSystem
         /// <typeparam name="T">Event type to subscribe to</typeparam>
         /// <param name="handler">Async event handler function</param>
         /// <returns>Subscription token for unsubscribing</returns>
-        IEventSubscription Subscribe<T>(Func<T, Task> handler) where T : GameEvent;
+        IEventSubscription Subscribe<T>(Func<T, Task> handler) where T : L5RGame.GameEvent;
         
         /// <summary>
         /// Subscribe to events by name (for dynamic event handling)
@@ -33,14 +32,14 @@ namespace L5RGame.EventSystem
         /// <param name="eventName">Name of the event type</param>
         /// <param name="handler">Event handler function</param>
         /// <returns>Subscription token for unsubscribing</returns>
-        IEventSubscription Subscribe(string eventName, Action<GameEvent> handler);
+        IEventSubscription Subscribe(string eventName, Action<L5RGame.GameEvent> handler);
         
         /// <summary>
         /// Subscribe to all events (useful for logging/debugging)
         /// </summary>
         /// <param name="handler">Event handler that receives all events</param>
         /// <returns>Subscription token for unsubscribing</returns>
-        IEventSubscription SubscribeToAll(Action<GameEvent> handler);
+        IEventSubscription SubscribeToAll(Action<L5RGame.GameEvent> handler);
         
         /// <summary>
         /// Unsubscribe from an event using the subscription token
@@ -53,7 +52,7 @@ namespace L5RGame.EventSystem
         /// </summary>
         /// <typeparam name="T">Event type</typeparam>
         /// <param name="eventInstance">Event instance to publish</param>
-        void Publish<T>(T eventInstance) where T : GameEvent;
+        void Publish<T>(T eventInstance) where T : L5RGame.GameEvent;
         
         /// <summary>
         /// Publish an event asynchronously
@@ -61,7 +60,7 @@ namespace L5RGame.EventSystem
         /// <typeparam name="T">Event type</typeparam>
         /// <param name="eventInstance">Event instance to publish</param>
         /// <returns>Task representing the async operation</returns>
-        Task PublishAsync<T>(T eventInstance) where T : GameEvent;
+        Task PublishAsync<T>(T eventInstance) where T : L5RGame.GameEvent;
         
         /// <summary>
         /// Clear all subscriptions (for cleanup)
@@ -79,7 +78,7 @@ namespace L5RGame.EventSystem
         /// </summary>
         /// <typeparam name="T">Event type</typeparam>
         /// <returns>Number of subscriptions for this event type</returns>
-        int GetSubscriptionCount<T>() where T : GameEvent;
+        int GetSubscriptionCount<T>() where T : L5RGame.GameEvent;
         
         /// <summary>
         /// Enable or disable the event bus

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using L5RGame.Events;
+using L5RGame.EventSystem;
 using UnityEngine;
 
 namespace L5RGame.Actions
@@ -119,7 +120,7 @@ namespace L5RGame.Actions
         {
             if (IsExecuted)
             {
-                Debug.LogWarning($"Action {ActionName} ({ActionId}) has already been executed");
+                UnityEngine.Debug.LogWarning($"Action {ActionName} ({ActionId}) has already been executed");
                 return false;
             }
             
@@ -168,7 +169,7 @@ namespace L5RGame.Actions
                 var failureEvent = CreateExecutionFailureEvent(ex, stopwatch.ElapsedMilliseconds);
                 EventBus.Publish(failureEvent);
                 
-                Debug.LogError($"Failed to execute action {ActionName}: {ex.Message}");
+                UnityEngine.Debug.LogError($"Failed to execute action {ActionName}: {ex.Message}");
                 return false;
             }
         }
@@ -191,14 +192,14 @@ namespace L5RGame.Actions
                 if (result)
                 {
                     // Publish undo event
-                    EventBus.Publish(new ActionUndoEvent(Game, ExecutingPlayer, ActionType, ActionName, Target, this));
+                    EventBus.Publish(new ActionUndoEvent(Game, ExecutingPlayer, ActionType, ActionName, Target, "action_undo", true, this));
                 }
                 
                 return result;
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to undo action {ActionName}: {ex.Message}");
+                UnityEngine.Debug.LogError($"Failed to undo action {ActionName}: {ex.Message}");
                 return false;
             }
         }

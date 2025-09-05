@@ -43,7 +43,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             string statusText = WasAlreadyHonored ? " (already honored)" : " (newly honored)";
             return $"{Character.Name} is honored{statusText}";

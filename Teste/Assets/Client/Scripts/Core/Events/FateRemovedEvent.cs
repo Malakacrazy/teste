@@ -34,6 +34,16 @@ namespace L5RGame.Events
         public int FateAfterRemoval { get; private set; }
         
         /// <summary>
+        /// Will the character leave play? (Compatibility property)
+        /// </summary>
+        public bool WillLeavePlay => WillCharacterLeave;
+        
+        /// <summary>
+        /// Fate remaining on the character (Compatibility property)
+        /// </summary>
+        public int FateRemaining => FateAfterRemoval;
+        
+        /// <summary>
         /// Initialize fate removed event
         /// </summary>
         /// <param name="game">Game instance</param>
@@ -63,7 +73,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             string leaveText = WillCharacterLeave ? " (character will leave play)" : "";
             return $"Fate removed from {Character.Name}: -{AmountRemoved} ({FateBeforeRemoval}→{FateAfterRemoval}){leaveText}";

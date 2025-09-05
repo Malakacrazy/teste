@@ -385,6 +385,11 @@ namespace L5RGame
             }
         }
         
+        /// <summary>
+        /// Check if this ability requires a target
+        /// </summary>
+        public virtual bool RequiresTarget => false;
+        
         public override string ToString()
         {
             return $"BaseAbility[{abilityType}]: {GetTitle()}";

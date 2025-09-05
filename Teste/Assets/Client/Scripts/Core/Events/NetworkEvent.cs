@@ -105,7 +105,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             var targetInfo = TargetPlayerIds != null ? $" to {TargetPlayerIds.Count} player(s)" : " to all players";
             var spectatorInfo = BroadcastToSpectators ? " and spectators" : "";

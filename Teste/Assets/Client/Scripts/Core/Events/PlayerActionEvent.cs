@@ -10,6 +10,11 @@ namespace L5RGame.Events
     public class PlayerActionEvent : GameEvent
     {
         /// <summary>
+        /// Parameterless constructor for object pooling
+        /// </summary>
+        public PlayerActionEvent() : base() { }
+        
+        /// <summary>
         /// Type of action taken
         /// </summary>
         public string ActionType { get; private set; }
@@ -111,7 +116,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             string targetText = ActionTarget != null ? $" targeting {GetTargetDescription()}" : "";
             string costText = ActionCosts.Count > 0 ? $" (costs: {GetCostDescription()})" : "";

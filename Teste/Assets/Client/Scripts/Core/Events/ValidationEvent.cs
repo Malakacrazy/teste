@@ -10,6 +10,11 @@ namespace L5RGame.Events
     public class ValidationEvent : GameEvent
     {
         /// <summary>
+        /// Parameterless constructor for object pooling
+        /// </summary>
+        public ValidationEvent() : base() { }
+        
+        /// <summary>
         /// Type of validation performed
         /// </summary>
         public string ValidationType { get; private set; }
@@ -114,7 +119,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             string severityIcon = Severity switch
             {

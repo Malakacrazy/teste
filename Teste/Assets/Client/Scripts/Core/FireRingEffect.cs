@@ -365,7 +365,7 @@ namespace L5RGame
         private void ExecuteHonorAction(AbilityContext context)
         {
             // Store previous honor state
-            bool wasAlreadyHonored = selectedTarget.IsHonored;
+            bool wasAlreadyHonored = selectedTarget.IsHonored();
             
             // Create and execute honor action
             var honorAction = GameActions.CreateHonorAction(selectedTarget);
@@ -385,7 +385,7 @@ namespace L5RGame
         private void ExecuteDishonorAction(AbilityContext context)
         {
             // Store previous dishonor state
-            bool wasAlreadyDishonored = selectedTarget.IsDishonored;
+            bool wasAlreadyDishonored = selectedTarget.IsDishonored();
             
             // Create and execute dishonor action
             var dishonorAction = GameActions.CreateDishonorAction(selectedTarget);

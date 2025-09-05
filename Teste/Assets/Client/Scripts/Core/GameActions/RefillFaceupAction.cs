@@ -67,6 +67,7 @@ namespace L5RGame
                         {
                             card.Facedown = false;
                         }
+                        return true;
                     });
                     LogExecution("Refilled {0} province faceup for {1}", properties.Location, player.name);
                     return true;

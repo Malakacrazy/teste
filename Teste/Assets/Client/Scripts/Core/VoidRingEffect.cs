@@ -270,7 +270,7 @@ namespace L5RGame
         /// <param name="context">Ability context</param>
         private void CheckCharacterLeaving(BaseCard target, AbilityContext context)
         {
-            if (target.FateTokens <= 0 && target.Location == CardLocation.PlayArea)
+            if (target.FateTokens <= 0 && target.Location == "PlayArea")
             {
                 var discardAction = GameActions.CreateDiscardAction(target.controller, target);
                 discardAction.Resolve(target, context);
@@ -379,7 +379,7 @@ namespace L5RGame
                 var characterLeavesEvent = new CharacterLeavesPlayEvent(
                     game: context.Game,
                     character: character,
-                    destination: CardLocation.DiscardPile,
+                    destination: "DiscardPile",
                     reason: reason,
                     source: this
                 );

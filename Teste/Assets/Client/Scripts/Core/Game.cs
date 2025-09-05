@@ -2083,7 +2083,7 @@ def on_trigger(card, event_name, event_data):
             // Auto-select first target for now
             if (targets?.Length > 0 && targets[0] is TargetSelectionData targetData)
             {
-                onTargetSelected?.Invoke(targetData.Target);
+                onTargetSelected?.Invoke(targetData.Target as BaseCard);
             }
             else if (allowCancel)
             {
@@ -2103,11 +2103,139 @@ def on_trigger(card, event_name, event_data):
         }
     }
     
+    // Missing static properties and methods for Game class
+    public partial class Game
+    {
+        /// <summary>
+        /// Static UI instance property
+        /// </summary>
+        public static UIInstance UI => GameUI.Instance;
+        
+        /// <summary>
+        /// Static Analytics instance property  
+        /// </summary>
+        public static AnalyticsWrapper Analytics { get; } = new AnalyticsWrapper();
+        
+        /// <summary>
+        /// Get all cards currently in play from all players
+        /// </summary>
+        /// <returns>List of all cards in play</returns>
+        public List<BaseCard> GetAllCardsInPlay()
+        {
+            var allCards = new List<BaseCard>();
+            foreach (var player in GetPlayers())
+            {
+                allCards.AddRange(player.GetCardsInPlay());
+            }
+            return allCards;
+        }
+
+        /// <summary>
+        /// Get all cards from all players (in play and in hands/decks)
+        /// </summary>
+        /// <returns>List of all cards</returns>
+        public List<BaseCard> GetAllCards()
+        {
+            var allCards = new List<BaseCard>();
+            foreach (var player in GetPlayers())
+            {
+                allCards.AddRange(player.GetAllCards());
+            }
+            return allCards;
+        }
+        
+        /// <summary>
+        /// Property alias for GetAllCards method (compatibility)
+        /// </summary>
+        public List<BaseCard> AllCards => GetAllCards();
+
+        /// <summary>
+        /// Get all rings in the game
+        /// </summary>
+        /// <returns>List of all rings</returns>
+        public List<Ring> GetAllRings()
+        {
+            return rings.Values.ToList();
+        }
+
+        /// <summary>
+        /// Get the currently active player
+        /// </summary>
+        public Player activePlayer
+        {
+            get
+            {
+                // Return the first player who has action phase priority
+                return GetPlayers().FirstOrDefault(p => p.actionPhasePriority) ?? GetFirstPlayer();
+            }
+        }
+        
+        /// <summary>
+        /// Current player property for API compatibility
+        /// </summary>
+        public Player currentPlayer
+        {
+            get
+            {
+                return activePlayer ?? GetFirstPlayer();
+            }
+        }
+
+        /// <summary>
+        /// Handle card movement tracking
+        /// </summary>
+        /// <param name="card">Card that was moved</param>
+        /// <param name="oldLocation">Previous location</param>
+        /// <param name="newLocation">New location</param>
+        public void OnCardMoved(BaseCard card, string oldLocation, string newLocation)
+        {
+            // Placeholder implementation for card movement tracking
+            if (card != null && !string.IsNullOrEmpty(newLocation))
+            {
+                AddMessage("{0} moved from {1} to {2}", card.name, oldLocation ?? "unknown", newLocation);
+            }
+        }
+        
+        /// <summary>
+        /// Event system methods for registration
+        /// </summary>
+        public void on(string eventName, System.Action<GameEvent> handler)
+        {
+            // Placeholder for event registration - would connect to actual event system
+            Debug.Log($"Registering handler for event: {eventName}");
+        }
+        
+        public void removeListener(string eventName, System.Action<GameEvent> handler)
+        {
+            // Placeholder for event removal - would connect to actual event system
+            Debug.Log($"Removing handler for event: {eventName}");
+        }
+        
+        /// <summary>
+        /// Game properties for compatibility
+        /// </summary>
+        public int TurnNumber => roundNumber;
+        public string CurrentPhase => currentPhase;
+        public string GameId => gameId;
+        public List<Player> Players => GetPlayers();
+    }
+    
 
     // Interface for game router (will be implemented by network layer)
     public interface IGameRouter
     {
         void HandleError(Game game, Exception error);
         void GameWon(Game game, string reason, Player winner);
+    }
+    
+    /// <summary>
+    /// Wrapper class for GameAnalytics static methods
+    /// </summary>
+    public class AnalyticsWrapper
+    {
+        public void LogEvent(string eventName, Dictionary<string, object> eventData = null)
+        {
+            GameAnalytics.LogEvent(eventName, eventData);
+        }
     }
 }

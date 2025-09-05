@@ -70,7 +70,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             var controllerChange = FromController != ToController ? $" (controller: {FromController.Name} → {ToController.Name})" : "";
             return $"{Card.Name} moved from {FromLocation} to {ToLocation}{controllerChange}";

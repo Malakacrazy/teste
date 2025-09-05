@@ -9,6 +9,11 @@ namespace L5RGame.Events
     public class GameStateChangedEvent : GameEvent
     {
         /// <summary>
+        /// Parameterless constructor for object pooling
+        /// </summary>
+        public GameStateChangedEvent() : base() { }
+        
+        /// <summary>
         /// Previous game state
         /// </summary>
         public string PreviousState { get; private set; }
@@ -67,7 +72,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             string durationText = PhaseDurationMs > 0 ? $" (duration: {PhaseDurationMs}ms)" : "";
             return $"Game state changed: {PreviousState} → {NewState} ({ChangeReason}){durationText}";

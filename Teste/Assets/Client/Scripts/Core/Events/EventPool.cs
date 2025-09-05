@@ -202,9 +202,8 @@ namespace L5RGame.Events
         
         private static void ResetEventForReuse(GameEvent gameEvent)
         {
-            // Reset common properties
-            gameEvent.EventId = Guid.NewGuid().ToString();
-            gameEvent.Timestamp = DateTime.UtcNow;
+            // Note: EventId and Timestamp are auto-generated read-only properties
+            // They will be set automatically when the event is created
             
             // Clear event data dictionary
             if (gameEvent.GetAllEventData() is Dictionary<string, object> eventData)

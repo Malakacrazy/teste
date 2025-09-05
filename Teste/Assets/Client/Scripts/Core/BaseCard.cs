@@ -1074,5 +1074,42 @@ namespace L5RGame
             
             return matchingAbilities;
         }
+        
+        /// <summary>
+        /// Check if this card can be bowed
+        /// </summary>
+        public virtual bool CanBeBowed() 
+        {
+            return !bowed && location == Locations.PlayArea;
+        }
+        
+        /// <summary>
+        /// Check if this card can be bowed with context
+        /// </summary>
+        public virtual bool CanBeBowed(object context)
+        {
+            return CanBeBowed();
+        }
+        
+        /// <summary>
+        /// Check if this card can be readied
+        /// </summary>
+        public virtual bool CanBeReadied()
+        {
+            return bowed && location == Locations.PlayArea;
+        }
+        
+        /// <summary>
+        /// Check if this card can be readied with context
+        /// </summary>
+        public virtual bool CanBeReadied(object context)
+        {
+            return CanBeReadied();
+        }
+        
+        /// <summary>
+        /// Get the fate cost of this card
+        /// </summary>
+        public virtual int FateCost => Cost;
     }
 }

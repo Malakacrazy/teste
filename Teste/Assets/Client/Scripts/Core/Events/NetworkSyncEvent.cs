@@ -52,7 +52,7 @@ namespace L5RGame.Events
             AddEventData("sync_data_count", SyncData.Count);
         }
         
-        public override string GetDescription()
+        public string GetDescription()
         {
             var targets = TargetPlayers == null ? "all players" : $"{TargetPlayers.Count} specific players";
             return $"Network sync ({SyncType}) from {TriggeredBy.Name} to {targets} [P{Priority}]";

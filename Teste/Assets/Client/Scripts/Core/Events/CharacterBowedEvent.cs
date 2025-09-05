@@ -51,7 +51,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             string statusText = WasAlreadyBowed ? " (already bowed)" : " (newly bowed)";
             string reasonText = !string.IsNullOrEmpty(Reason) ? $" - {Reason}" : "";

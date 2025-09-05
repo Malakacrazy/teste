@@ -61,7 +61,7 @@ namespace L5RGame.Events
             }
         }
         
-        public override string GetDescription()
+        public string GetDescription()
         {
             var success = UndoSuccessful ? "successfully" : "failed to";
             return $"{TriggeredBy.Name} {success} undid {ActionName} ({UndoReason})";

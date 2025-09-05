@@ -9,6 +9,11 @@ namespace L5RGame.Events
     public class GameMessageEvent : GameEvent
     {
         /// <summary>
+        /// Parameterless constructor for object pooling
+        /// </summary>
+        public GameMessageEvent() : base() { }
+        
+        /// <summary>
         /// The message to display
         /// </summary>
         public string Message { get; private set; }
@@ -49,7 +54,7 @@ namespace L5RGame.Events
         /// <summary>
         /// Get description of this event
         /// </summary>
-        public override string GetDescription()
+        public string GetDescription()
         {
             return $"Game message ({Category}): {Message}";
         }
