@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using L5RGame.Events;
+using L5RGame.EventSystem;
 
 namespace L5RGame
 {
     /// <summary>
-    /// C# implementation of Void Ring Effect ability
-    /// Allows removing fate from a character when Void Ring is resolved
+    /// Event-driven implementation of Void Ring Effect ability.
+    /// Uses the event system instead of direct coupling to analytics, UI, and messages.
     /// </summary>
     [Serializable]
     public class VoidRingEffect : BaseAbility
@@ -27,6 +29,7 @@ namespace L5RGame
         
         // Current execution state
         private List<BaseCard> validTargets;
+        private IEventBus eventBus;
         
         #endregion
         
@@ -49,6 +52,10 @@ namespace L5RGame
         public override void Initialize(BaseCard sourceCard, Game gameInstance)
         {
             base.Initialize(sourceCard, gameInstance);
+            
+            // Get the event bus from the game instance
+            eventBus = gameInstance.GetEventBus(); // This method will be added to Game class
+            
             ConfigureTargeting();
         }
         
@@ -112,7 +119,7 @@ namespace L5RGame
             var targets = new List<BaseCard>();
             
             // Get all characters in play
-            var allCharacters = Game.GameState.GetAllCardsInPlay()
+            var allCharacters = context.Game.GetAllCardsInPlay()
                 .Where(card => card.CardType == CardTypes.Character)
                 .ToList();
             
@@ -212,8 +219,8 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void HandleCancelTargetSelection(AbilityContext context)
         {
-            Game.AddMessage($"{context.Player.Name} chooses not to resolve the void ring");
-            LogAnalyticsEvent(context, "not_resolved", null);
+            // Publish ring resolved event for not resolving
+            PublishRingResolvedEvent(context, "not_resolved", null);
             CompleteExecution(context);
         }
         
@@ -223,17 +230,9 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void HandleNoValidTargets(AbilityContext context)
         {
-            if (isOptional)
-            {
-                Game.AddMessage($"{context.Player.Name} chooses not to resolve the void ring (no valid targets)");
-                LogAnalyticsEvent(context, "no_targets", null);
-            }
-            else
-            {
-                Game.AddMessage($"{context.Player.Name} cannot resolve the void ring (no valid targets)");
-                LogAnalyticsEvent(context, "forced_no_targets", null);
-            }
-            
+            // Publish ring resolved event for no targets
+            string effectChosen = isOptional ? "no_targets" : "forced_no_targets";
+            PublishRingResolvedEvent(context, effectChosen, null);
             CompleteExecution(context);
         }
         
@@ -244,14 +243,18 @@ namespace L5RGame
         /// <param name="target">Target character</param>
         private void ExecuteRemoveFate(AbilityContext context, BaseCard target)
         {
-            Game.AddMessage($"{context.Player.Name} resolves the void ring, removing a fate from {target.Name}");
+            // Store original fate count for event
+            var originalFate = target.FateTokens;
             
             // Create and execute remove fate action
-            var removeFateAction = Game.Actions.CreateRemoveFateAction(fateToRemove);
+            var removeFateAction = GameActions.CreateRemoveFateAction(target, fateToRemove);
             removeFateAction.Resolve(target, context);
             
-            // Log analytics
-            LogAnalyticsEvent(context, "fate_removed", target);
+            // Publish fate removed event instead of calling analytics/messages directly
+            PublishFateRemovedEvent(context, target, originalFate);
+            
+            // Publish ring resolved event
+            PublishRingResolvedEvent(context, "fate_removed", target);
             
             // Check for character leaving play
             CheckCharacterLeaving(target, context);
@@ -269,14 +272,11 @@ namespace L5RGame
         {
             if (target.FateTokens <= 0 && target.Location == CardLocation.PlayArea)
             {
-                // Character should leave play
-                Game.AddMessage($"{target.Name} leaves play due to having no fate");
-                
-                var discardAction = Game.Actions.CreateDiscardAction();
+                var discardAction = GameActions.CreateDiscardAction(target.controller, target);
                 discardAction.Resolve(target, context);
                 
-                // Log character leaving
-                LogAnalyticsEvent(context, "character_left_play", target);
+                // Publish character leaves play event
+                PublishCharacterLeavesPlayEvent(context, target, "no fate");
             }
         }
         
@@ -297,49 +297,104 @@ namespace L5RGame
                 }
             }
             
-            // Trigger game-wide fate removal events
-            Game.TriggerEvent("fate_removed", new FateRemovedEventArgs
-            {
-                Character = target,
-                Player = context.Player,
-                Source = this,
-                AmountRemoved = fateToRemove
-            });
-        }
-        
-        /// <summary>
-        /// Log analytics event
-        /// </summary>
-        /// <param name="context">Ability execution context</param>
-        /// <param name="action">Action taken</param>
-        /// <param name="target">Target character (if any)</param>
-        private void LogAnalyticsEvent(AbilityContext context, string action, BaseCard target)
-        {
-            var analyticsData = new Dictionary<string, object>
-            {
-                { "player_id", context.Player.PlayerId },
-                { "action", action },
-                { "ring_element", "void" },
-                { "valid_targets_count", validTargets?.Count ?? 0 },
-                { "fate_to_remove", fateToRemove }
-            };
-            
-            if (target != null)
-            {
-                analyticsData.Add("target_id", target.CardId);
-                analyticsData.Add("target_name", target.Name);
-                analyticsData.Add("target_owner", target.Owner.PlayerId);
-                analyticsData.Add("target_fate_before", target.FateTokens + fateToRemove);
-                analyticsData.Add("target_fate_after", target.FateTokens);
-                analyticsData.Add("target_will_leave", target.FateTokens <= 0);
-            }
-            
-            Game.Analytics.LogEvent("void_ring_effect", analyticsData);
+            // No need to trigger direct game events - the event handlers will react to our published events
         }
         
         #endregion
         
-        #region Advanced Configuration
+        #region Event Publishing Methods
+        
+        /// <summary>
+        /// Publish a fate removed event
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="target">Character that lost fate</param>
+        /// <param name="originalFate">Fate count before removal</param>
+        private void PublishFateRemovedEvent(AbilityContext context, BaseCard target, int originalFate)
+        {
+            try
+            {
+                if (eventBus == null) return;
+                
+                var fateRemovedEvent = new FateRemovedEvent(
+                    game: context.Game,
+                    triggeredBy: context.Player,
+                    character: target,
+                    amountRemoved: fateToRemove,
+                    source: this
+                );
+                
+                eventBus.Publish(fateRemovedEvent);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to publish FateRemovedEvent: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// Publish a ring resolved event
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="effectChosen">Effect that was chosen</param>
+        /// <param name="target">Target of the effect (if any)</param>
+        private void PublishRingResolvedEvent(AbilityContext context, string effectChosen, BaseCard target)
+        {
+            try
+            {
+                if (eventBus == null) return;
+                
+                // Get the void ring from the game
+                var voidRing = context.Game.rings.TryGetValue("void", out Ring ring) ? ring : null;
+                
+                var ringResolvedEvent = new RingResolvedEvent(
+                    game: context.Game,
+                    triggeredBy: context.Player,
+                    ring: voidRing,
+                    effectChosen: effectChosen,
+                    effectTarget: target,
+                    source: this
+                );
+                
+                eventBus.Publish(ringResolvedEvent);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to publish RingResolvedEvent: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// Publish a character leaves play event
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="character">Character leaving play</param>
+        /// <param name="reason">Reason for leaving</param>
+        private void PublishCharacterLeavesPlayEvent(AbilityContext context, BaseCard character, string reason)
+        {
+            try
+            {
+                if (eventBus == null) return;
+                
+                var characterLeavesEvent = new CharacterLeavesPlayEvent(
+                    game: context.Game,
+                    character: character,
+                    destination: CardLocation.DiscardPile,
+                    reason: reason,
+                    source: this
+                );
+                
+                eventBus.Publish(characterLeavesEvent);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to publish CharacterLeavesPlayEvent: {ex.Message}");
+            }
+        }
+        
+        #endregion
+        
+        #region Advanced Configuration (Preserved from Original)
         
         /// <summary>
         /// Configure fate removal amount
@@ -506,12 +561,13 @@ namespace L5RGame
         [ContextMenu("Show Effect Preview")]
         private void ShowEffectPreview()
         {
-            var preview = $"Void Ring Effect Preview:\n";
+            var preview = $"Void Ring Effect Preview (Event-Driven):\n";
             preview += $"• Fate to Remove: {fateToRemove}\n";
             preview += $"• Allow Own Characters: {allowTargetingOwnCharacters}\n";
             preview += $"• Allow Opponent Characters: {allowTargetingOpponentCharacters}\n";
             preview += $"• Optional: {isOptional}\n";
-            preview += $"• Require Valid Target: {requireValidTarget}";
+            preview += $"• Require Valid Target: {requireValidTarget}\n";
+            preview += $"• Uses Event System: YES (decoupled from direct analytics/UI/message calls)";
             
             Debug.Log(preview);
         }
@@ -520,9 +576,7 @@ namespace L5RGame
         #endregion
     }
     
-    /// <summary>
-    /// Event arguments for fate removed events
-    /// </summary>
+    // Supporting classes preserved from original for compatibility
     public class FateRemovedEventArgs : EventArgs
     {
         public BaseCard Character;
@@ -531,9 +585,6 @@ namespace L5RGame
         public int AmountRemoved;
     }
     
-    /// <summary>
-    /// Summary of effect impact
-    /// </summary>
     [Serializable]
     public class EffectImpactSummary
     {

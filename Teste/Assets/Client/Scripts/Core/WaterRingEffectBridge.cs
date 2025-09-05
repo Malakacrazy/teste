@@ -19,10 +19,10 @@ namespace L5RGame
         public string Reasoning;
         public List<BaseCard> AlternativeTargets;
         
-        // Missing properties for compilation
-        public string Action => RecommendedAction;
-        public BaseCard Target => RecommendedTarget;
-        public float StrategicValue => Confidence * 100f;
+        // Properties for compilation - made settable
+        public string Action { get; set; }
+        public BaseCard Target { get; set; }
+        public float StrategicValue { get; set; }
         public bool WillChangeBoardState { get; set; } = true;
         public string Source { get; set; } = "AI";
         
@@ -36,6 +36,9 @@ namespace L5RGame
             RecommendedAction = action;
             RecommendedTarget = target;
             Confidence = confidence;
+            Action = action;
+            Target = target;
+            StrategicValue = confidence * 100f;
             AlternativeTargets = new List<BaseCard>();
         }
         
@@ -55,16 +58,16 @@ namespace L5RGame
         public float PositionalAdvantage;
         public Dictionary<string, object> Metadata;
         
-        // Missing properties for compilation
-        public static int TotalCharactersInPlay { get; set; }
-        public static int OwnReadyCharacters { get; set; }
-        public static int OwnBowedCharacters { get; set; }
-        public static int OpponentReadyCharacters { get; set; }
-        public static int OpponentBowedCharacters { get; set; }
-        public static List<BaseCard> VulnerableCharacters { get; set; } = new List<BaseCard>();
-        public static List<BaseCard> HighPowerTargets { get; set; } = new List<BaseCard>();
-        public static string Summary { get; set; } = "Board analysis complete";
-        public static List<string> TacticalSuggestions { get; set; } = new List<string>();
+        // Instance properties for compilation
+        public int TotalCharactersInPlay { get; set; }
+        public int OwnReadyCharacters { get; set; }
+        public int OwnBowedCharacters { get; set; }
+        public int OpponentReadyCharacters { get; set; }
+        public int OpponentBowedCharacters { get; set; }
+        public int VulnerableCharacters { get; set; }
+        public int HighPowerTargets { get; set; }
+        public string Summary { get; set; } = "Board analysis complete";
+        public List<string> TacticalSuggestions { get; set; } = new List<string>();
         
         public BoardPositionAnalysis()
         {
@@ -89,17 +92,17 @@ namespace L5RGame
         public string PositionalAdvantage;
         public Dictionary<string, object> Analysis;
         
-        // Missing properties for compilation
-        public static bool IsBowed { get; set; }
-        public static string Action { get; set; }
-        public static int FateTokens { get; set; }
-        public static int Power { get; set; }
-        public static float StrategicValue { get; set; }
-        public static bool IsRecommended { get; set; }
-        public static string OwnerType { get; set; }
-        public static bool IsParticipatingInConflict { get; set; }
-        public static bool IsVulnerable { get; set; }
-        public static string Description { get; set; }
+        // Instance properties for compilation
+        public bool IsBowed { get; set; }
+        public string Action { get; set; }
+        public int FateTokens { get; set; }
+        public int Power { get; set; }
+        public float StrategicValue { get; set; }
+        public bool IsRecommended { get; set; }
+        public string OwnerType { get; set; }
+        public bool IsParticipatingInConflict { get; set; }
+        public bool IsVulnerable { get; set; }
+        public string Description { get; set; }
         
         public EnhancedWaterTargetData()
         {
@@ -665,7 +668,7 @@ namespace L5RGame
         /// <returns>Board analysis</returns>
         private BoardPositionAnalysis AnalyzeBoardPositionCSharp(AbilityContext context)
         {
-            var allCharacters = Game.GameState.GetAllCardsInPlay()
+            var allCharacters = Game.Instance.GetAllCardsInPlay()
                 .Where(c => c.CardType == CardTypes.Character)
                 .ToList();
 
@@ -866,7 +869,7 @@ namespace L5RGame
 
             var analyticsData = new Dictionary<string, object>
             {
-                { "ability_id", AbilityId },
+                { "ability_id", AbilityId.WaterRing },
                 { "player_id", context.Player.PlayerId },
                 { "selected_target_id", selectedTarget?.CardId },
                 { "action", action },

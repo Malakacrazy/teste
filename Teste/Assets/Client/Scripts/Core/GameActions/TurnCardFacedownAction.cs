@@ -67,7 +67,7 @@ namespace L5RGame
                     gameEvent.context.Game.AddMessage("{0} is immediately revealed again!", card);
                     card.inConflict = true;
                     
-                    var revealEvent = gameEvent.context.Game.Actions.Reveal(new List<BaseCard> { card })
+                    var revealEvent = gameEvent.context.Game.actions.Reveal(new List<BaseCard> { card })
                         .GetEvent(card, gameEvent.context.Game.GetFrameworkContext());
                     gameEvent.context.Game.OpenThenEventWindow(new List<GameEvent> { revealEvent });
                     LogExecution("Turned {0} facedown and immediately revealed again due to conflict", card.name);

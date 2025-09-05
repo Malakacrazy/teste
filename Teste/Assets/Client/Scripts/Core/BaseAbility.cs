@@ -49,9 +49,35 @@ namespace L5RGame
         }
         
         // Missing methods for compilation
-        public virtual void SetTargetConfiguration(TargetConfiguration config)
+        public virtual void SetTargetConfiguration(Dictionary<string, object> config)
         {
             // Placeholder implementation for target configuration
+        }
+        
+        public virtual void SetTargetConfiguration(TargetConfiguration config)
+        {
+            // Convert TargetConfiguration to dictionary for compatibility
+            var dict = new Dictionary<string, object>
+            {
+                ["Mode"] = config.Mode,
+                ["ActivePromptTitle"] = config.ActivePromptTitle,
+                ["Source"] = config.Source,
+                ["CardTypeFilter"] = config.CardTypeFilter,
+                ["AllowCancel"] = config.AllowCancel,
+                ["MaxTargets"] = config.MaxTargets,
+                ["MinTargets"] = config.MinTargets,
+                ["LocationFilter"] = config.LocationFilter,
+                ["ControllerFilter"] = config.ControllerFilter,
+                ["TargetingType"] = config.TargetingType
+            };
+            
+            // Add custom properties
+            foreach (var kvp in config.Properties)
+            {
+                dict[kvp.Key] = kvp.Value;
+            }
+            
+            SetTargetConfiguration(dict);
         }
         
         public virtual void CompleteExecution(AbilityContext context)
@@ -333,6 +359,30 @@ namespace L5RGame
         public virtual AbilityContext CreateContext(Player player)
         {
             return AbilityContext.CreateContext(this, player);
+        }
+        
+        /// <summary>
+        /// Try to execute this ability with the given context
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <returns>True if the ability was executed successfully</returns>
+        public virtual bool TryExecute(AbilityContext context)
+        {
+            try
+            {
+                if (!CanExecute(context))
+                {
+                    return false;
+                }
+                
+                ExecuteAbility(context);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error executing ability {GetTitle()}: {e.Message}");
+                return false;
+            }
         }
         
         public override string ToString()

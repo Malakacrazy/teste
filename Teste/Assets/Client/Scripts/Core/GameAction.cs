@@ -564,6 +564,11 @@ namespace L5RGame
         
         #endregion
         
+        #region Abstract and Virtual Methods
+        
+        
+        #endregion
+        
         #region Debug and Utility
         
         /// <summary>

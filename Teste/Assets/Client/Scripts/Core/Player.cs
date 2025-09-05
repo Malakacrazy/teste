@@ -1154,6 +1154,21 @@ namespace L5RGame
         public string PlayerId => id;
         
         /// <summary>
+        /// Discard a specific card from hand
+        /// </summary>
+        /// <param name="card">Card to discard</param>
+        public void DiscardCardFromHand(BaseCard card)
+        {
+            if (hand.Contains(card))
+            {
+                hand.Remove(card);
+                conflictDiscardPile.Add(card);
+                card.location = "conflict discard pile";
+                Debug.Log($"{Name} discards {card.Name} from hand");
+            }
+        }
+        
+        /// <summary>
         /// Disconnect the player (for testing/debug commands)
         /// </summary>
         public void Disconnect()

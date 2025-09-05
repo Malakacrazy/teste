@@ -17,10 +17,10 @@ namespace L5RGame
         public string Description;
         public bool IsValid;
         
-        // Missing properties for compilation
-        public static string Text { get; set; }
-        public static string Value { get; set; }
-        public static bool Available { get; set; }
+        // Instance properties for compilation
+        public string Text { get; set; }
+        public string Value { get; set; }
+        public bool Available { get; set; }
         
         public ChoiceData() { }
         

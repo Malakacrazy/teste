@@ -127,6 +127,14 @@ namespace L5RGame
         }
         
         /// <summary>
+        /// Default parameterless constructor
+        /// </summary>
+        public AbilityContext()
+        {
+            Awake();
+        }
+        
+        /// <summary>
         /// Constructor that accepts AbilityContextProperties
         /// </summary>
         public AbilityContext(AbilityContextProperties properties)

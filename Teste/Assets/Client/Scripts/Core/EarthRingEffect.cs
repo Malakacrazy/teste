@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using L5RGame.Events;
 
 namespace L5RGame
 {
     /// <summary>
-    /// C# implementation of Earth Ring Effect ability
+    /// Event-driven implementation of Earth Ring Effect ability
     /// Provides card draw and discard mechanics when Earth Ring is resolved
     /// </summary>
     [Serializable]
@@ -165,36 +166,48 @@ namespace L5RGame
         private void ExecuteDrawAndDiscard(AbilityContext context)
         {
             var opponent = context.Player.Opponent;
+            var eventBus = context.Game.GetEventBus();
             
             if (opponent != null && opponent.Hand.Count > 0)
             {
-                // Both effects: draw and discard
-                Game.AddMessage($"{context.Player.Name} resolves the earth ring, drawing a card and forcing {opponent.Name} to discard a card at random");
-                
                 // Execute draw action for player
-                var drawAction = Game.Actions.CreateDrawCardsAction(cardsToDrawPlayer);
+                var drawAction = GameActions.CreateDrawCardsAction(context.Player, cardsToDrawPlayer);
                 drawAction.Resolve(context.Player, context);
                 
                 // Execute discard action for opponent
                 var discardAction = discardAtRandom 
-                    ? Game.Actions.CreateDiscardRandomAction(cardsToDiscardOpponent)
-                    : Game.Actions.CreateDiscardAction(cardsToDiscardOpponent);
+                    ? GameActions.CreateDiscardRandomAction(opponent, cardsToDiscardOpponent)
+                    : GameActions.CreateDiscardAction(opponent, null);
                     
                 discardAction.Resolve(opponent, context);
                 
-                // Log analytics
-                LogDrawAndDiscardAnalytics(context, true);
+                // Publish earth ring draw and discard event
+                eventBus.Publish(new EarthRingDrawDiscardEvent(
+                    context.Game,
+                    context.Player,
+                    cardsToDrawPlayer,
+                    cardsToDiscardOpponent,
+                    true, // opponent discarded
+                    discardAtRandom,
+                    this
+                ));
             }
             else
             {
                 // Only draw effect (no opponent or opponent has no cards)
-                Game.AddMessage($"{context.Player.Name} resolves the earth ring, drawing a card");
-                
-                var drawAction = Game.Actions.CreateDrawCardsAction(cardsToDrawPlayer);
+                var drawAction = GameActions.CreateDrawCardsAction(context.Player, cardsToDrawPlayer);
                 drawAction.Resolve(context.Player, context);
                 
-                // Log analytics
-                LogDrawAndDiscardAnalytics(context, false);
+                // Publish earth ring draw only event
+                eventBus.Publish(new EarthRingDrawDiscardEvent(
+                    context.Game,
+                    context.Player,
+                    cardsToDrawPlayer,
+                    0, // no cards discarded
+                    false, // opponent didn't discard
+                    discardAtRandom,
+                    this
+                ));
             }
         }
         
@@ -204,40 +217,15 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void ExecuteDontResolve(AbilityContext context)
         {
-            Game.AddMessage($"{context.Player.Name} chooses not to resolve the earth ring");
+            var eventBus = context.Game.GetEventBus();
             
-            // Log analytics event
-            Game.Analytics.LogEvent("earth_ring_not_resolved", new Dictionary<string, object>
-            {
-                { "player_id", context.Player.PlayerId },
-                { "ring_element", "earth" }
-            });
-        }
-        
-        /// <summary>
-        /// Log analytics for draw and discard actions
-        /// </summary>
-        /// <param name="context">Ability execution context</param>
-        /// <param name="opponentDiscarded">Whether opponent discarded a card</param>
-        private void LogDrawAndDiscardAnalytics(AbilityContext context, bool opponentDiscarded)
-        {
-            var analyticsData = new Dictionary<string, object>
-            {
-                { "player_id", context.Player.PlayerId },
-                { "cards_drawn", cardsToDrawPlayer },
-                { "hand_size_after", context.Player.Hand.Count },
-                { "opponent_discarded", opponentDiscarded }
-            };
-            
-            if (opponentDiscarded && context.Player.Opponent != null)
-            {
-                analyticsData.Add("opponent_id", context.Player.Opponent.PlayerId);
-                analyticsData.Add("opponent_hand_size_after", context.Player.Opponent.Hand.Count);
-                analyticsData.Add("cards_discarded", cardsToDiscardOpponent);
-                analyticsData.Add("discard_at_random", discardAtRandom);
-            }
-            
-            Game.Analytics.LogEvent("earth_ring_draw_discard", analyticsData);
+            // Publish earth ring not resolved event
+            eventBus.Publish(new EarthRingNotResolvedEvent(
+                context.Game,
+                context.Player,
+                "player_choice",
+                this
+            ));
         }
         
         #endregion

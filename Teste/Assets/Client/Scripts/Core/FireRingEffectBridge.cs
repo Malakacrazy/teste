@@ -18,10 +18,10 @@ namespace L5RGame
         public string Reasoning;
         public Dictionary<string, object> Parameters;
         
-        // Missing properties for compilation
-        public string Action => RecommendedAction;
+        // Properties for compilation - made settable
+        public string Action { get; set; }
         public BaseCard Target { get; set; }
-        public float StrategicValue => Confidence * 100f;
+        public float StrategicValue { get; set; }
         
         public AIRecommendation()
         {
@@ -33,6 +33,8 @@ namespace L5RGame
             RecommendedAction = action;
             Confidence = confidence;
             Reasoning = reasoning;
+            Action = action;
+            StrategicValue = confidence * 100f;
             Parameters = new Dictionary<string, object>();
         }
         
@@ -52,11 +54,11 @@ namespace L5RGame
         public float Priority;
         public Dictionary<string, object> Metadata;
         
-        // Missing properties for compilation
-        public static List<string> AvailableActions { get; set; } = new List<string>();
-        public static float StrategicValue { get; set; }
-        public static bool IsRecommended { get; set; }
-        public static string RecommendedAction { get; set; }
+        // Instance properties for compilation
+        public List<string> AvailableActions { get; set; } = new List<string>();
+        public float StrategicValue { get; set; }
+        public bool IsRecommended { get; set; }
+        public string RecommendedAction { get; set; }
         
         public EnhancedTargetData()
         {
@@ -583,7 +585,7 @@ namespace L5RGame
 
             var analyticsData = new Dictionary<string, object>
             {
-                { "ability_id", AbilityId },
+                { "ability_id", AbilityId.FireRing },
                 { "player_id", context.Player.PlayerId },
                 { "selected_target_id", selectedTarget?.CardId },
                 { "selected_action", selectedAction },

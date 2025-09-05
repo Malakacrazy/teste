@@ -767,7 +767,7 @@ namespace L5RGame
             
             var analyticsData = new Dictionary<string, object>
             {
-                { "ability_id", AbilityId },
+                { "ability_id", AbilityId.VoidRing },
                 { "player_id", context.Player.PlayerId },
                 { "selected_target_id", selectedTarget?.CardId },
                 { "was_ai_recommended", wasRecommended },

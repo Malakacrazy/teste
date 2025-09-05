@@ -544,16 +544,6 @@ namespace L5RGame
         public const string VoidRing = "void_ring";
     }
 
-    public static class CardLocation
-    {
-        public const string Hand = Locations.Hand;
-        public const string PlayArea = Locations.PlayArea;
-        public const string ConflictDeck = Locations.ConflictDeck;
-        public const string DynastyDeck = Locations.DynastyDeck;
-        public const string ConflictDiscardPile = Locations.ConflictDiscardPile;
-        public const string DynastyDiscardPile = Locations.DynastyDiscardPile;
-        public const string RemovedFromGame = Locations.RemovedFromGame;
-    }
 
     public static class AbilityTrigger
     {
@@ -565,11 +555,34 @@ namespace L5RGame
         public const string OnDishonored = "onDishonored";
         public const string AfterConflict = "afterConflict";
         public const string DuringConflict = "duringConflict";
+        public const string CharacterBowed = "characterBowed";
+        public const string CharacterReadied = "characterReadied";
+        public const string CharacterEntersPlay = "characterEntersPlay";
+        public const string CharacterLeavesPlay = "characterLeavesPlay";
+        public const string CardPlayed = "cardPlayed";
+        public const string PhaseStarted = "phaseStarted";
+        public const string PhaseEnded = "phaseEnded";
+        public const string FateRemoved = "fateRemoved";
+        public const string FateGained = "fateGained";
     }
 
-    public static class TargetConfiguration
+    /// <summary>
+    /// Configuration for targeting system
+    /// </summary>
+    public class TargetConfiguration
     {
-        public static string CardTypeFilter { get; set; } = "";
+        public string Mode { get; set; } = "";
+        public string ActivePromptTitle { get; set; } = "";
+        public string Source { get; set; } = "";
+        public string CardTypeFilter { get; set; } = "";
+        public bool AllowCancel { get; set; } = false;
+        public int MaxTargets { get; set; } = 1;
+        public int MinTargets { get; set; } = 0;
+        public List<string> LocationFilter { get; set; } = new List<string>();
+        public List<string> ControllerFilter { get; set; } = new List<string>();
+        public string TargetingType { get; set; } = "";
+        public Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, Func<AbilityContext, bool>> Choices { get; set; } = new Dictionary<string, Func<AbilityContext, bool>>();
     }
     
     /// <summary>

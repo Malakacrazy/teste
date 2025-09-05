@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using L5RGame.Events;
+using L5RGame.EventSystem;
 
 namespace L5RGame
 {
     /// <summary>
-    /// C# implementation of Water Ring Effect ability
-    /// Allows bowing characters with no fate or readying bowed characters
+    /// Event-driven implementation of Water Ring Effect ability.
+    /// Allows bowing readied characters or readying bowed characters when Water Ring is resolved.
+    /// Uses the event system instead of direct coupling to analytics, UI, and messages.
     /// </summary>
     [Serializable]
     public class WaterRingEffect : BaseAbility
@@ -26,8 +29,16 @@ namespace L5RGame
         public override bool CannotTargetFirst => true;
         public override int DefaultPriority => 3;
         
+        // Choice constants
+        private const string CHOICE_BOW = "bow";
+        private const string CHOICE_READY = "ready";
+        private const string CHOICE_BACK = "back";
+        private const string CHOICE_DONT_RESOLVE = "dont_resolve";
+        
         // Current execution state
+        private BaseCard selectedTarget;
         private List<BaseCard> validTargets;
+        private IEventBus eventBus;
         
         #endregion
         
@@ -50,6 +61,10 @@ namespace L5RGame
         public override void Initialize(BaseCard sourceCard, Game gameInstance)
         {
             base.Initialize(sourceCard, gameInstance);
+            
+            // Get the event bus from the game instance
+            eventBus = gameInstance.GetEventBus();
+            
             ConfigureTargeting();
         }
         
@@ -94,7 +109,7 @@ namespace L5RGame
             var targetConfig = new TargetConfiguration
             {
                 Mode = TargetModes.Select,
-                ActivePromptTitle = "Choose character to bow or unbow",
+                ActivePromptTitle = "Choose character to bow or ready",
                 Source = "Water Ring",
                 CardTypeFilter = CardTypes.Character,
                 AllowCancel = isOptional
@@ -104,7 +119,7 @@ namespace L5RGame
         }
         
         /// <summary>
-        /// Get valid character targets for bow/unbow actions
+        /// Get valid character targets for bow/ready actions
         /// </summary>
         /// <param name="context">Ability execution context</param>
         /// <returns>List of valid character targets</returns>
@@ -112,10 +127,9 @@ namespace L5RGame
         {
             var targets = new List<BaseCard>();
             
-            // Get all characters in play area
-            var allCharacters = Game.GameState.GetAllCardsInPlay()
-                .Where(card => card.CardType == CardTypes.Character && 
-                              card.Location == CardLocation.PlayArea)
+            // Get all characters in play
+            var allCharacters = context.Game.GetAllCardsInPlay()
+                .Where(card => card.CardType == CardTypes.Character)
                 .ToList();
             
             foreach (var character in allCharacters)
@@ -127,44 +141,27 @@ namespace L5RGame
                 if (character.Owner != context.Player && !allowTargetingOpponentCharacters)
                     continue;
                 
-                // Check if character is a valid target
-                if (IsValidWaterRingTarget(character, context))
+                bool canTarget = false;
+                
+                // Check if character can be bowed (readied characters)
+                if (allowBowingReadiedCharacters && !character.isBowed && character.CanBeBowed(context))
+                {
+                    canTarget = true;
+                }
+                
+                // Check if character can be readied (bowed characters)
+                if (allowReadyingBowedCharacters && character.isBowed && character.CanBeReadied(context))
+                {
+                    canTarget = true;
+                }
+                
+                if (canTarget)
                 {
                     targets.Add(character);
                 }
             }
             
             return targets;
-        }
-        
-        /// <summary>
-        /// Check if a character is a valid target for Water Ring Effect
-        /// </summary>
-        /// <param name="character">Character to check</param>
-        /// <param name="context">Ability context</param>
-        /// <returns>True if character is a valid target</returns>
-        private bool IsValidWaterRingTarget(BaseCard character, AbilityContext context)
-        {
-            // Character must be in play area
-            if (character.Location != CardLocation.PlayArea)
-                return false;
-            
-            // Check for bowed characters that can be readied
-            if (character.IsBowed && allowReadyingBowedCharacters)
-            {
-                return character.AllowGameAction("ready", context);
-            }
-            
-            // Check for readied characters with no fate that can be bowed
-            if (!character.IsBowed && allowBowingReadiedCharacters)
-            {
-                if (character.FateTokens == 0 && character.AllowGameAction("bow", context))
-                {
-                    return true;
-                }
-            }
-            
-            return false;
         }
         
         /// <summary>
@@ -186,7 +183,7 @@ namespace L5RGame
             var targetUI = Game.UI.GetTargetSelectionWindow();
             targetUI.ShowTargetSelection(
                 title: "Water Ring Effect",
-                description: "Choose character to bow or unbow:",
+                description: "Choose character to bow or ready:",
                 targets: targetData.ToArray(),
                 onTargetSelected: (selectedTarget) => HandleTargetSelection(context, selectedTarget),
                 allowCancel: isOptional,
@@ -202,12 +199,20 @@ namespace L5RGame
         /// <returns>Description string</returns>
         private string GetTargetDescription(BaseCard target, AbilityContext context)
         {
-            var ownerText = target.Owner == context.Player ? "Your" : "Opponent's";
-            var actionText = target.IsBowed ? "Ready" : "Bow";
-            var statusText = target.IsBowed ? "bowed" : "readied";
-            var fateText = target.FateTokens == 0 ? " (no fate)" : $" ({target.FateTokens} fate)";
+            var actions = new List<string>();
             
-            return $"{ownerText} {statusText} character{fateText} - Will {actionText}";
+            if (allowBowingReadiedCharacters && !target.isBowed && target.CanBeBowed(context))
+            {
+                actions.Add("Bow");
+            }
+            
+            if (allowReadyingBowedCharacters && target.isBowed && target.CanBeReadied(context))
+            {
+                actions.Add("Ready");
+            }
+            
+            string statusText = target.isBowed ? "Bowed" : "Ready";
+            return $"{statusText} - Available actions: {string.Join(", ", actions)}";
         }
         
         /// <summary>
@@ -217,16 +222,10 @@ namespace L5RGame
         /// <param name="target">Selected target</param>
         private void HandleTargetSelection(AbilityContext context, BaseCard target)
         {
-            if (target.IsBowed)
-            {
-                ExecuteReadyAction(context, target);
-            }
-            else
-            {
-                ExecuteBowAction(context, target);
-            }
+            selectedTarget = target;
             
-            CompleteExecution(context);
+            // Show action selection for the selected target
+            ShowActionSelection(context);
         }
         
         /// <summary>
@@ -235,8 +234,7 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void HandleCancelTargetSelection(AbilityContext context)
         {
-            Game.AddMessage($"{context.Player.Name} chooses not to resolve the water ring");
-            LogAnalyticsEvent(context, "not_resolved", null, null);
+            PublishRingResolvedEvent(context, "not_resolved", null);
             CompleteExecution(context);
         }
         
@@ -246,145 +244,262 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void HandleNoValidTargets(AbilityContext context)
         {
-            if (isOptional)
-            {
-                Game.AddMessage($"{context.Player.Name} chooses not to resolve the water ring (no valid targets)");
-                LogAnalyticsEvent(context, "no_targets", null, null);
-            }
-            else
-            {
-                Game.AddMessage($"{context.Player.Name} cannot resolve the water ring (no valid targets)");
-                LogAnalyticsEvent(context, "forced_no_targets", null, null);
-            }
-            
+            string effectChosen = isOptional ? "no_targets" : "forced_no_targets";
+            PublishRingResolvedEvent(context, effectChosen, null);
             CompleteExecution(context);
         }
         
         /// <summary>
-        /// Execute ready action on bowed character
+        /// Show action selection for the chosen target
         /// </summary>
         /// <param name="context">Ability execution context</param>
-        /// <param name="target">Target character</param>
-        private void ExecuteReadyAction(AbilityContext context, BaseCard target)
+        private void ShowActionSelection(AbilityContext context)
         {
-            Game.AddMessage($"{context.Player.Name} resolves the water ring, readying {target.Name}");
+            var choices = new List<ActionChoice>();
             
-            // Create and execute ready action
-            var readyAction = Game.Actions.CreateReadyAction();
-            readyAction.Resolve(target, context);
+            // Add bow option if available
+            if (allowBowingReadiedCharacters && !selectedTarget.isBowed && selectedTarget.CanBeBowed(context))
+            {
+                choices.Add(new ActionChoice
+                {
+                    Text = $"Bow {selectedTarget.Name}",
+                    Value = CHOICE_BOW,
+                    Description = "Make this character bowed",
+                    IsAvailable = true
+                });
+            }
             
-            // Log analytics
-            LogAnalyticsEvent(context, "ready", target, "readied");
+            // Add ready option if available
+            if (allowReadyingBowedCharacters && selectedTarget.isBowed && selectedTarget.CanBeReadied(context))
+            {
+                choices.Add(new ActionChoice
+                {
+                    Text = $"Ready {selectedTarget.Name}",
+                    Value = CHOICE_READY,
+                    Description = "Make this character ready",
+                    IsAvailable = true
+                });
+            }
             
-            // Trigger additional effects
-            TriggerReadyEffects(context, target);
+            // Add back option
+            choices.Add(new ActionChoice
+            {
+                Text = "Back",
+                Value = CHOICE_BACK,
+                Description = "Choose a different character",
+                IsAvailable = true
+            });
+            
+            // Add don't resolve option if optional
+            if (isOptional)
+            {
+                choices.Add(new ActionChoice
+                {
+                    Text = "Don't resolve the water ring",
+                    Value = CHOICE_DONT_RESOLVE,
+                    Description = "Cancel ring effect resolution",
+                    IsAvailable = true
+                });
+            }
+            
+            // Show choice UI
+            var choiceUI = Game.UI.GetChoiceWindow();
+            choiceUI.ShowChoices(
+                title: "Water Ring Effect",
+                description: $"Choose action for {selectedTarget.Name}:",
+                choices: choices.Select(c => c.Text).ToArray(),
+                onChoiceSelected: (selectedChoice) => HandleActionSelection(context, choices, selectedChoice),
+                allowCancel: false
+            );
         }
         
         /// <summary>
-        /// Execute bow action on readied character
+        /// Handle action selection
         /// </summary>
         /// <param name="context">Ability execution context</param>
-        /// <param name="target">Target character</param>
-        private void ExecuteBowAction(AbilityContext context, BaseCard target)
+        /// <param name="choices">Available choices</param>
+        /// <param name="selectedChoiceText">Selected choice text</param>
+        private void HandleActionSelection(AbilityContext context, List<ActionChoice> choices, string selectedChoiceText)
         {
-            Game.AddMessage($"{context.Player.Name} resolves the water ring, bowing {target.Name}");
+            var selectedChoice = choices.FirstOrDefault(c => c.Text == selectedChoiceText);
+            if (selectedChoice == null)
+            {
+                Debug.LogWarning($"Unknown choice selected: {selectedChoiceText}");
+                return;
+            }
+            
+            switch (selectedChoice.Value)
+            {
+                case CHOICE_BOW:
+                    ExecuteBowAction(context);
+                    break;
+                    
+                case CHOICE_READY:
+                    ExecuteReadyAction(context);
+                    break;
+                    
+                case CHOICE_BACK:
+                    // Go back to target selection
+                    ShowTargetSelection(context);
+                    return;
+                    
+                case CHOICE_DONT_RESOLVE:
+                    ExecuteDontResolve(context);
+                    break;
+                    
+                default:
+                    Debug.LogWarning($"Unhandled choice value: {selectedChoice.Value}");
+                    break;
+            }
+            
+            // Complete execution for non-back choices
+            CompleteExecution(context);
+        }
+        
+        /// <summary>
+        /// Execute bow action on selected target
+        /// </summary>
+        /// <param name="context">Ability execution context</param>
+        private void ExecuteBowAction(AbilityContext context)
+        {
+            // Store previous bow state
+            bool wasAlreadyBowed = selectedTarget.isBowed;
             
             // Create and execute bow action
-            var bowAction = Game.Actions.CreateBowAction();
-            bowAction.Resolve(target, context);
+            var bowAction = GameActions.CreateBowAction(selectedTarget);
+            bowAction.Resolve(selectedTarget, context);
             
-            // Log analytics
-            LogAnalyticsEvent(context, "bow", target, "bowed");
+            // Publish character bowed event instead of direct analytics/messages
+            PublishCharacterBowedEvent(context, selectedTarget, wasAlreadyBowed, "water ring effect");
             
-            // Trigger additional effects
-            TriggerBowEffects(context, target);
+            // Publish ring resolved event
+            PublishRingResolvedEvent(context, "bow", selectedTarget);
         }
         
         /// <summary>
-        /// Trigger additional effects when character is readied
-        /// </summary>
-        /// <param name="context">Ability context</param>
-        /// <param name="target">Target character</param>
-        private void TriggerReadyEffects(AbilityContext context, BaseCard target)
-        {
-            // Check for ready-based triggers
-            if (target.HasAbilities)
-            {
-                var readyTriggers = target.GetAbilitiesWithTrigger(AbilityTrigger.CharacterReadied);
-                foreach (var trigger in readyTriggers)
-                {
-                    trigger.TryExecute(context);
-                }
-            }
-            
-            // Trigger game-wide ready events
-            Game.TriggerEvent("character_readied", new CharacterStatusEventArgs
-            {
-                Character = target,
-                Player = context.Player,
-                Source = this,
-                PreviousStatus = CharacterStatus.Bowed,
-                NewStatus = CharacterStatus.Ready
-            });
-        }
-        
-        /// <summary>
-        /// Trigger additional effects when character is bowed
-        /// </summary>
-        /// <param name="context">Ability context</param>
-        /// <param name="target">Target character</param>
-        private void TriggerBowEffects(AbilityContext context, BaseCard target)
-        {
-            // Check for bow-based triggers
-            if (target.HasAbilities)
-            {
-                var bowTriggers = target.GetAbilitiesWithTrigger(AbilityTrigger.CharacterBowed);
-                foreach (var trigger in bowTriggers)
-                {
-                    trigger.TryExecute(context);
-                }
-            }
-            
-            // Trigger game-wide bow events
-            Game.TriggerEvent("character_bowed", new CharacterStatusEventArgs
-            {
-                Character = target,
-                Player = context.Player,
-                Source = this,
-                PreviousStatus = CharacterStatus.Ready,
-                NewStatus = CharacterStatus.Bowed
-            });
-        }
-        
-        /// <summary>
-        /// Log analytics event
+        /// Execute ready action on selected target
         /// </summary>
         /// <param name="context">Ability execution context</param>
-        /// <param name="action">Action taken</param>
-        /// <param name="target">Target character (if any)</param>
-        /// <param name="result">Result of action</param>
-        private void LogAnalyticsEvent(AbilityContext context, string action, BaseCard target, string result)
+        private void ExecuteReadyAction(AbilityContext context)
         {
-            var analyticsData = new Dictionary<string, object>
-            {
-                { "player_id", context.Player.PlayerId },
-                { "action", action },
-                { "ring_element", "water" },
-                { "valid_targets_count", validTargets?.Count ?? 0 }
-            };
+            // Store previous ready state
+            bool wasAlreadyReady = !selectedTarget.isBowed;
             
-            if (target != null)
+            // Create and execute ready action
+            var readyAction = GameActions.CreateReadyAction(selectedTarget);
+            readyAction.Resolve(selectedTarget, context);
+            
+            // Publish character readied event instead of direct analytics/messages
+            PublishCharacterReadiedEvent(context, selectedTarget, wasAlreadyReady, "water ring effect");
+            
+            // Publish ring resolved event
+            PublishRingResolvedEvent(context, "ready", selectedTarget);
+        }
+        
+        /// <summary>
+        /// Execute don't resolve action
+        /// </summary>
+        /// <param name="context">Ability execution context</param>
+        private void ExecuteDontResolve(AbilityContext context)
+        {
+            // Publish ring resolved event for not resolving
+            PublishRingResolvedEvent(context, "not_resolved", selectedTarget);
+        }
+        
+        #endregion
+        
+        #region Event Publishing Methods
+        
+        /// <summary>
+        /// Publish a character bowed event
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="character">Character that was bowed</param>
+        /// <param name="wasAlreadyBowed">Was already bowed before this effect</param>
+        /// <param name="reason">Reason for bowing</param>
+        private void PublishCharacterBowedEvent(AbilityContext context, BaseCard character, bool wasAlreadyBowed, string reason)
+        {
+            try
             {
-                analyticsData.Add("target_id", target.CardId);
-                analyticsData.Add("target_name", target.Name);
-                analyticsData.Add("target_owner", target.Owner.PlayerId);
-                analyticsData.Add("target_power", target.Power);
-                analyticsData.Add("target_fate", target.FateTokens);
-                analyticsData.Add("previous_status", target.IsBowed ? "ready" : "bowed");
-                analyticsData.Add("new_status", result);
+                if (eventBus == null) return;
+                
+                var bowedEvent = new CharacterBowedEvent(
+                    game: context.Game,
+                    triggeredBy: context.Player,
+                    character: character,
+                    wasAlreadyBowed: wasAlreadyBowed,
+                    reason: reason,
+                    source: this
+                );
+                
+                eventBus.Publish(bowedEvent);
             }
-            
-            Game.Analytics.LogEvent("water_ring_effect", analyticsData);
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to publish CharacterBowedEvent: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// Publish a character readied event
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="character">Character that was readied</param>
+        /// <param name="wasAlreadyReady">Was already ready before this effect</param>
+        /// <param name="reason">Reason for readying</param>
+        private void PublishCharacterReadiedEvent(AbilityContext context, BaseCard character, bool wasAlreadyReady, string reason)
+        {
+            try
+            {
+                if (eventBus == null) return;
+                
+                var readiedEvent = new CharacterReadiedEvent(
+                    game: context.Game,
+                    triggeredBy: context.Player,
+                    character: character,
+                    wasAlreadyReady: wasAlreadyReady,
+                    reason: reason,
+                    source: this
+                );
+                
+                eventBus.Publish(readiedEvent);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to publish CharacterReadiedEvent: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// Publish a ring resolved event
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="effectChosen">Effect that was chosen</param>
+        /// <param name="target">Target of the effect (if any)</param>
+        private void PublishRingResolvedEvent(AbilityContext context, string effectChosen, BaseCard target)
+        {
+            try
+            {
+                if (eventBus == null) return;
+                
+                // Get the water ring from the game
+                var waterRing = context.Game.rings.TryGetValue("water", out Ring ring) ? ring : null;
+                
+                var ringResolvedEvent = new RingResolvedEvent(
+                    game: context.Game,
+                    triggeredBy: context.Player,
+                    ring: waterRing,
+                    effectChosen: effectChosen,
+                    effectTarget: target,
+                    source: this
+                );
+                
+                eventBus.Publish(ringResolvedEvent);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to publish RingResolvedEvent: {ex.Message}");
+            }
         }
         
         #endregion
@@ -392,9 +507,9 @@ namespace L5RGame
         #region Advanced Configuration
         
         /// <summary>
-        /// Configure allowed actions
+        /// Configure which actions are allowed
         /// </summary>
-        /// <param name="allowBowing">Allow bowing readied characters</param>
+        /// <param name="allowBowing">Allow bowing ready characters</param>
         /// <param name="allowReadying">Allow readying bowed characters</param>
         public void ConfigureAllowedActions(bool allowBowing, bool allowReadying)
         {
@@ -404,7 +519,7 @@ namespace L5RGame
             if (!allowBowing && !allowReadying)
             {
                 Debug.LogWarning("Water Ring Effect: At least one action (bow or ready) should be allowed");
-                allowReadyingBowedCharacters = true; // Default fallback
+                allowBowingReadiedCharacters = true; // Default fallback
             }
         }
         
@@ -426,6 +541,29 @@ namespace L5RGame
         }
         
         /// <summary>
+        /// Get available actions for a specific target
+        /// </summary>
+        /// <param name="target">Target character</param>
+        /// <param name="context">Ability context</param>
+        /// <returns>List of available action names</returns>
+        public List<string> GetAvailableActionsForTarget(BaseCard target, AbilityContext context)
+        {
+            var actions = new List<string>();
+            
+            if (allowBowingReadiedCharacters && !target.isBowed && target.CanBeBowed(context))
+            {
+                actions.Add("Bow");
+            }
+            
+            if (allowReadyingBowedCharacters && target.isBowed && target.CanBeReadied(context))
+            {
+                actions.Add("Ready");
+            }
+            
+            return actions;
+        }
+        
+        /// <summary>
         /// Get strategic value of targeting a specific character
         /// </summary>
         /// <param name="target">Target character</param>
@@ -435,65 +573,36 @@ namespace L5RGame
         {
             float value = 0f;
             
-            // Base value for any status change
+            // Base value for any action
             value += 2f;
             
-            if (target.IsBowed)
+            // Higher value for powerful characters
+            if (target.Power >= 4)
             {
-                // Readying characters
-                if (target.Owner == context.Player)
+                value += 2f;
+            }
+            
+            // Bowing opponent characters is generally valuable
+            if (target.Owner != context.Player && !target.isBowed)
+            {
+                value += 3f;
+                
+                // Extra value if participating in conflicts
+                if (target.IsParticipatingInConflict)
                 {
-                    // High value for readying own characters
-                    value += 4f;
-                    
-                    // Extra value for powerful characters
-                    if (target.Power >= 4)
-                    {
-                        value += 2f;
-                    }
-                    
-                    // Extra value if character has useful abilities
-                    if (target.HasActionAbilities)
-                    {
-                        value += 1f;
-                    }
-                }
-                else
-                {
-                    // Lower value for readying opponent's characters
-                    value -= 1f;
+                    value += 2f;
                 }
             }
-            else
+            
+            // Readying own characters is valuable
+            if (target.Owner == context.Player && target.isBowed)
             {
-                // Bowing characters (only possible if they have no fate)
-                if (target.Owner != context.Player)
+                value += 2f;
+                
+                // Extra value for powerful ready characters
+                if (target.Power >= 3)
                 {
-                    // High value for bowing opponent's characters
-                    value += 4f;
-                    
-                    // Extra value for powerful characters
-                    if (target.Power >= 4)
-                    {
-                        value += 2f;
-                    }
-                    
-                    // Extra value if character is participating in conflicts
-                    if (target.IsParticipatingInConflict)
-                    {
-                        value += 2f;
-                    }
-                }
-                else
-                {
-                    // Lower value for bowing own characters
-                    value -= 2f;
-                    
-                    // Unless it's strategic (e.g., triggering bow abilities)
-                    if (target.HasBowTriggeredAbilities)
-                    {
-                        value += 3f;
-                    }
+                    value += 1f;
                 }
             }
             
@@ -501,76 +610,25 @@ namespace L5RGame
         }
         
         /// <summary>
-        /// Get the best target recommendation
-        /// </summary>
-        /// <param name="context">Ability context</param>
-        /// <returns>Recommended target or null</returns>
-        public BaseCard GetBestTargetRecommendation(AbilityContext context)
-        {
-            var targets = GetValidCharacterTargets(context);
-            if (targets.Count == 0)
-                return null;
-            
-            BaseCard bestTarget = null;
-            float bestValue = -1f;
-            
-            foreach (var target in targets)
-            {
-                float value = GetTargetStrategicValue(target, context);
-                if (value > bestValue)
-                {
-                    bestValue = value;
-                    bestTarget = target;
-                }
-            }
-            
-            return bestTarget;
-        }
-        
-        /// <summary>
-        /// Get characters that can be readied
-        /// </summary>
-        /// <param name="context">Ability context</param>
-        /// <returns>List of characters that can be readied</returns>
-        public List<BaseCard> GetCharactersThatCanBeReadied(AbilityContext context)
-        {
-            return GetValidCharacterTargets(context)
-                .Where(c => c.IsBowed && allowReadyingBowedCharacters)
-                .ToList();
-        }
-        
-        /// <summary>
-        /// Get characters that can be bowed
-        /// </summary>
-        /// <param name="context">Ability context</param>
-        /// <returns>List of characters that can be bowed</returns>
-        public List<BaseCard> GetCharactersThatCanBeBowed(AbilityContext context)
-        {
-            return GetValidCharacterTargets(context)
-                .Where(c => !c.IsBowed && c.FateTokens == 0 && allowBowingReadiedCharacters)
-                .ToList();
-        }
-        
-        /// <summary>
         /// Get effect impact summary
         /// </summary>
         /// <param name="context">Ability context</param>
         /// <returns>Impact summary</returns>
-        public WaterRingImpactSummary GetEffectImpact(AbilityContext context)
+        public WaterRingEffectImpactSummary GetEffectImpact(AbilityContext context)
         {
             var validTargets = GetValidCharacterTargets(context);
-            var canReady = GetCharactersThatCanBeReadied(context);
-            var canBow = GetCharactersThatCanBeBowed(context);
-            var bestTarget = GetBestTargetRecommendation(context);
+            var bowTargets = validTargets.Where(t => !t.isBowed && t.CanBeBowed(context)).ToList();
+            var readyTargets = validTargets.Where(t => t.isBowed && t.CanBeReadied(context)).ToList();
+            var ownTargets = validTargets.Where(t => t.Owner == context.Player).ToList();
+            var opponentTargets = validTargets.Where(t => t.Owner != context.Player).ToList();
             
-            return new WaterRingImpactSummary
+            return new WaterRingEffectImpactSummary
             {
                 ValidTargetsCount = validTargets.Count,
-                CharactersThatCanBeReadied = canReady.Count,
-                CharactersThatCanBeBowed = canBow.Count,
-                BestTarget = bestTarget,
-                BestTargetValue = bestTarget != null ? GetTargetStrategicValue(bestTarget, context) : 0f,
-                RecommendedAction = bestTarget?.IsBowed == true ? "Ready" : "Bow"
+                BowableTargetsCount = bowTargets.Count,
+                ReadyableTargetsCount = readyTargets.Count,
+                OwnTargetsCount = ownTargets.Count,
+                OpponentTargetsCount = opponentTargets.Count
             };
         }
         
@@ -586,7 +644,7 @@ namespace L5RGame
         {
             if (!allowBowingReadiedCharacters && !allowReadyingBowedCharacters)
             {
-                allowReadyingBowedCharacters = true;
+                allowBowingReadiedCharacters = true;
                 Debug.LogWarning("Water Ring Effect: At least one action must be allowed");
             }
             
@@ -603,13 +661,14 @@ namespace L5RGame
         [ContextMenu("Show Effect Preview")]
         private void ShowEffectPreview()
         {
-            var preview = $"Water Ring Effect Preview:\n";
-            preview += $"• Allow Bowing: {allowBowingReadiedCharacters}\n";
-            preview += $"• Allow Readying: {allowReadyingBowedCharacters}\n";
+            var preview = $"Water Ring Effect Preview (Event-Driven):\n";
+            preview += $"• Allow Bowing Ready Characters: {allowBowingReadiedCharacters}\n";
+            preview += $"• Allow Readying Bowed Characters: {allowReadyingBowedCharacters}\n";
             preview += $"• Allow Own Characters: {allowTargetingOwnCharacters}\n";
             preview += $"• Allow Opponent Characters: {allowTargetingOpponentCharacters}\n";
             preview += $"• Optional: {isOptional}\n";
-            preview += $"• Require Valid Target: {requireValidTarget}";
+            preview += $"• Require Valid Target: {requireValidTarget}\n";
+            preview += $"• Uses Event System: YES (decoupled from direct analytics/UI/message calls)";
             
             Debug.Log(preview);
         }
@@ -619,54 +678,29 @@ namespace L5RGame
     }
     
     /// <summary>
-    /// Character status enumeration
-    /// </summary>
-    public enum CharacterStatus
-    {
-        Ready,
-        Bowed
-    }
-    
-    /// <summary>
-    /// Event arguments for character status changes
-    /// </summary>
-    public class CharacterStatusEventArgs : EventArgs
-    {
-        public BaseCard Character;
-        public Player Player;
-        public BaseAbility Source;
-        public CharacterStatus PreviousStatus;
-        public CharacterStatus NewStatus;
-    }
-    
-    /// <summary>
-    /// Summary of Water Ring effect impact
+    /// Summary of water ring effect impact
     /// </summary>
     [Serializable]
-    public class WaterRingImpactSummary
+    public class WaterRingEffectImpactSummary
     {
         public int ValidTargetsCount;
-        public int CharactersThatCanBeReadied;
-        public int CharactersThatCanBeBowed;
-        public BaseCard BestTarget;
-        public float BestTargetValue;
-        public string RecommendedAction;
+        public int BowableTargetsCount;
+        public int ReadyableTargetsCount;
+        public int OwnTargetsCount;
+        public int OpponentTargetsCount;
         
         public override string ToString()
         {
             var summary = $"Water Ring Impact: {ValidTargetsCount} valid targets";
-            if (CharactersThatCanBeReadied > 0)
+            if (BowableTargetsCount > 0)
             {
-                summary += $", {CharactersThatCanBeReadied} can be readied";
+                summary += $", {BowableTargetsCount} can be bowed";
             }
-            if (CharactersThatCanBeBowed > 0)
+            if (ReadyableTargetsCount > 0)
             {
-                summary += $", {CharactersThatCanBeBowed} can be bowed";
+                summary += $", {ReadyableTargetsCount} can be readied";
             }
-            if (BestTarget != null)
-            {
-                summary += $", best target: {RecommendedAction} {BestTarget.Name} (value: {BestTargetValue:F1})";
-            }
+            summary += $" ({OwnTargetsCount} own, {OpponentTargetsCount} opponent)";
             return summary;
         }
     }

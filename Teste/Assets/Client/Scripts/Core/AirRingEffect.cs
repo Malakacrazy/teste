@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using L5RGame.Events;
 
 namespace L5RGame
 {
     /// <summary>
-    /// C# implementation of Air Ring Effect ability
+    /// Event-driven implementation of Air Ring Effect ability
     /// Provides honor manipulation choices when Air Ring is resolved
     /// </summary>
     [Serializable]
@@ -125,16 +126,15 @@ namespace L5RGame
                 }
             }
             
-            // Show choice UI using game instance
-            if (context.Game != null)
-            {
-                Debug.Log($"Air Ring Effect: Showing {availableChoices.Count} choices to {context.Player.Name}");
-                // For now, just auto-select the first choice as a placeholder
-                if (availableChoices.Count > 0)
-                {
-                    HandleChoiceSelection(context, availableChoices[0]);
-                }
-            }
+            // Show choice UI
+            var choiceUI = Game.UI.GetChoiceWindow();
+            choiceUI.ShowChoices(
+                title: "Air Ring Effect",
+                description: "Choose an effect to resolve:",
+                choices: availableChoices.ToArray(),
+                onChoiceSelected: (selectedChoice) => HandleChoiceSelection(context, selectedChoice),
+                allowCancel: isOptional
+            );
         }
         
         /// <summary>
@@ -173,21 +173,19 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void ExecuteGainHonor(AbilityContext context)
         {
-            context.Game.AddMessage($"{context.Player.Name} resolves the air ring, gaining {honorGainAmount} honor");
+            var eventBus = context.Game.GetEventBus();
             
-            var gainHonorAction = context.Game.Actions.CreateGainHonorAction(honorGainAmount);
+            var gainHonorAction = GameActions.CreateGainHonorAction(context.Player, honorGainAmount);
             gainHonorAction.Resolve(context.Player, context);
             
-            // Log for analytics
-            if (Game.Analytics != null)
-            {
-                Game.Analytics.LogEvent("air_ring_gain_honor", new Dictionary<string, object>
-                {
-                    { "player_id", context.Player.PlayerId },
-                    { "amount", honorGainAmount },
-                    { "total_honor", context.Player.Honor }
-                });
-            }
+            // Publish air ring gain honor event
+            eventBus.Publish(new AirRingGainHonorEvent(
+                context.Game,
+                context.Player,
+                honorGainAmount,
+                context.Player.Honor,
+                this
+            ));
         }
         
         /// <summary>
@@ -202,23 +200,25 @@ namespace L5RGame
                 return;
             }
             
-            context.Game.AddMessage($"{context.Player.Name} resolves the air ring, taking {honorTakeAmount} honor from {context.Player.Opponent.Name}");
+            var eventBus = context.Game.GetEventBus();
+            int playerHonorBefore = context.Player.Honor;
+            int opponentHonorBefore = context.Player.Opponent.Honor;
             
-            var takeHonorAction = context.Game.Actions.CreateTakeHonorAction(honorTakeAmount);
+            var takeHonorAction = GameActions.CreateTakeHonorAction(context.Player, context.Player.Opponent, honorTakeAmount);
             takeHonorAction.Resolve(context.Player.Opponent, context);
             
-            // Log for analytics
-            if (Game.Analytics != null)
-            {
-                Game.Analytics.LogEvent("air_ring_take_honor", new Dictionary<string, object>
-                {
-                    { "player_id", context.Player.PlayerId },
-                    { "opponent_id", context.Player.Opponent.PlayerId },
-                    { "amount", honorTakeAmount },
-                    { "player_honor", context.Player.Honor },
-                    { "opponent_honor", context.Player.Opponent.Honor }
-                });
-            }
+            // Publish air ring take honor event
+            eventBus.Publish(new AirRingTakeHonorEvent(
+                context.Game,
+                context.Player,
+                context.Player.Opponent,
+                honorTakeAmount,
+                playerHonorBefore,
+                context.Player.Honor,
+                opponentHonorBefore,
+                context.Player.Opponent.Honor,
+                this
+            ));
         }
         
         /// <summary>
@@ -227,18 +227,17 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void ExecuteDontResolve(AbilityContext context)
         {
+            var eventBus = context.Game.GetEventBus();
             var ringElement = GetCurrentRingElement(context);
-            context.Game.AddMessage($"{context.Player.Name} chooses not to resolve the {ringElement} ring");
             
-            // Log for analytics
-            if (Game.Analytics != null)
-            {
-                Game.Analytics.LogEvent("air_ring_not_resolved", new Dictionary<string, object>
-                {
-                    { "player_id", context.Player.PlayerId },
-                    { "ring_element", ringElement }
-                });
-            }
+            // Publish air ring not resolved event
+            eventBus.Publish(new AirRingNotResolvedEvent(
+                context.Game,
+                context.Player,
+                ringElement,
+                "player_choice",
+                this
+            ));
         }
         
         /// <summary>
@@ -258,6 +257,62 @@ namespace L5RGame
         
         #endregion
         
+        #region Advanced Configuration
+        
+        /// <summary>
+        /// Configure honor amounts
+        /// </summary>
+        /// <param name="gainAmount">Amount of honor to gain</param>
+        /// <param name="takeAmount">Amount of honor to take from opponent</param>
+        public void ConfigureHonorAmounts(int gainAmount, int takeAmount)
+        {
+            honorGainAmount = Mathf.Max(0, gainAmount);
+            honorTakeAmount = Mathf.Max(0, takeAmount);
+        }
+        
+        /// <summary>
+        /// Get the expected honor advantage from gain option
+        /// </summary>
+        /// <returns>Honor advantage from gain</returns>
+        public int GetGainHonorAdvantage()
+        {
+            return honorGainAmount;
+        }
+        
+        /// <summary>
+        /// Get the expected honor advantage from take option
+        /// </summary>
+        /// <param name="context">Ability execution context</param>
+        /// <returns>Honor advantage from take (includes swing)</returns>
+        public int GetTakeHonorAdvantage(AbilityContext context)
+        {
+            if (context.Player.Opponent == null || context.Player.Opponent.Honor <= 0)
+                return 0;
+                
+            return honorTakeAmount * 2; // Player gains, opponent loses
+        }
+        
+        /// <summary>
+        /// Determine optimal choice based on game state
+        /// </summary>
+        /// <param name="context">Ability execution context</param>
+        /// <returns>Recommended choice</returns>
+        public string GetOptimalChoice(AbilityContext context)
+        {
+            // If opponent has honor and take gives more advantage
+            if (context.Player.Opponent != null && 
+                context.Player.Opponent.Honor > 0 && 
+                GetTakeHonorAdvantage(context) > GetGainHonorAdvantage())
+            {
+                return CHOICE_TAKE_HONOR;
+            }
+            
+            // Default to gain honor
+            return CHOICE_GAIN_HONOR;
+        }
+        
+        #endregion
+        
         #region Unity Inspector Methods
         
 #if UNITY_EDITOR
@@ -271,6 +326,20 @@ namespace L5RGame
                 
             if (honorTakeAmount < 0)
                 honorTakeAmount = 0;
+        }
+        
+        /// <summary>
+        /// Show effect preview in inspector
+        /// </summary>
+        [ContextMenu("Show Effect Preview")]
+        private void ShowEffectPreview()
+        {
+            var preview = $"Air Ring Effect Preview:\n";
+            preview += $"• Gain Honor: {honorGainAmount}\n";
+            preview += $"• Take Honor: {honorTakeAmount} (swing: {honorTakeAmount * 2})\n";
+            preview += $"• Optional: {isOptional}";
+            
+            Debug.Log(preview);
         }
 #endif
         

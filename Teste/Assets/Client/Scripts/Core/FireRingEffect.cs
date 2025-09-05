@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using L5RGame.Events;
+using L5RGame.EventSystem;
 
 namespace L5RGame
 {
     /// <summary>
-    /// C# implementation of Fire Ring Effect ability
-    /// Allows honoring or dishonoring a character when Fire Ring is resolved
+    /// Event-driven implementation of Fire Ring Effect ability.
+    /// Allows honoring or dishonoring a character when Fire Ring is resolved.
+    /// Uses the event system instead of direct coupling to analytics, UI, and messages.
     /// </summary>
     [Serializable]
     public class FireRingEffect : BaseAbility
@@ -33,6 +36,7 @@ namespace L5RGame
         // Current execution state
         private BaseCard selectedTarget;
         private List<BaseCard> validTargets;
+        private IEventBus eventBus;
         
         #endregion
         
@@ -55,6 +59,10 @@ namespace L5RGame
         public override void Initialize(BaseCard sourceCard, Game gameInstance)
         {
             base.Initialize(sourceCard, gameInstance);
+            
+            // Get the event bus from the game instance
+            eventBus = gameInstance.GetEventBus();
+            
             ConfigureTargeting();
         }
         
@@ -79,7 +87,7 @@ namespace L5RGame
             if (validTargets.Count == 0 && !isOptional)
             {
                 // No valid targets and not optional - cannot execute
-                Game.AddMessage($"{context.Player.Name} cannot resolve the fire ring (no valid targets)");
+                PublishRingResolvedEvent(context, "forced_no_targets", null);
                 CompleteExecution(context);
                 return;
             }
@@ -101,6 +109,7 @@ namespace L5RGame
             {
                 Mode = TargetModes.Select,
                 ActivePromptTitle = "Choose character to honor or dishonor",
+                Source = "Fire Ring",
                 CardTypeFilter = CardTypes.Character,
                 AllowCancel = isOptional
             };
@@ -118,7 +127,7 @@ namespace L5RGame
             var targets = new List<BaseCard>();
             
             // Get all characters in play
-            var allCharacters = Game.GameState.GetAllCardsInPlay()
+            var allCharacters = context.Game.GetAllCardsInPlay()
                 .Where(card => card.CardType == CardTypes.Character)
                 .ToList();
             
@@ -127,13 +136,13 @@ namespace L5RGame
                 bool canTarget = false;
                 
                 // Check if character can be honored
-                if (allowHonor && character.CanBeHonored(context))
+                if (allowHonor && character.CanBeHonored)
                 {
                     canTarget = true;
                 }
                 
                 // Check if character can be dishonored
-                if (allowDishonor && character.CanBeDishonored(context))
+                if (allowDishonor && character.CanBeDishonored)
                 {
                     canTarget = true;
                 }
@@ -191,12 +200,12 @@ namespace L5RGame
         {
             var actions = new List<string>();
             
-            if (allowHonor && target.CanBeHonored(context))
+            if (allowHonor && target.CanBeHonored)
             {
                 actions.Add("Honor");
             }
             
-            if (allowDishonor && target.CanBeDishonored(context))
+            if (allowDishonor && target.CanBeDishonored)
             {
                 actions.Add("Dishonor");
             }
@@ -225,8 +234,7 @@ namespace L5RGame
         {
             if (isOptional)
             {
-                Game.AddMessage($"{context.Player.Name} chooses not to resolve the fire ring");
-                LogAnalyticsEvent(context, "not_resolved", null, null);
+                PublishRingResolvedEvent(context, "not_resolved", null);
             }
             
             CompleteExecution(context);
@@ -238,17 +246,8 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void HandleNoValidTargets(AbilityContext context)
         {
-            if (isOptional)
-            {
-                Game.AddMessage($"{context.Player.Name} chooses not to resolve the fire ring (no valid targets)");
-                LogAnalyticsEvent(context, "no_targets", null, null);
-            }
-            else
-            {
-                Game.AddMessage($"{context.Player.Name} cannot resolve the fire ring (no valid targets)");
-                LogAnalyticsEvent(context, "forced_no_targets", null, null);
-            }
-            
+            string effectChosen = isOptional ? "no_targets" : "forced_no_targets";
+            PublishRingResolvedEvent(context, effectChosen, null);
             CompleteExecution(context);
         }
         
@@ -261,7 +260,7 @@ namespace L5RGame
             var choices = new List<ActionChoice>();
             
             // Add honor option if available
-            if (allowHonor && selectedTarget.CanBeHonored(context))
+            if (allowHonor && selectedTarget.CanBeHonored)
             {
                 choices.Add(new ActionChoice
                 {
@@ -273,7 +272,7 @@ namespace L5RGame
             }
             
             // Add dishonor option if available
-            if (allowDishonor && selectedTarget.CanBeDishonored(context))
+            if (allowDishonor && selectedTarget.CanBeDishonored)
             {
                 choices.Add(new ActionChoice
                 {
@@ -365,14 +364,18 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void ExecuteHonorAction(AbilityContext context)
         {
-            Game.AddMessage($"{context.Player.Name} resolves the fire ring, honoring {selectedTarget.Name}");
+            // Store previous honor state
+            bool wasAlreadyHonored = selectedTarget.IsHonored;
             
             // Create and execute honor action
-            var honorAction = Game.Actions.CreateHonorAction();
+            var honorAction = GameActions.CreateHonorAction(selectedTarget);
             honorAction.Resolve(selectedTarget, context);
             
-            // Log analytics
-            LogAnalyticsEvent(context, "honor", selectedTarget, "honored");
+            // Publish character honored event instead of direct analytics/messages
+            PublishCharacterHonoredEvent(context, selectedTarget, wasAlreadyHonored);
+            
+            // Publish ring resolved event
+            PublishRingResolvedEvent(context, "honor", selectedTarget);
         }
         
         /// <summary>
@@ -381,14 +384,18 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void ExecuteDishonorAction(AbilityContext context)
         {
-            Game.AddMessage($"{context.Player.Name} resolves the fire ring, dishonoring {selectedTarget.Name}");
+            // Store previous dishonor state
+            bool wasAlreadyDishonored = selectedTarget.IsDishonored;
             
             // Create and execute dishonor action
-            var dishonorAction = Game.Actions.CreateDishonorAction();
+            var dishonorAction = GameActions.CreateDishonorAction(selectedTarget);
             dishonorAction.Resolve(selectedTarget, context);
             
-            // Log analytics
-            LogAnalyticsEvent(context, "dishonor", selectedTarget, "dishonored");
+            // Publish character dishonored event instead of direct analytics/messages
+            PublishCharacterDishonoredEvent(context, selectedTarget, wasAlreadyDishonored);
+            
+            // Publish ring resolved event
+            PublishRingResolvedEvent(context, "dishonor", selectedTarget);
         }
         
         /// <summary>
@@ -397,47 +404,105 @@ namespace L5RGame
         /// <param name="context">Ability execution context</param>
         private void ExecuteDontResolve(AbilityContext context)
         {
-            Game.AddMessage($"{context.Player.Name} chooses not to resolve the fire ring");
-            
-            // Log analytics
-            LogAnalyticsEvent(context, "not_resolved", selectedTarget, null);
-        }
-        
-        /// <summary>
-        /// Log analytics event
-        /// </summary>
-        /// <param name="context">Ability execution context</param>
-        /// <param name="action">Action taken</param>
-        /// <param name="target">Target character (if any)</param>
-        /// <param name="result">Result of action</param>
-        private void LogAnalyticsEvent(AbilityContext context, string action, BaseCard target, string result)
-        {
-            var analyticsData = new Dictionary<string, object>
-            {
-                { "player_id", context.Player.PlayerId },
-                { "action", action },
-                { "ring_element", "fire" },
-                { "valid_targets_count", validTargets?.Count ?? 0 }
-            };
-            
-            if (target != null)
-            {
-                analyticsData.Add("target_id", target.CardId);
-                analyticsData.Add("target_name", target.Name);
-                analyticsData.Add("target_owner", target.Owner.PlayerId);
-            }
-            
-            if (!string.IsNullOrEmpty(result))
-            {
-                analyticsData.Add("result", result);
-            }
-            
-            Game.Analytics.LogEvent("fire_ring_effect", analyticsData);
+            // Publish ring resolved event for not resolving
+            PublishRingResolvedEvent(context, "not_resolved", selectedTarget);
         }
         
         #endregion
         
-        #region Advanced Configuration
+        #region Event Publishing Methods
+        
+        /// <summary>
+        /// Publish a character honored event
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="character">Character that was honored</param>
+        /// <param name="wasAlreadyHonored">Was already honored before this effect</param>
+        private void PublishCharacterHonoredEvent(AbilityContext context, BaseCard character, bool wasAlreadyHonored)
+        {
+            try
+            {
+                if (eventBus == null) return;
+                
+                var honoredEvent = new CharacterHonoredEvent(
+                    game: context.Game,
+                    triggeredBy: context.Player,
+                    character: character,
+                    wasAlreadyHonored: wasAlreadyHonored,
+                    source: this
+                );
+                
+                eventBus.Publish(honoredEvent);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to publish CharacterHonoredEvent: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// Publish a character dishonored event
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="character">Character that was dishonored</param>
+        /// <param name="wasAlreadyDishonored">Was already dishonored before this effect</param>
+        private void PublishCharacterDishonoredEvent(AbilityContext context, BaseCard character, bool wasAlreadyDishonored)
+        {
+            try
+            {
+                if (eventBus == null) return;
+                
+                var dishonoredEvent = new CharacterDishonoredEvent(
+                    game: context.Game,
+                    triggeredBy: context.Player,
+                    character: character,
+                    wasAlreadyDishonored: wasAlreadyDishonored,
+                    source: this
+                );
+                
+                eventBus.Publish(dishonoredEvent);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to publish CharacterDishonoredEvent: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// Publish a ring resolved event
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="effectChosen">Effect that was chosen</param>
+        /// <param name="target">Target of the effect (if any)</param>
+        private void PublishRingResolvedEvent(AbilityContext context, string effectChosen, BaseCard target)
+        {
+            try
+            {
+                if (eventBus == null) return;
+                
+                // Get the fire ring from the game
+                var fireRing = context.Game.rings.TryGetValue("fire", out Ring ring) ? ring : null;
+                
+                var ringResolvedEvent = new RingResolvedEvent(
+                    game: context.Game,
+                    triggeredBy: context.Player,
+                    ring: fireRing,
+                    effectChosen: effectChosen,
+                    effectTarget: target,
+                    source: this
+                );
+                
+                eventBus.Publish(ringResolvedEvent);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to publish RingResolvedEvent: {ex.Message}");
+            }
+        }
+        
+        #endregion
+        
+        #region Advanced Configuration (Preserved from Original)
         
         /// <summary>
         /// Configure which actions are allowed
@@ -466,12 +531,12 @@ namespace L5RGame
         {
             var actions = new List<string>();
             
-            if (allowHonor && target.CanBeHonored(context))
+            if (allowHonor && target.CanBeHonored)
             {
                 actions.Add("Honor");
             }
             
-            if (allowDishonor && target.CanBeDishonored(context))
+            if (allowDishonor && target.CanBeDishonored)
             {
                 actions.Add("Dishonor");
             }
@@ -499,13 +564,13 @@ namespace L5RGame
             }
             
             // Higher value for opponent's characters when dishonoring
-            if (target.Owner != context.Player && allowDishonor && target.CanBeDishonored(context))
+            if (target.Owner != context.Player && allowDishonor && target.CanBeDishonored)
             {
                 value += 3f;
             }
             
             // Higher value for own characters when honoring
-            if (target.Owner == context.Player && allowHonor && target.CanBeHonored(context))
+            if (target.Owner == context.Player && allowHonor && target.CanBeHonored)
             {
                 value += 2f;
             }
@@ -517,6 +582,75 @@ namespace L5RGame
             }
             
             return Mathf.Clamp(value, 0f, 10f);
+        }
+        
+        /// <summary>
+        /// Get the best target recommendation for a specific action
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <param name="preferredAction">Preferred action (honor/dishonor)</param>
+        /// <returns>Recommended target or null</returns>
+        public BaseCard GetBestTargetRecommendation(AbilityContext context, string preferredAction = null)
+        {
+            var targets = GetValidCharacterTargets(context);
+            if (targets.Count == 0)
+                return null;
+            
+            // Filter targets by preferred action if specified
+            if (!string.IsNullOrEmpty(preferredAction))
+            {
+                if (preferredAction.ToLower() == "honor")
+                {
+                    targets = targets.Where(t => t.CanBeHonored).ToList();
+                }
+                else if (preferredAction.ToLower() == "dishonor")
+                {
+                    targets = targets.Where(t => t.CanBeDishonored).ToList();
+                }
+            }
+            
+            if (targets.Count == 0)
+                return null;
+            
+            BaseCard bestTarget = null;
+            float bestValue = -1f;
+            
+            foreach (var target in targets)
+            {
+                float value = GetTargetStrategicValue(target, context);
+                if (value > bestValue)
+                {
+                    bestValue = value;
+                    bestTarget = target;
+                }
+            }
+            
+            return bestTarget;
+        }
+        
+        /// <summary>
+        /// Get effect impact summary
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <returns>Impact summary</returns>
+        public FireRingEffectImpactSummary GetEffectImpact(AbilityContext context)
+        {
+            var validTargets = GetValidCharacterTargets(context);
+            var honorTargets = validTargets.Where(t => t.CanBeHonored).ToList();
+            var dishonorTargets = validTargets.Where(t => t.CanBeDishonored).ToList();
+            var bestHonorTarget = GetBestTargetRecommendation(context, "honor");
+            var bestDishonorTarget = GetBestTargetRecommendation(context, "dishonor");
+            
+            return new FireRingEffectImpactSummary
+            {
+                ValidTargetsCount = validTargets.Count,
+                HonorableTargetsCount = honorTargets.Count,
+                DishonorableTargetsCount = dishonorTargets.Count,
+                BestHonorTarget = bestHonorTarget,
+                BestDishonorTarget = bestDishonorTarget,
+                BestHonorValue = bestHonorTarget != null ? GetTargetStrategicValue(bestHonorTarget, context) : 0f,
+                BestDishonorValue = bestDishonorTarget != null ? GetTargetStrategicValue(bestDishonorTarget, context) : 0f
+            };
         }
         
         #endregion
@@ -542,11 +676,12 @@ namespace L5RGame
         [ContextMenu("Show Effect Preview")]
         private void ShowEffectPreview()
         {
-            var preview = $"Fire Ring Effect Preview:\n";
+            var preview = $"Fire Ring Effect Preview (Event-Driven):\n";
             preview += $"• Allow Honor: {allowHonor}\n";
             preview += $"• Allow Dishonor: {allowDishonor}\n";
             preview += $"• Optional: {isOptional}\n";
-            preview += $"• Require Valid Target: {requireValidTarget}";
+            preview += $"• Require Valid Target: {requireValidTarget}\n";
+            preview += $"• Uses Event System: YES (decoupled from direct analytics/UI/message calls)";
             
             Debug.Log(preview);
         }
@@ -556,36 +691,39 @@ namespace L5RGame
     }
     
     /// <summary>
-    /// Data structure for action choices
+    /// Summary of fire ring effect impact
     /// </summary>
     [Serializable]
-    public class ActionChoice
+    public class FireRingEffectImpactSummary
     {
-        public string Text;
-        public string Value;
-        public string Description;
-        public bool IsAvailable;
+        public int ValidTargetsCount;
+        public int HonorableTargetsCount;
+        public int DishonorableTargetsCount;
+        public BaseCard BestHonorTarget;
+        public BaseCard BestDishonorTarget;
+        public float BestHonorValue;
+        public float BestDishonorValue;
         
         public override string ToString()
         {
-            return $"{Text} ({Value}) - Available: {IsAvailable}";
-        }
-    }
-    
-    /// <summary>
-    /// Data structure for target selection
-    /// </summary>
-    [Serializable]
-    public class TargetSelectionData
-    {
-        public BaseCard Target;
-        public string DisplayName;
-        public string Description;
-        public bool IsValid;
-        
-        public override string ToString()
-        {
-            return $"{DisplayName} - Valid: {IsValid}";
+            var summary = $"Fire Ring Impact: {ValidTargetsCount} valid targets";
+            if (HonorableTargetsCount > 0)
+            {
+                summary += $", {HonorableTargetsCount} can be honored";
+            }
+            if (DishonorableTargetsCount > 0)
+            {
+                summary += $", {DishonorableTargetsCount} can be dishonored";
+            }
+            if (BestHonorTarget != null)
+            {
+                summary += $", best honor target: {BestHonorTarget.Name} (value: {BestHonorValue:F1})";
+            }
+            if (BestDishonorTarget != null)
+            {
+                summary += $", best dishonor target: {BestDishonorTarget.Name} (value: {BestDishonorValue:F1})";
+            }
+            return summary;
         }
     }
 }

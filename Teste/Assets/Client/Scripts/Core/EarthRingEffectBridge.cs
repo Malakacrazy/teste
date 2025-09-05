@@ -418,7 +418,7 @@ namespace L5RGame
         {
             var analyticsData = new Dictionary<string, object>
             {
-                { "ability_id", AbilityId },
+                { "ability_id", AbilityId.EarthRing },
                 { "player_id", context.Player.PlayerId },
                 { "choice_selected", choice },
                 { "strategic_value", strategicValue },
@@ -503,7 +503,7 @@ namespace L5RGame
         [ContextMenu("Show Status")]
         public void ShowStatusInConsole()
         {
-            Debug.Log(GetImplementationStatus());
+            Debug.Log(Game.TurnManager.GetImplementationStatus());
         }
 #endif
         

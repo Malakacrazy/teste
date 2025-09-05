@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using System.Collections;
+using L5RGame.Events;
+using L5RGame.EventSystem;
+using L5RGame.EventSystem.Handlers;
 
 #if UNITY_EDITOR || UNITY_STANDALONE
 using IronPython.Hosting;
@@ -102,6 +105,14 @@ namespace L5RGame
         [SerializeField] public GamePipeline pipeline;
         [SerializeField] private GameActions gameActions;
         [SerializeField] private GameCosts gameCosts;
+        
+        // Event system components
+        [Header("Event System")]
+        [SerializeField] private bool enableEventSystem = true;
+        private IEventBus eventBus;
+        private AnalyticsEventHandler analyticsHandler;
+        private GameMessageHandler messageHandler;
+        private UIEventHandler uiHandler;
         
         // Game state
         [Header("Game Settings")]
@@ -205,7 +216,7 @@ namespace L5RGame
             }
         }
         
-        public static object TurnManager => Instance?.pipeline;
+        public static TurnManagerInstance TurnManager => new TurnManagerInstance();
         public static object GameState => Instance?.currentPhase;
         
         public static void TriggerEvent(string eventName, object eventData = null)
@@ -267,6 +278,7 @@ namespace L5RGame
             createdAt = DateTime.Now;
             
             InitializeRings();
+            InitializeEventSystem();
             InitializePython();
         }
 
@@ -284,6 +296,45 @@ namespace L5RGame
             var ring = new Ring();
             ring.Initialize(this, element, conflictType.ToString().ToLower());
             return ring;
+        }
+
+        private void InitializeEventSystem()
+        {
+            if (!enableEventSystem)
+            {
+                Debug.Log("⚠️ Event system disabled");
+                return;
+            }
+            
+            try
+            {
+                // Initialize event bus
+                eventBus = new GameEventBus(
+                    enableDebugLogging: debugMode,
+                    enablePerformanceMonitoring: debugMode
+                );
+                
+                // Initialize event handlers
+                analyticsHandler = new AnalyticsEventHandler();
+                messageHandler = new GameMessageHandler();
+                uiHandler = new UIEventHandler();
+                
+                // Initialize handlers with the event bus
+                analyticsHandler.Initialize(eventBus);
+                messageHandler.Initialize(eventBus);
+                uiHandler.Initialize(eventBus);
+                
+                Debug.Log("🚌 Event system initialized successfully");
+                Debug.Log($"📊 Analytics handler: {analyticsHandler.EventsProcessed} events processed");
+                Debug.Log($"💬 Message handler: {messageHandler.EventsProcessed} events processed");
+                Debug.Log($"🎭 UI handler: {uiHandler.EventsProcessed} events processed");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to initialize event system: {ex.Message}");
+                enableEventSystem = false;
+                eventBus = null;
+            }
         }
 
         private void InitializePython()
@@ -1144,6 +1195,24 @@ def on_trigger(card, event_name, event_data):
         }
         
         /// <summary>
+        /// Get the event bus for the game
+        /// </summary>
+        /// <returns>Event bus instance or null if not initialized</returns>
+        public IEventBus GetEventBus()
+        {
+            return eventBus;
+        }
+        
+        /// <summary>
+        /// Check if event system is enabled and initialized
+        /// </summary>
+        /// <returns>True if event system is available</returns>
+        public bool IsEventSystemEnabled()
+        {
+            return enableEventSystem && eventBus != null && eventBus.IsEnabled;
+        }
+        
+        /// <summary>
         /// Get the local player (player associated with this client)
         /// </summary>
         /// <returns>Local player or null if not found</returns>
@@ -1796,6 +1865,55 @@ def on_trigger(card, event_name, event_data):
             }
 #endif
         }
+        
+        /// <summary>
+        /// Cleanup event system when game is destroyed
+        /// </summary>
+        private void OnDestroy()
+        {
+            try
+            {
+                // Shutdown event handlers
+                analyticsHandler?.Shutdown();
+                messageHandler?.Shutdown();
+                uiHandler?.Shutdown();
+                
+                // Dispose event bus
+                if (eventBus is IDisposable disposableEventBus)
+                {
+                    disposableEventBus.Dispose();
+                }
+                
+                eventBus = null;
+                
+                Debug.Log("🚌 Event system cleaned up");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Error cleaning up event system: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// Get debug information about the event system
+        /// </summary>
+        /// <returns>Event system debug info</returns>
+        public object GetEventSystemDebugInfo()
+        {
+            if (!IsEventSystemEnabled())
+            {
+                return new { enabled = false, reason = "Event system not initialized or disabled" };
+            }
+            
+            return new
+            {
+                enabled = true,
+                eventBus = eventBus.GetDebugInfo(),
+                analyticsHandler = analyticsHandler?.GetDebugInfo(),
+                messageHandler = messageHandler?.GetDebugInfo(),
+                uiHandler = uiHandler?.GetDebugInfo()
+            };
+        }
     }
 
     // Supporting classes and enums
@@ -1924,131 +2042,67 @@ def on_trigger(card, event_name, event_data):
     // Properties missing from errors
     public static class GameUI 
     {
-        public static object Instance { get; set; } // Static placeholder for UI access
+        public static UIInstance Instance { get; set; } = new UIInstance(); // Static placeholder for UI access
+        
+        public static UIInstance GetChoiceWindow()
+        {
+            return Instance;
+        }
+        
+        public static UIInstance GetTargetSelectionWindow()
+        {
+            return Instance;
+        }
     }
     
-    public static class GameAnalytics 
+    public class UIInstance
     {
-        public static object Instance { get; set; } // Static placeholder for Analytics
+        public void ShowChoices(string title, string description, string[] choices, System.Action<string> onChoiceSelected, bool allowCancel = false)
+        {
+            Debug.Log($"UI Choice: {title} - {description} with {choices?.Length ?? 0} choices");
+            // Auto-select first choice for now
+            if (choices?.Length > 0)
+            {
+                onChoiceSelected?.Invoke(choices[0]);
+            }
+        }
+        
+        public UIInstance GetChoiceWindow()
+        {
+            return this;
+        }
+        
+        public UIInstance GetTargetSelectionWindow()
+        {
+            return this;
+        }
+        
+        public void ShowTargetSelection(string title, string description, object[] targets, System.Action<BaseCard> onTargetSelected, bool allowCancel = false, System.Action onCancel = null)
+        {
+            Debug.Log($"Target Selection: {title} - {description} with {targets?.Length ?? 0} targets");
+            // Auto-select first target for now
+            if (targets?.Length > 0 && targets[0] is TargetSelectionData targetData)
+            {
+                onTargetSelected?.Invoke(targetData.Target);
+            }
+            else if (allowCancel)
+            {
+                onCancel?.Invoke();
+            }
+        }
     }
     
-    // Additional methods needed for compilation
-    public partial class Game
+    
+    public class TurnManagerInstance
     {
-        public object GameState => GetState("system"); // Return current game state
+        public int CurrentTurn => Game.Instance?.roundNumber ?? 1;
         
-        // Static properties for compatibility with errors
-        public static object UI => GameUI.Instance;
-        public static object Analytics => GameAnalytics.Instance;
-        /// <summary>
-        /// Get all cards currently in play from all players
-        /// </summary>
-        /// <returns>List of all cards in play</returns>
-        public List<BaseCard> GetAllCardsInPlay()
+        public string GetImplementationStatus()
         {
-            var allCards = new List<BaseCard>();
-            foreach (var player in GetPlayers())
-            {
-                allCards.AddRange(player.GetCardsInPlay());
-            }
-            return allCards;
-        }
-
-        /// <summary>
-        /// Get all cards from all players (in play and in hands/decks)
-        /// </summary>
-        /// <returns>List of all cards</returns>
-        public List<BaseCard> GetAllCards()
-        {
-            var allCards = new List<BaseCard>();
-            foreach (var player in GetPlayers())
-            {
-                allCards.AddRange(player.GetAllCards());
-            }
-            return allCards;
-        }
-        
-        /// <summary>
-        /// Property alias for GetAllCards method (compatibility)
-        /// </summary>
-        public List<BaseCard> AllCards => GetAllCards();
-
-        /// <summary>
-        /// Get all rings in the game
-        /// </summary>
-        /// <returns>List of all rings</returns>
-        public List<Ring> GetAllRings()
-        {
-            return rings.Values.ToList();
-        }
-
-        /// <summary>
-        /// Get the currently active player
-        /// </summary>
-        public Player activePlayer
-        {
-            get
-            {
-                // Return the first player who has action phase priority
-                return GetPlayers().FirstOrDefault(p => p.actionPhasePriority) ?? GetFirstPlayer();
-            }
-        }
-
-        /// <summary>
-        /// Check if a card can be moved (with card checking)
-        /// </summary>
-        /// <param name="card">Card to check</param>
-        /// <param name="newLocation">Target location</param>
-        /// <returns>True if move is valid</returns>
-        public void OnCardMoved(BaseCard card, string oldLocation, string newLocation)
-        {
-            // Placeholder implementation for card movement tracking
-            if (card != null && !string.IsNullOrEmpty(newLocation))
-            {
-                AddMessage("{0} moved from {1} to {2}", card.name, oldLocation ?? "unknown", newLocation);
-            }
-        }
-
-        // Missing methods for compilation        
-        public void QueueSimpleStep(System.Action action)
-        {
-            action?.Invoke(); // Simple immediate execution for now
-        }
-        
-        /// <summary>
-        /// Current player property for API compatibility
-        /// </summary>
-        public Player currentPlayer
-        {
-            get
-            {
-                return activePlayer ?? GetFirstPlayer();
-            }
-        }
-        
-        /// <summary>
-        /// Event system methods for registration
-        /// </summary>
-        public void on(string eventName, System.Action<GameEvent> handler)
-        {
-            // Placeholder for event registration - would connect to actual event system
-            Debug.Log($"Registering handler for event: {eventName}");
-        }
-        
-        public void removeListener(string eventName, System.Action<GameEvent> handler)
-        {
-            // Placeholder for event removal - would connect to actual event system
-            Debug.Log($"Removing handler for event: {eventName}");
-        }
-        
-        /// <summary>
-        /// EmitEvent method with GameEvent parameter
-        /// </summary>
-        public void EmitEvent(string eventName, GameEvent gameEvent)
-        {
-            OnEventTriggered?.Invoke(gameEvent, currentPhase);
+            return "csharp"; // Default implementation status
         }
     }
+    
 
     // Interface for game router (will be implemented by network layer)
     public interface IGameRouter

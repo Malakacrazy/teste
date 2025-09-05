@@ -13,12 +13,15 @@ namespace L5RGame
     {
         [Header("Effect Source")]
         public List<object> activeEffects = new List<object>();
-        protected Game game;
+        [System.NonSerialized]
+        public Game game;
         public Game Game => game;
         
         [Header("Card Properties")]
+        [System.NonSerialized]
         public Player controller;
         public List<object> persistentEffects = new List<object>();
+        [System.NonSerialized]
         public bool facedown = false;
         
         /// <summary>

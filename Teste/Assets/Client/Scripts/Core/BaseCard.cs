@@ -54,8 +54,6 @@ namespace L5RGame
     {
         [Header("Card Identity")]
         public Player owner;
-        public Player controller;
-        public Game game;
         public CardData cardData;
 
         [Header("Card Properties")]
@@ -64,7 +62,7 @@ namespace L5RGame
         public string printedType;
         public bool inConflict = false;
         public string type;
-        public bool facedown = false;
+        public string CardType => type; // Property alias for compatibility
 
         [Header("Card State")]
         public Dictionary<string, int> tokens = new Dictionary<string, int>();

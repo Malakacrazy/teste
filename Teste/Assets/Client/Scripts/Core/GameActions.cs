@@ -24,6 +24,53 @@ namespace L5RGame
         public static GainHonorAction CreateGainHonorAction(Player player, int amount) => new GainHonorAction(player, amount);
         public static GameAction CreateTakeHonorAction(Player player, Player target, int amount) => new TakeHonorAction(player, target, amount);
         
+        // Additional missing GameAction methods
+        public static GameAction CreateReadyAction(BaseCard card)
+        {
+            var action = new ReadyAction();
+            action.SetDefaultTarget(ctx => card);
+            return action;
+        }
+        
+        public static GameAction CreateBowAction(BaseCard card)
+        {
+            var action = new BowAction();
+            action.SetDefaultTarget(ctx => card);
+            return action;
+        }
+        
+        public static GameAction CreateDrawCardsAction(Player player, int amount) => new DrawCardsAction(player, amount);
+        
+        public static GameAction CreateDiscardRandomAction(Player player, int amount)
+        {
+            var action = new RandomDiscardAction(new RandomDiscardAction.RandomDiscardProperties(amount));
+            action.SetDefaultTarget(ctx => player);
+            return action;
+        }
+        
+        public static GameAction CreateDiscardAction(Player player, BaseCard card) => new DiscardAction(player, card);
+        
+        public static GameAction CreateHonorAction(BaseCard card)
+        {
+            var action = new HonorAction();
+            action.SetDefaultTarget(ctx => card);
+            return action;
+        }
+        
+        public static GameAction CreateDishonorAction(BaseCard card)
+        {
+            var action = new DishonorAction();
+            action.SetDefaultTarget(ctx => card);
+            return action;
+        }
+        
+        public static GameAction CreateRemoveFateAction(BaseCard card, int amount)
+        {
+            var action = new RemoveFateAction();
+            action.SetDefaultTarget(ctx => card);
+            return action;
+        }
+        
         public GameAction GetAction(string actionName, object value) => null; // Cannot instantiate abstract GameAction
 
         /// <summary>

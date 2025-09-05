@@ -15,7 +15,6 @@ namespace L5RGame
         public string objectName;
         public string id;
         public string printedType = "";
-        public bool facedown = false;
         public string uuid;
 
         [Header("Effects")]
