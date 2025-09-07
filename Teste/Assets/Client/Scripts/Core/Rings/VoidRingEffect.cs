@@ -324,7 +324,8 @@ namespace L5RGame
                     source: this
                 );
                 
-                eventBus.Publish(fateRemovedEvent);
+                // Publish as Handler event (during effect resolution)
+                PublishHandler(fateRemovedEvent);
             }
             catch (Exception ex)
             {
@@ -356,7 +357,8 @@ namespace L5RGame
                     source: this
                 );
                 
-                eventBus.Publish(ringResolvedEvent);
+                // Publish as Reaction event (after ring resolution)
+                PublishReaction(ringResolvedEvent);
             }
             catch (Exception ex)
             {
@@ -384,7 +386,8 @@ namespace L5RGame
                     source: this
                 );
                 
-                eventBus.Publish(characterLeavesEvent);
+                // Publish as Handler event (during character leaving resolution)
+                PublishHandler(characterLeavesEvent);
             }
             catch (Exception ex)
             {

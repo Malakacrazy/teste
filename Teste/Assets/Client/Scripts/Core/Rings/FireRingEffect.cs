@@ -432,7 +432,8 @@ namespace L5RGame
                     source: this
                 );
                 
-                eventBus.Publish(honoredEvent);
+                // Publish as Handler event (during honor resolution)
+                PublishHandler(honoredEvent);
             }
             catch (Exception ex)
             {
@@ -460,7 +461,8 @@ namespace L5RGame
                     source: this
                 );
                 
-                eventBus.Publish(dishonoredEvent);
+                // Publish as Handler event (during dishonor resolution)
+                PublishHandler(dishonoredEvent);
             }
             catch (Exception ex)
             {
@@ -492,7 +494,8 @@ namespace L5RGame
                     source: this
                 );
                 
-                eventBus.Publish(ringResolvedEvent);
+                // Publish as Reaction event (after ring resolution)
+                PublishReaction(ringResolvedEvent);
             }
             catch (Exception ex)
             {

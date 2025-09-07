@@ -244,7 +244,7 @@ namespace L5RGame.EventSystem.Handlers
         private void HandleCharacterLeavesPlayMessage(CharacterLeavesPlayEvent evt)
         {
             string reasonText = !string.IsNullOrEmpty(evt.Reason) ? $" ({evt.Reason})" : "";
-            string destinationText = evt.Destination != CardLocation.DiscardPile ? $" to {evt.Destination}" : "";
+            string destinationText = evt.Destination != "DiscardPile" ? $" to {evt.Destination}" : "";
             
             AddGameMessage($"{evt.Character.Name} leaves play{destinationText}{reasonText}");
         }

@@ -21,12 +21,12 @@ namespace L5RGame.EventSystem
         private readonly ConcurrentBag<EventSubscriptionInternal> _allEventSubscriptions;
         private readonly ConcurrentDictionary<string, EventSubscriptionInternal> _subscriptionLookup;
         
-        private readonly object _lockObject = new object();
+        protected readonly object _lockObject = new object();
         private volatile bool _enabled = true;
         private volatile bool _disposed = false;
         
         // Statistics and monitoring
-        private readonly EventBusStats _stats = new EventBusStats();
+        protected readonly EventBusStats _stats = new EventBusStats();
         private readonly ConcurrentBag<Exception> _recentErrors = new ConcurrentBag<Exception>();
         
         // Configuration

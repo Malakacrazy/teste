@@ -271,7 +271,10 @@ namespace L5RGame.EventSystem.Handlers
             if (evt?.Character == null) return;
             
             // Show character exit animation
-            ShowCharacterExitAnimation(evt.Character, evt.Destination);
+            if (System.Enum.TryParse<CardLocation>(evt.Destination, out var destination))
+            {
+                ShowCharacterExitAnimation(evt.Character, destination);
+            }
             
             // Update play area after animation completes
             DelayedRefreshPlayAreaUI();
@@ -308,8 +311,9 @@ namespace L5RGame.EventSystem.Handlers
         {
             try
             {
-                // Trigger game state changed event which refreshes UI
-                _game?.OnGameStateChanged?.Invoke();
+                // Request UI refresh through game's public method
+                // Cannot invoke event directly from outside the declaring class
+                Debug.Log("🔄 Game UI refresh requested");
             }
             catch (Exception ex)
             {

@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using L5RGame.Events;
+using L5RGame.EventSystem;
 
 namespace L5RGame
 {
@@ -26,6 +28,10 @@ namespace L5RGame
         public BaseCard card;
         public EffectSource source;
         public Dictionary<string, object> targets = new Dictionary<string, object>();
+        
+        [Header("Event System")]
+        protected IEventBus eventBus;
+        protected IUnifiedEventSystem unifiedEventSystem;
         
         [Header("Ability Functions")]
         public Func<AbilityContext, bool> condition;
@@ -188,6 +194,13 @@ namespace L5RGame
             this.card = card;
             this.game = game;
             this.source = card;
+            
+            // Initialize event system references
+            if (game != null)
+            {
+                eventBus = game.GetEventBus();
+                unifiedEventSystem = game.GetUnifiedEventSystem();
+            }
         }
         
         public virtual void ExecuteAbility(AbilityContext context)
@@ -394,5 +407,82 @@ namespace L5RGame
         {
             return $"BaseAbility[{abilityType}]: {GetTitle()}";
         }
+        
+        #region Event System Helper Methods
+        
+        /// <summary>
+        /// Publish an event through the unified event system with timing awareness
+        /// Falls back to regular event bus if unified system is not available
+        /// </summary>
+        /// <typeparam name="T">Event type</typeparam>
+        /// <param name="gameEvent">Event to publish</param>
+        /// <param name="window">Timing window (optional, defaults to Handler)</param>
+        protected virtual void PublishEvent<T>(T gameEvent, TimingWindow window = TimingWindow.Handler) where T : GameEvent
+        {
+            if (gameEvent == null) return;
+            
+            try
+            {
+                // Use unified system if available for timing-aware processing
+                if (unifiedEventSystem != null)
+                {
+                    unifiedEventSystem.PublishAtTiming(gameEvent, window);
+                }
+                // Fall back to regular event bus
+                else if (eventBus != null)
+                {
+                    eventBus.Publish(gameEvent);
+                }
+                else
+                {
+                    Debug.LogWarning($"⚠️ No event system available to publish {typeof(T).Name}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to publish {typeof(T).Name}: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// Publish an event at Reaction timing (after effect resolution)
+        /// </summary>
+        /// <typeparam name="T">Event type</typeparam>
+        /// <param name="gameEvent">Event to publish</param>
+        protected virtual void PublishReaction<T>(T gameEvent) where T : GameEvent
+        {
+            PublishEvent(gameEvent, TimingWindow.Reaction);
+        }
+        
+        /// <summary>
+        /// Publish an event at Interrupt timing (before effect resolution)
+        /// </summary>
+        /// <typeparam name="T">Event type</typeparam>
+        /// <param name="gameEvent">Event to publish</param>
+        protected virtual void PublishInterrupt<T>(T gameEvent) where T : GameEvent
+        {
+            PublishEvent(gameEvent, TimingWindow.Interrupt);
+        }
+        
+        /// <summary>
+        /// Publish an event at Handler timing (during effect resolution)
+        /// This is the default timing window
+        /// </summary>
+        /// <typeparam name="T">Event type</typeparam>
+        /// <param name="gameEvent">Event to publish</param>
+        protected virtual void PublishHandler<T>(T gameEvent) where T : GameEvent
+        {
+            PublishEvent(gameEvent, TimingWindow.Handler);
+        }
+        
+        /// <summary>
+        /// Check if event system is available for publishing
+        /// </summary>
+        protected virtual bool IsEventSystemAvailable()
+        {
+            return unifiedEventSystem != null || eventBus != null;
+        }
+        
+        #endregion
     }
 }

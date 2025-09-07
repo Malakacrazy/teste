@@ -167,7 +167,7 @@ namespace L5RGame.EventSystem
         /// <returns>True if should process</returns>
         protected virtual bool ShouldProcessEvent(GameEvent gameEvent)
         {
-            return IsEnabled && gameEvent != null && !gameEvent.IsCancelled;
+            return IsEnabled && gameEvent != null && !gameEvent.IsCancelled();
         }
         
         #endregion

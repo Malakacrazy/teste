@@ -30,6 +30,7 @@ namespace L5RGame.EventSystem
         private IEventBus eventBus;
         private List<GameEventLogEntry> eventHistory = new List<GameEventLogEntry>();
         private string logFilePath;
+        private List<IEventSubscription> activeSubscriptions = new List<IEventSubscription>();
         
         [Header("Runtime Statistics")]
         [SerializeField] private int totalEventsLogged = 0;
@@ -62,24 +63,24 @@ namespace L5RGame.EventSystem
         {
             if (logFateEvents)
             {
-                eventBus.Subscribe<FateRemovedEvent>(LogEvent);
+                activeSubscriptions.Add(eventBus.Subscribe<FateRemovedEvent>(LogEvent));
             }
             
             if (logRingEvents)
             {
-                eventBus.Subscribe<RingResolvedEvent>(LogEvent);
+                activeSubscriptions.Add(eventBus.Subscribe<RingResolvedEvent>(LogEvent));
             }
             
             if (logCharacterEvents)
             {
-                eventBus.Subscribe<CharacterHonoredEvent>(LogEvent);
-                eventBus.Subscribe<CharacterDishonoredEvent>(LogEvent);
-                eventBus.Subscribe<CharacterLeavesPlayEvent>(LogEvent);
+                activeSubscriptions.Add(eventBus.Subscribe<CharacterHonoredEvent>(LogEvent));
+                activeSubscriptions.Add(eventBus.Subscribe<CharacterDishonoredEvent>(LogEvent));
+                activeSubscriptions.Add(eventBus.Subscribe<CharacterLeavesPlayEvent>(LogEvent));
             }
             
             if (logCardEvents)
             {
-                eventBus.Subscribe<CardDrawnEvent>(LogEvent);
+                activeSubscriptions.Add(eventBus.Subscribe<CardDrawnEvent>(LogEvent));
             }
             
             if (logAbilityEvents)
@@ -289,21 +290,12 @@ namespace L5RGame.EventSystem
         {
             if (eventBus != null)
             {
-                // Unsubscribe from all events
-                if (logFateEvents)
-                    eventBus.Unsubscribe<FateRemovedEvent>(LogEvent);
-                if (logRingEvents)
-                    eventBus.Unsubscribe<RingResolvedEvent>(LogEvent);
-                if (logCharacterEvents)
+                // Unsubscribe from all stored subscriptions
+                foreach (var subscription in activeSubscriptions)
                 {
-                    eventBus.Unsubscribe<CharacterHonoredEvent>(LogEvent);
-                    eventBus.Unsubscribe<CharacterDishonoredEvent>(LogEvent);
-                    eventBus.Unsubscribe<CharacterLeavesPlayEvent>(LogEvent);
+                    eventBus.Unsubscribe(subscription);
                 }
-                if (logCardEvents)
-                    eventBus.Unsubscribe<CardDrawnEvent>(LogEvent);
-                if (logAbilityEvents)
-                    eventBus.Unsubscribe<AbilityExecutedEvent>(LogEvent);
+                activeSubscriptions.Clear();
                 
                 Debug.Log("📝 Event logger cleanup completed");
             }

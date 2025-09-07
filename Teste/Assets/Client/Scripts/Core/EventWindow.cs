@@ -250,7 +250,7 @@ namespace L5RGame
         {
             foreach (var gameEvent in events)
             {
-                game.EmitEvent(gameEvent.name + ":" + AbilityTypes.OtherEffects, gameEvent);
+                game.EmitEvent(gameEvent.name + ":" + AbilityTypes.OtherEffects, gameEvent.GetData());
             }
             
             return true;
@@ -289,7 +289,7 @@ namespace L5RGame
                 {
                     Debug.Log($"⚡ Executing event: {gameEvent.name}");
                     gameEvent.ExecuteHandler();
-                    game.EmitEvent(gameEvent.name, gameEvent);
+                    game.EmitEvent(gameEvent.name, gameEvent.GetData());
                 }
                 else
                 {

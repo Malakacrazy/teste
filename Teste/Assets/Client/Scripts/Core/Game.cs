@@ -109,7 +109,8 @@ namespace L5RGame
         // Event system components
         [Header("Event System")]
         [SerializeField] private bool enableEventSystem = true;
-        private IEventBus eventBus;
+        private IUnifiedEventSystem unifiedEventSystem;
+        private IEventBus eventBus; // For backward compatibility
         private AnalyticsEventHandler analyticsHandler;
         private GameMessageHandler messageHandler;
         private UIEventHandler uiHandler;
@@ -308,31 +309,33 @@ namespace L5RGame
             
             try
             {
-                // Initialize event bus
-                eventBus = new GameEventBus(
-                    enableDebugLogging: debugMode,
-                    enablePerformanceMonitoring: debugMode
-                );
+                // Initialize unified event system (replaces both EventWindow and GameEventBus)
+                unifiedEventSystem = new TimingAwareEventBus(debugMode, debugMode);
+                
+                // Set backward compatibility reference
+                eventBus = unifiedEventSystem;
                 
                 // Initialize event handlers
                 analyticsHandler = new AnalyticsEventHandler();
                 messageHandler = new GameMessageHandler();
                 uiHandler = new UIEventHandler();
                 
-                // Initialize handlers with the event bus
-                analyticsHandler.Initialize(eventBus);
-                messageHandler.Initialize(eventBus);
-                uiHandler.Initialize(eventBus);
+                // Initialize handlers with the unified event system
+                analyticsHandler.Initialize(unifiedEventSystem);
+                messageHandler.Initialize(unifiedEventSystem);
+                uiHandler.Initialize(unifiedEventSystem);
                 
-                Debug.Log("🚌 Event system initialized successfully");
+                Debug.Log("🌉 Unified event system initialized successfully");
                 Debug.Log($"📊 Analytics handler: {analyticsHandler.EventsProcessed} events processed");
                 Debug.Log($"💬 Message handler: {messageHandler.EventsProcessed} events processed");
                 Debug.Log($"🎭 UI handler: {uiHandler.EventsProcessed} events processed");
+                Debug.Log("🎯 TimingAware EventBus: L5R timing windows fully supported");
             }
             catch (Exception ex)
             {
-                Debug.LogError($"❌ Failed to initialize event system: {ex.Message}");
+                Debug.LogError($"❌ Failed to initialize unified event system: {ex.Message}");
                 enableEventSystem = false;
+                unifiedEventSystem = null;
                 eventBus = null;
             }
         }
@@ -1204,6 +1207,14 @@ def on_trigger(card, event_name, event_data):
         }
         
         /// <summary>
+        /// Gets the unified event system that supports L5R timing windows
+        /// </summary>
+        public IUnifiedEventSystem GetUnifiedEventSystem()
+        {
+            return unifiedEventSystem;
+        }
+        
+        /// <summary>
         /// Check if event system is enabled and initialized
         /// </summary>
         /// <returns>True if event system is available</returns>
@@ -1447,13 +1458,24 @@ def on_trigger(card, event_name, event_data):
 
         public EventWindow OpenEventWindow(List<GameEvent> events)
         {
+            // Use unified event system if available, otherwise fall back to traditional EventWindow
+            if (unifiedEventSystem != null)
+            {
+                var eventWindow = new EventWindow(this, events);
+                
+                // Process through unified system asynchronously without blocking
+                _ = ProcessEventWindowThroughUnifiedSystemAsync(eventWindow);
+                
+                return QueueStep(eventWindow);
+            }
+            
             return QueueStep(new EventWindow(this, events));
         }
 
         public EventWindow OpenEventWindow(List<object> events)
         {
             var gameEvents = events.Cast<GameEvent>().ToList();
-            return QueueStep(new EventWindow(this, gameEvents));
+            return OpenEventWindow(gameEvents);
         }
 
         public ThenEventWindow OpenThenEventWindow(List<GameEvent> events)
@@ -1463,6 +1485,25 @@ def on_trigger(card, event_name, event_data):
                 return QueueStep(new ThenEventWindow(this, events));
             }
             return (ThenEventWindow)OpenEventWindow(events);
+        }
+        
+        /// <summary>
+        /// Process EventWindow through the unified event system using the bridge
+        /// </summary>
+        private async System.Threading.Tasks.Task ProcessEventWindowThroughUnifiedSystemAsync(EventWindow eventWindow)
+        {
+            if (unifiedEventSystem == null || eventWindow == null) return;
+            
+            try
+            {
+                // Use the EventWindow extension method to process through unified system
+                await eventWindow.ProcessThroughUnifiedSystemAsync(this);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"❌ Failed to process EventWindow through unified system: {ex.Message}");
+                // EventWindow will fall back to traditional processing automatically
+            }
         }
 
         public void RaiseInitiateAbilityEvent(Dictionary<string, object> parameters, System.Func<bool> handler)
@@ -1878,15 +1919,22 @@ def on_trigger(card, event_name, event_data):
                 messageHandler?.Shutdown();
                 uiHandler?.Shutdown();
                 
-                // Dispose event bus
-                if (eventBus is IDisposable disposableEventBus)
+                // Dispose unified event system
+                if (unifiedEventSystem is IDisposable disposableUnifiedSystem)
+                {
+                    disposableUnifiedSystem.Dispose();
+                }
+                
+                // Dispose event bus (backward compatibility reference)
+                if (eventBus is IDisposable disposableEventBus && eventBus != unifiedEventSystem)
                 {
                     disposableEventBus.Dispose();
                 }
                 
+                unifiedEventSystem = null;
                 eventBus = null;
                 
-                Debug.Log("🚌 Event system cleaned up");
+                Debug.Log("🌉 Unified event system cleaned up");
             }
             catch (Exception ex)
             {
@@ -1908,10 +1956,12 @@ def on_trigger(card, event_name, event_data):
             return new
             {
                 enabled = true,
-                eventBus = eventBus.GetDebugInfo(),
+                unifiedEventSystem = unifiedEventSystem?.GetDebugInfo(),
+                eventBus = eventBus?.GetDebugInfo(),
                 analyticsHandler = analyticsHandler?.GetDebugInfo(),
                 messageHandler = messageHandler?.GetDebugInfo(),
-                uiHandler = uiHandler?.GetDebugInfo()
+                uiHandler = uiHandler?.GetDebugInfo(),
+                systemType = unifiedEventSystem != null ? "Unified (TimingAware)" : "Legacy (EventBus only)"
             };
         }
     }

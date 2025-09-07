@@ -414,7 +414,7 @@ namespace L5RGame.Events
                             EventData = e.GetAllEventData()
                         });
                         
-                        var json = JsonSerializer.Serialize(eventData, new JsonSerializerOptions { WriteIndented = true });
+                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(eventData, Newtonsoft.Json.Formatting.Indented);
                         File.WriteAllText(filePath, json);
                         
                         _lastPersistenceTime = DateTime.UtcNow;
@@ -445,7 +445,7 @@ namespace L5RGame.Events
                     return 0;
                     
                 var json = await File.ReadAllTextAsync(filePath);
-                var eventData = JsonSerializer.Deserialize<dynamic[]>(json);
+                var eventData = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic[]>(json);
                 
                 Debug.Log($"📂 Loaded {eventData?.Length ?? 0} events from {filePath}");
                 return eventData?.Length ?? 0;
