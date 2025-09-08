@@ -136,6 +136,7 @@ namespace L5RGame
                     {
                         context.ring = ring;
                     }
+                    PublishTargetResolved(context, ring, selectedPlayer);
                     return true;
                 },
                 onCancel = () =>
@@ -163,11 +164,13 @@ namespace L5RGame
         {
             if (!context.rings.ContainsKey(name))
             {
+                PublishTargetValidationFailed(context, "Ring not found in context");
                 return false;
             }
             
             if (context.choosingPlayerOverride != null && GetChoosingPlayer(context) == context.player)
             {
+                PublishTargetValidationFailed(context, "Invalid choosing player override");
                 return false;
             }
             
@@ -180,9 +183,18 @@ namespace L5RGame
             }
             
             if (rings == null)
+            {
+                PublishTargetValidationFailed(context, "Ring target is null");
                 return false;
+            }
             
-            return properties.ringCondition == null || properties.ringCondition(rings as Ring, context);
+            bool isValid = properties.ringCondition == null || properties.ringCondition(rings as Ring, context);
+            if (!isValid)
+            {
+                PublishTargetValidationFailed(context, "Ring target condition failed");
+            }
+            
+            return isValid;
         }
         
         public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context)

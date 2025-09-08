@@ -125,6 +125,7 @@ namespace L5RGame
                 if (legalTargets.Count == 1)
                 {
                     context.targets[name] = legalTargets[0];
+                    PublishTargetResolved(context, legalTargets[0], player, TargetModes.AutoSingle);
                     return;
                 }
             }
@@ -170,6 +171,7 @@ namespace L5RGame
                     {
                         context.target = card;
                     }
+                    PublishTargetResolved(context, card, selectedPlayer);
                     return true;
                 },
                 onCancel = () =>
@@ -197,11 +199,13 @@ namespace L5RGame
         {
             if (!context.targets.ContainsKey(name))
             {
+                PublishTargetValidationFailed(context, "Target not found in context");
                 return false;
             }
             
             if (context.choosingPlayerOverride != null && GetChoosingPlayer(context) == context.player)
             {
+                PublishTargetValidationFailed(context, "Invalid choosing player override");
                 return false;
             }
             
@@ -219,9 +223,16 @@ namespace L5RGame
             
             var choosingPlayer = context.choosingPlayerOverride ?? GetChoosingPlayer(context);
             
-            return cardList.All(card => selector.CanTarget(card, context, choosingPlayer)) &&
-                   selector.HasEnoughSelected(cardList) && 
-                   !selector.HasExceededLimit(cardList);
+            bool isValid = cardList.All(card => selector.CanTarget(card, context, choosingPlayer)) &&
+                          selector.HasEnoughSelected(cardList) && 
+                          !selector.HasExceededLimit(cardList);
+            
+            if (!isValid)
+            {
+                PublishTargetValidationFailed(context, "Target validation failed - invalid selection");
+            }
+            
+            return isValid;
         }
         
         public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context)

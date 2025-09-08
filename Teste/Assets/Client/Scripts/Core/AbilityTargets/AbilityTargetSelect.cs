@@ -149,6 +149,7 @@ namespace L5RGame
                     {
                         context.select = choice;
                     }
+                    PublishTargetResolved(context, choice, player);
                 };
             }).ToList();
             
@@ -203,15 +204,30 @@ namespace L5RGame
         {
             if (properties.targets && context.choosingPlayerOverride != null && GetChoosingPlayer(context) == context.player)
             {
+                PublishTargetValidationFailed(context, "Invalid choosing player override");
                 return false;
             }
             
             if (!context.selects.ContainsKey(name) || context.selects[name] == null)
+            {
+                PublishTargetValidationFailed(context, "Selection not found in context");
                 return false;
+            }
             
             var selectChoice = context.selects[name] as SelectChoice;
-            if (selectChoice == null) return false;
-            return IsChoiceLegal(selectChoice.GetChoice(), context);
+            if (selectChoice == null)
+            {
+                PublishTargetValidationFailed(context, "Invalid select choice");
+                return false;
+            }
+            
+            bool isValid = IsChoiceLegal(selectChoice.GetChoice(), context);
+            if (!isValid)
+            {
+                PublishTargetValidationFailed(context, "Select choice is not legal");
+            }
+            
+            return isValid;
         }
         
         public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context)

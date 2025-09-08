@@ -146,6 +146,7 @@ namespace L5RGame
                     {
                         context.token = card.personalHonor as StatusToken;
                     }
+                    PublishTargetResolved(context, card.personalHonor, selectedPlayer);
                     return true;
                 },
                 onCancel = () =>
@@ -173,19 +174,32 @@ namespace L5RGame
         {
             if (!context.tokens.ContainsKey(name) || context.tokens[name] == null)
             {
+                PublishTargetValidationFailed(context, "Token not found in context");
                 return false;
             }
             
             if (context.choosingPlayerOverride != null && GetChoosingPlayer(context) == context.player)
             {
+                PublishTargetValidationFailed(context, "Invalid choosing player override");
                 return false;
             }
             
             var token = context.tokens[name];
             // Since personalHonor returns { card = this, value = PersonalHonor }, we need to extract the card
             var tokenCard = token?.GetType().GetProperty("card")?.GetValue(token) as BaseCard;
-            if (tokenCard == null) return false;
-            return selector.CanTarget(tokenCard, context, GetChoosingPlayer(context));
+            if (tokenCard == null)
+            {
+                PublishTargetValidationFailed(context, "Token card not found");
+                return false;
+            }
+            
+            bool isValid = selector.CanTarget(tokenCard, context, GetChoosingPlayer(context));
+            if (!isValid)
+            {
+                PublishTargetValidationFailed(context, "Token target validation failed");
+            }
+            
+            return isValid;
         }
         
         public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context)

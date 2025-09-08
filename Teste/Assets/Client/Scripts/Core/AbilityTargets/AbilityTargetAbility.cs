@@ -159,6 +159,7 @@ namespace L5RGame
                     if (validAbilities.Count == 1)
                     {
                         context.targetAbility = validAbilities[0];
+                        PublishTargetResolved(context, validAbilities[0], selectedPlayer);
                     }
                     else if (validAbilities.Count > 1)
                     {
@@ -178,7 +179,12 @@ namespace L5RGame
                                 }
                                 else
                                 {
-                                    context.targetAbility = validAbilities.FirstOrDefault(ability => ability.title == choice);
+                                    var selectedAbility = validAbilities.FirstOrDefault(ability => ability.title == choice);
+                                    context.targetAbility = selectedAbility;
+                                    if (selectedAbility != null)
+                                    {
+                                        PublishTargetResolved(context, selectedAbility, selectedPlayer);
+                                    }
                                 }
                             }
                         });
@@ -211,16 +217,27 @@ namespace L5RGame
         {
             if (context.choosingPlayerOverride != null && GetChoosingPlayer(context) == context.player)
             {
+                PublishTargetValidationFailed(context, "Invalid choosing player override");
                 return false;
             }
             
             var targetAbility = context.targetAbility as BaseAbility;
             if (targetAbility?.card == null)
+            {
+                PublishTargetValidationFailed(context, "Target ability or card not found");
                 return false;
-                
-            return properties.cardType.Contains(targetAbility.card.GetCardType()) &&
-                   (properties.cardCondition == null || properties.cardCondition(targetAbility.card, context)) &&
-                   abilityCondition(targetAbility);
+            }
+            
+            bool isValid = properties.cardType.Contains(targetAbility.card.GetCardType()) &&
+                          (properties.cardCondition == null || properties.cardCondition(targetAbility.card, context)) &&
+                          abilityCondition(targetAbility);
+            
+            if (!isValid)
+            {
+                PublishTargetValidationFailed(context, "Ability target validation failed");
+            }
+            
+            return isValid;
         }
         
         public override bool HasTargetsChosenByInitiatingPlayer(AbilityContext context)
