@@ -1,0 +1,70 @@
+Assets\Client\Scripts\Core\Prompts\HonorBidPrompt.cs(7,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'HonorBidPrompt'
+Assets\Client\Scripts\Core\Prompts\MenuPrompt.cs(5,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'MenuPrompt'
+Assets\Client\Scripts\Core\Prompts\HandlerMenuPrompt.cs(8,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'HandlerMenuPrompt'
+Assets\Client\Scripts\Core\Prompts\SelectRingPrompt.cs(8,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'SelectRingPrompt'
+Assets\Client\Scripts\Core\Prompts\SelectCardPrompt.cs(8,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'SelectCardPrompt'
+Assets\Client\Scripts\Core\Prompts\InitiateConflictPrompt.cs(18,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'InitiateConflictPrompt'
+Assets\Client\Scripts\Core\Prompts\SelectDefendersPrompt.cs(7,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'SelectDefendersPrompt'
+Assets\Client\Scripts\Core\Prompts\AttachmentPrompt.cs(5,18): error CS0101: The namespace 'L5RGame' already contains a definition for 'AttachmentPrompt'
+Assets\Client\Scripts\Core\Prompts\AttachmentPrompt.cs(11,16): error CS0111: Type 'AttachmentPrompt' already defines a member called 'AttachmentPrompt' with the same parameter types
+Assets\Client\Scripts\Core\GameSteps.cs(6,18): error CS0263: Partial declarations of 'MenuPrompt' must not specify different base classes
+Assets\Client\Scripts\Core\GameSteps.cs(6,41): error CS0535: 'MenuPrompt' does not implement interface member 'IGameStep.Execute()'
+Assets\Client\Scripts\Core\GameSteps.cs(6,41): error CS0535: 'MenuPrompt' does not implement interface member 'IGameStep.IsComplete'
+Assets\Client\Scripts\Core\GameSteps.cs(6,41): error CS0535: 'MenuPrompt' does not implement interface member 'IGameStep.CanCancel'
+Assets\Client\Scripts\Core\GameSteps.cs(6,41): error CS0535: 'MenuPrompt' does not implement interface member 'IGameStep.CancelStep()'
+Assets\Client\Scripts\Core\GameSteps.cs(6,41): error CS0535: 'MenuPrompt' does not implement interface member 'IGameStep.QueueStep(IGameStep)'
+Assets\Client\Scripts\Core\GameSteps.cs(6,41): error CS0535: 'MenuPrompt' does not implement interface member 'IGameStep.OnCardClicked(Player, BaseCard)'
+Assets\Client\Scripts\Core\GameSteps.cs(6,41): error CS0535: 'MenuPrompt' does not implement interface member 'IGameStep.OnRingClicked(Player, Ring)'
+Assets\Client\Scripts\Core\GameSteps.cs(6,41): error CS0535: 'MenuPrompt' does not implement interface member 'IGameStep.OnMenuCommand(Player, string, string, string)'
+Assets\Client\Scripts\Core\GameSteps.cs(6,41): error CS0535: 'MenuPrompt' does not implement interface member 'IGameStep.StepName'
+Assets\Client\Scripts\Core\Prompts\InitiateConflictPrompt.cs(7,55): error CS0116: A namespace cannot directly contain members such as fields, methods or statements
+Assets\Client\Scripts\Core\Prompts\MenuPrompt.cs(11,69): error CS0246: The type or namespace name 'PromptProperties' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\Prompts\MenuPrompt.cs(9,16): error CS0246: The type or namespace name 'PromptProperties' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\GameSteps.cs(61,18): error CS0263: Partial declarations of 'HandlerMenuPrompt' must not specify different base classes
+Assets\Client\Scripts\Core\GameSteps.cs(61,48): error CS0535: 'HandlerMenuPrompt' does not implement interface member 'IGameStep.Execute()'
+Assets\Client\Scripts\Core\GameSteps.cs(61,48): error CS0535: 'HandlerMenuPrompt' does not implement interface member 'IGameStep.IsComplete'
+Assets\Client\Scripts\Core\GameSteps.cs(61,48): error CS0535: 'HandlerMenuPrompt' does not implement interface member 'IGameStep.CanCancel'
+Assets\Client\Scripts\Core\GameSteps.cs(61,48): error CS0535: 'HandlerMenuPrompt' does not implement interface member 'IGameStep.CancelStep()'
+Assets\Client\Scripts\Core\GameSteps.cs(61,48): error CS0535: 'HandlerMenuPrompt' does not implement interface member 'IGameStep.QueueStep(IGameStep)'
+Assets\Client\Scripts\Core\GameSteps.cs(61,48): error CS0535: 'HandlerMenuPrompt' does not implement interface member 'IGameStep.OnCardClicked(Player, BaseCard)'
+Assets\Client\Scripts\Core\GameSteps.cs(61,48): error CS0535: 'HandlerMenuPrompt' does not implement interface member 'IGameStep.OnRingClicked(Player, Ring)'
+Assets\Client\Scripts\Core\GameSteps.cs(61,48): error CS0535: 'HandlerMenuPrompt' does not implement interface member 'IGameStep.OnMenuCommand(Player, string, string, string)'
+Assets\Client\Scripts\Core\GameSteps.cs(61,48): error CS0535: 'HandlerMenuPrompt' does not implement interface member 'IGameStep.StepName'
+Assets\Client\Scripts\Core\Prompts\UiPrompt.cs(19,30): error CS0505: 'UiPrompt.IsComplete()': cannot override because 'BaseStep.IsComplete' is not a function
+Assets\Client\Scripts\Core\Prompts\HandlerMenuPrompt.cs(15,60): error CS0246: The type or namespace name 'PromptProperties' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\Prompts\HandlerMenuPrompt.cs(11,16): error CS0246: The type or namespace name 'PromptProperties' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\GameSteps.cs(85,18): error CS0263: Partial declarations of 'SelectRingPrompt' must not specify different base classes
+Assets\Client\Scripts\Core\GameSteps.cs(85,47): error CS0535: 'SelectRingPrompt' does not implement interface member 'IGameStep.Execute()'
+Assets\Client\Scripts\Core\GameSteps.cs(85,47): error CS0535: 'SelectRingPrompt' does not implement interface member 'IGameStep.IsComplete'
+Assets\Client\Scripts\Core\GameSteps.cs(85,47): error CS0535: 'SelectRingPrompt' does not implement interface member 'IGameStep.CanCancel'
+Assets\Client\Scripts\Core\GameSteps.cs(85,47): error CS0535: 'SelectRingPrompt' does not implement interface member 'IGameStep.CancelStep()'
+Assets\Client\Scripts\Core\GameSteps.cs(85,47): error CS0535: 'SelectRingPrompt' does not implement interface member 'IGameStep.QueueStep(IGameStep)'
+Assets\Client\Scripts\Core\GameSteps.cs(85,47): error CS0535: 'SelectRingPrompt' does not implement interface member 'IGameStep.OnCardClicked(Player, BaseCard)'
+Assets\Client\Scripts\Core\GameSteps.cs(85,47): error CS0535: 'SelectRingPrompt' does not implement interface member 'IGameStep.OnMenuCommand(Player, string, string, string)'
+Assets\Client\Scripts\Core\GameSteps.cs(85,47): error CS0535: 'SelectRingPrompt' does not implement interface member 'IGameStep.StepName'
+Assets\Client\Scripts\Core\Prompts\SelectRingPrompt.cs(15,67): error CS0246: The type or namespace name 'PromptProperties' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\Prompts\SelectRingPrompt.cs(11,16): error CS0246: The type or namespace name 'PromptProperties' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\Prompts\SelectRingPrompt.cs(85,30): error CS0111: Type 'SelectRingPrompt' already defines a member called 'Continue' with the same parameter types
+Assets\Client\Scripts\Core\GameSteps.cs(145,18): error CS0263: Partial declarations of 'SelectCardPrompt' must not specify different base classes
+Assets\Client\Scripts\Core\GameSteps.cs(145,47): error CS0535: 'SelectCardPrompt' does not implement interface member 'IGameStep.Execute()'
+Assets\Client\Scripts\Core\GameSteps.cs(145,47): error CS0535: 'SelectCardPrompt' does not implement interface member 'IGameStep.IsComplete'
+Assets\Client\Scripts\Core\GameSteps.cs(145,47): error CS0535: 'SelectCardPrompt' does not implement interface member 'IGameStep.CanCancel'
+Assets\Client\Scripts\Core\GameSteps.cs(145,47): error CS0535: 'SelectCardPrompt' does not implement interface member 'IGameStep.CancelStep()'
+Assets\Client\Scripts\Core\GameSteps.cs(145,47): error CS0535: 'SelectCardPrompt' does not implement interface member 'IGameStep.QueueStep(IGameStep)'
+Assets\Client\Scripts\Core\GameSteps.cs(145,47): error CS0535: 'SelectCardPrompt' does not implement interface member 'IGameStep.OnRingClicked(Player, Ring)'
+Assets\Client\Scripts\Core\GameSteps.cs(145,47): error CS0535: 'SelectCardPrompt' does not implement interface member 'IGameStep.OnMenuCommand(Player, string, string, string)'
+Assets\Client\Scripts\Core\GameSteps.cs(145,47): error CS0535: 'SelectCardPrompt' does not implement interface member 'IGameStep.StepName'
+Assets\Client\Scripts\Core\Prompts\SelectCardPrompt.cs(19,67): error CS0246: The type or namespace name 'PromptProperties' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\Prompts\SelectCardPrompt.cs(11,16): error CS0246: The type or namespace name 'PromptProperties' could not be found (are you missing a using directive or an assembly reference?)
+Assets\Client\Scripts\Core\Prompts\SelectCardPrompt.cs(13,29): error CS0723: Cannot declare a variable of static type 'CardSelector'
+Assets\Client\Scripts\Core\Prompts\SelectCardPrompt.cs(123,30): error CS0111: Type 'SelectCardPrompt' already defines a member called 'Continue' with the same parameter types
+Assets\Client\Scripts\Core\GameSteps\ConflictFlow.cs(781,18): error CS0263: Partial declarations of 'InitiateConflictPrompt' must not specify different base classes
+Assets\Client\Scripts\Core\Prompts\InitiateConflictPrompt.cs(27,16): error CS0111: Type 'InitiateConflictPrompt' already defines a member called 'InitiateConflictPrompt' with the same parameter types
+Assets\Client\Scripts\Core\Prompts\InitiateConflictPrompt.cs(39,30): error CS0111: Type 'InitiateConflictPrompt' already defines a member called 'Continue' with the same parameter types
+Assets\Client\Scripts\Core\Prompts\InitiateConflictPrompt.cs(139,30): error CS0111: Type 'InitiateConflictPrompt' already defines a member called 'OnCardClicked' with the same parameter types
+Assets\Client\Scripts\Core\Prompts\InitiateConflictPrompt.cs(144,30): error CS0111: Type 'InitiateConflictPrompt' already defines a member called 'OnRingClicked' with the same parameter types
+Assets\Client\Scripts\Core\GameSteps\ConflictFlow.cs(847,18): error CS0263: Partial declarations of 'SelectDefendersPrompt' must not specify different base classes
+Assets\Client\Scripts\Core\Prompts\SelectDefendersPrompt.cs(12,16): error CS0111: Type 'SelectDefendersPrompt' already defines a member called 'SelectDefendersPrompt' with the same parameter types
+Assets\Client\Scripts\Core\Prompts\SelectDefendersPrompt.cs(57,30): error CS0111: Type 'SelectDefendersPrompt' already defines a member called 'OnCardClicked' with the same parameter types
+Assets\Client\Scripts\Core\Prompts\HonorBidPrompt.cs(114,30): error CS0115: 'HonorBidPrompt.MenuCommand(Player, string)': no suitable method found to override
+Assets\Client\Scripts\Core\Prompts\HonorBidPrompt.cs(37,30): error CS0111: Type 'HonorBidPrompt' already defines a member called 'Continue' with the same parameter types
