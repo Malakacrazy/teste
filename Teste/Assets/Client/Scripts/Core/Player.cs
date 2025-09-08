@@ -23,12 +23,6 @@ namespace L5RGame
         }
     }
 
-    // Placeholder classes for missing types
-    public class AttachmentPrompt
-    {
-        public AttachmentPrompt(Game game, Player player, BaseCard card, string playingType) { }
-    }
-
     [System.Serializable]
     public class PlayerSettings
     {

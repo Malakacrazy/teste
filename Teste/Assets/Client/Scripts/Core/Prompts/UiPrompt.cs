@@ -16,10 +16,7 @@ namespace L5RGame
             uuid = System.Guid.NewGuid().ToString();
         }
 
-        public override bool IsComplete()
-        {
-            return completed;
-        }
+        public override bool IsComplete => completed;
 
         public virtual void Complete()
         {

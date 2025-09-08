@@ -4,6 +4,32 @@ using System.Collections.Generic;
 namespace L5RGame
 {
     /// <summary>
+    /// Base properties for all prompts
+    /// </summary>
+    [System.Serializable]
+    public class PromptProperties
+    {
+        public string promptTitle;
+        public string waitingPromptTitle;
+        public EffectSource source;
+        public AbilityContext context;
+        public PromptInfo activePrompt;
+        public bool canCancel = true;
+        public float timeoutSeconds = 30f;
+    }
+
+    /// <summary>
+    /// Properties for menu prompts
+    /// </summary>
+    [System.Serializable]
+    public class MenuPromptProperties : PromptProperties
+    {
+        public List<MenuOption> choices = new List<MenuOption>();
+        public System.Action<Player, string> choiceHandler;
+        public System.Action onCancel;
+    }
+
+    /// <summary>
     /// Properties for handler menu prompts
     /// </summary>
     [System.Serializable]

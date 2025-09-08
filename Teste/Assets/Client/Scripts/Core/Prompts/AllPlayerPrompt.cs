@@ -19,9 +19,6 @@ namespace L5RGame
             return false;
         }
 
-        public override bool IsComplete()
-        {
-            return game.GetPlayers().All(player => CompletionCondition(player));
-        }
+        public override bool IsComplete => game.GetPlayers().All(player => CompletionCondition(player));
     }
 }

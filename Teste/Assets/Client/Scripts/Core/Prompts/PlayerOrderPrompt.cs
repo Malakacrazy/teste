@@ -54,10 +54,13 @@ namespace L5RGame
             this.players = players;
         }
 
-        public override bool IsComplete()
-        {
-            LazyFetchPlayers();
-            return players.Count == 0;
+        public override bool IsComplete 
+        { 
+            get
+            {
+                LazyFetchPlayers();
+                return players.Count == 0;
+            }
         }
 
         public override bool ActiveCondition(Player player)

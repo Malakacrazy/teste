@@ -111,7 +111,7 @@ namespace L5RGame
             return new PromptInfo { menuTitle = "Waiting for opponent to choose a bid." };
         }
 
-        public override bool MenuCommand(Player player, string bidValue)
+        public override bool MenuCommand(Player player, string bidValue, string method = null)
         {
             game.AddMessage($"{player} has chosen a bid.");
             

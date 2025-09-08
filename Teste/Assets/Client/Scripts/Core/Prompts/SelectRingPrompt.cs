@@ -151,7 +151,7 @@ namespace L5RGame
             return true;
         }
 
-        public override bool MenuCommand(Player player, string arg)
+        public override bool MenuCommand(Player player, string arg, string method = null)
         {
             if (arg == "cancel")
             {

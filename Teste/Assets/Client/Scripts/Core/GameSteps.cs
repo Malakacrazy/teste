@@ -3,31 +3,6 @@ using System.Collections.Generic;
 
 namespace L5RGame
 {
-    public class MenuPrompt : BaseStep, IGameStep
-    {
-        private Player player;
-        private object context;
-        private MenuPromptProperties properties;
-
-        public MenuPrompt(Game game) : base(game) { }
-        public MenuPrompt(Game game, Player player, string title, string text) : base(game) { }
-        public MenuPrompt(Game game, Player targetPlayer, object contextObj, MenuPromptProperties props) : base(game)
-        {
-            player = targetPlayer;
-            context = contextObj;
-            properties = props;
-        }
-
-        public override bool Continue()
-        {
-            return false; // Wait for player input
-        }
-
-        public override string GetDebugInfo()
-        {
-            return $"MenuPrompt - Player: {player?.name}";
-        }
-    }
 
     public class GameStepHonorBidPrompt : BaseStep, IGameStep
     {
@@ -58,52 +33,7 @@ namespace L5RGame
 
 
 
-    public class HandlerMenuPrompt : BaseStep, IGameStep
-    {
-        private Player player;
-        private HandlerMenuPromptProperties properties;
 
-        public HandlerMenuPrompt(Game game) : base(game) { }
-        public HandlerMenuPrompt(Game game, Player player, object properties) : base(game) { }
-        public HandlerMenuPrompt(Game game, Player targetPlayer, HandlerMenuPromptProperties props) : base(game)
-        {
-            player = targetPlayer;
-            properties = props;
-        }
-
-        public override bool Continue()
-        {
-            return false; // Wait for player input
-        }
-
-        public override string GetDebugInfo()
-        {
-            return $"HandlerMenuPrompt - Player: {player?.name}";
-        }
-    }
-
-    public class SelectRingPrompt : BaseStep, IGameStep
-    {
-        private Player player;
-        private SelectRingPromptProperties properties;
-
-        public SelectRingPrompt(Game game) : base(game) { }
-        public SelectRingPrompt(Game game, Player targetPlayer, SelectRingPromptProperties props) : base(game)
-        {
-            player = targetPlayer;
-            properties = props;
-        }
-
-        public override bool Continue()
-        {
-            return false; // Wait for player input
-        }
-
-        public override string GetDebugInfo()
-        {
-            return $"SelectRingPrompt - Player: {player?.name}";
-        }
-    }
 
     public class SetupPhase : BaseStepWithPipeline, IGameStep
     {
@@ -142,27 +72,4 @@ namespace L5RGame
         }
     }
 
-    public class SelectCardPrompt : BaseStep, IGameStep
-    {
-        private Player player;
-        private SelectCardPromptProperties properties;
-
-        public SelectCardPrompt(Game game) : base(game) { }
-        public SelectCardPrompt(Game game, Player player, object properties) : base(game) { }
-        public SelectCardPrompt(Game game, Player targetPlayer, SelectCardPromptProperties props) : base(game)
-        {
-            player = targetPlayer;
-            properties = props;
-        }
-
-        public override bool Continue()
-        {
-            return false; // Wait for player input
-        }
-
-        public override string GetDebugInfo()
-        {
-            return $"SelectCardPrompt - Player: {player?.name}";
-        }
-    }
 }

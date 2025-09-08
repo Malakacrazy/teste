@@ -14,7 +14,7 @@ namespace L5RGame
         Func<string, bool, IMenuPromptProperties, object> ChoiceHandler { get; set; }
     }
 
-    public class MenuPromptProperties : GameAction.GameActionProperties, IMenuPromptProperties
+    public class MenuPromptActionProperties : GameAction.GameActionProperties, IMenuPromptProperties
     {
         public string ActivePromptTitle { get; set; }
         public string Player { get; set; }

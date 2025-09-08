@@ -158,7 +158,7 @@ namespace L5RGame
             return new PromptInfo { menuTitle = properties.waitingPromptTitle ?? "Waiting for opponent" };
         }
 
-        public override bool MenuCommand(Player player, string arg)
+        public override bool MenuCommand(Player player, string arg, string method = null)
         {
             if (arg == "cancel")
             {

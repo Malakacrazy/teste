@@ -10,7 +10,7 @@ namespace L5RGame
         public Player choosingPlayer;
         public PromptProperties properties;
         public AbilityContext context;
-        public CardSelector selector;
+        public BaseCardSelector selector;
         public List<BaseCard> selectedCards;
         public List<BaseCard> previouslySelectedCards;
         public bool onlyMustSelectMayBeChosen;
@@ -254,7 +254,7 @@ namespace L5RGame
             return false;
         }
 
-        public override bool MenuCommand(Player player, string arg)
+        public override bool MenuCommand(Player player, string arg, string method = null)
         {
             if (arg == "cancel")
             {

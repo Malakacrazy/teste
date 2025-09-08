@@ -4,19 +4,19 @@ using UnityEngine;
 
 namespace L5RGame
 {
-    public static readonly Dictionary<string, string> capitalize = new Dictionary<string, string>
-    {
-        {"military", "Military"},
-        {"political", "Political"},
-        {"air", "Air"},
-        {"water", "Water"},
-        {"earth", "Earth"},
-        {"fire", "Fire"},
-        {"void", "Void"}
-    };
-
     public class InitiateConflictPrompt : UiPrompt
     {
+        private static readonly Dictionary<string, string> capitalize = new Dictionary<string, string>
+        {
+            {"military", "Military"},
+            {"political", "Political"},
+            {"air", "Air"},
+            {"water", "Water"},
+            {"earth", "Earth"},
+            {"fire", "Fire"},
+            {"void", "Void"}
+        };
+
         public Conflict conflict;
         public Player choosingPlayer;
         public bool attackerChoosesRing;
@@ -301,7 +301,7 @@ namespace L5RGame
             conflict.RemoveFromConflict(card);
         }
 
-        public override bool MenuCommand(Player player, string arg)
+        public override bool MenuCommand(Player player, string arg, string method = null)
         {
             if (arg == "done")
             {
@@ -312,7 +312,7 @@ namespace L5RGame
                     return false;
                 }
                 
-                conflict.SetDeclarationComplete(true);
+                conflict.declarationComplete = true;
                 Complete();
                 conflict.declaredRing = conflict.ring;
                 conflict.declaredType = conflict.ring.conflictType;
@@ -320,12 +320,15 @@ namespace L5RGame
             }
             else if (arg == "pass")
             {
-                game.PromptWithHandlerMenu(choosingPlayer, new PromptProperties
+                game.PromptWithHandlerMenu(choosingPlayer, new HandlerMenuPromptProperties
                 {
                     activePromptTitle = "Are you sure you want to pass your conflict opportunity?",
-                    source = new EffectSource(game, "Pass Conflict"),
-                    choices = new[] { "Yes", "No" },
-                    handlers = new System.Action[]
+                    choices = new List<MenuOption> 
+                    { 
+                        new MenuOption { text = "Yes", arg = "yes" },
+                        new MenuOption { text = "No", arg = "no" }
+                    },
+                    handlers = new List<System.Action>
                     {
                         () => {
                             Complete();
