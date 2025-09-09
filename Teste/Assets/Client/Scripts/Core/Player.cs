@@ -47,6 +47,7 @@ namespace L5RGame
         public UserInfo user;
         public string emailHash;
         public string id;
+        public string uuid;  // Add uuid property for prompts
         public bool owner;
         public string printedType = "player";
         
@@ -62,6 +63,7 @@ namespace L5RGame
         public List<BaseCard> provinceDeck = new List<BaseCard>();
         public List<BaseCard> hand = new List<BaseCard>();
         public List<BaseCard> cardsInPlay = new List<BaseCard>();
+        public List<BaseCard> selectedCards = new List<BaseCard>();  // Add selectedCards property for prompts
         
         // Province locations
         public List<BaseCard> strongholdProvince = new List<BaseCard>();
@@ -319,6 +321,22 @@ namespace L5RGame
         public bool HasLegalConflictDeclaration(ConflictProperties properties)
         {
             return true; // Placeholder
+        }
+
+        // Additional overloads for HasLegalConflictDeclaration
+        public bool HasLegalConflictDeclaration(Ring ring, BaseCard province = null)
+        {
+            return true; // Placeholder - check if player can declare conflict on this ring/province
+        }
+
+        public bool HasLegalConflictDeclaration(string conflictType, Ring ring, BaseCard province = null)
+        {
+            return true; // Placeholder - check if player can declare this type of conflict
+        }
+
+        public bool HasLegalConflictDeclaration(string conflictType, Ring ring, BaseCard province, BaseCard card)
+        {
+            return true; // Placeholder - check if player can declare conflict with this card
         }
 
         public List<BaseCard> GetProvinces(System.Func<BaseCard, bool> predicate = null)

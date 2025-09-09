@@ -87,7 +87,7 @@ namespace L5RGame
 
         public override bool Continue()
         {
-            bool completed = IsComplete();
+            bool completed = IsComplete;
 
             if (completed)
             {

@@ -8,7 +8,7 @@ namespace L5RGame
     public class SelectCardPrompt : UiPrompt
     {
         public Player choosingPlayer;
-        public PromptProperties properties;
+        public SelectCardPromptProperties properties;
         public AbilityContext context;
         public BaseCardSelector selector;
         public List<BaseCard> selectedCards;
@@ -16,18 +16,19 @@ namespace L5RGame
         public bool onlyMustSelectMayBeChosen;
         public bool cannotUnselectMustSelect;
 
-        public SelectCardPrompt(Game game, Player choosingPlayer, PromptProperties properties) : base(game)
+        public SelectCardPrompt(Game game, Player choosingPlayer, SelectCardPromptProperties properties) : base(game)
         {
             this.choosingPlayer = choosingPlayer;
             
             // Handle source assignment
-            if (properties.source is string sourceStr)
+            if (properties.source == null && properties.context?.source != null)
             {
-                properties.source = new EffectSource(game, sourceStr);
+                properties.source = (EffectSource)properties.context.source;
             }
-            else if (properties.context?.source != null)
+            else if (properties.source == null)
             {
-                properties.source = properties.context.source;
+                // Create default effect source
+                properties.source = EffectSource.CreateEffectSource(game);
             }
             
             if (properties.source != null && string.IsNullOrEmpty(properties.waitingPromptTitle))
@@ -37,7 +38,7 @@ namespace L5RGame
             
             if (properties.source == null)
             {
-                properties.source = new EffectSource(game);
+                properties.source = EffectSource.CreateEffectSource(game);
             }
 
             this.properties = properties;
@@ -47,17 +48,15 @@ namespace L5RGame
             ApplyDefaultProperties();
             
             // Handle game actions
+            GameAction[] gameActions = null;
             if (properties.gameAction != null)
             {
-                if (!properties.gameAction.GetType().IsArray)
-                {
-                    properties.gameAction = new GameAction[] { properties.gameAction as GameAction };
-                }
+                gameActions = new GameAction[] { properties.gameAction };
                 
                 var originalCardCondition = properties.cardCondition;
-                properties.cardCondition = (card, ctx) =>
-                    originalCardCondition(card, ctx) && 
-                    (properties.gameAction as GameAction[]).Any(gameAction => gameAction.CanAffect(card, ctx));
+                properties.cardCondition = (card) =>
+                    originalCardCondition(card) && 
+                    gameActions.Any(gameAction => gameAction.CanAffect(card, context));
             }
             
             this.selector = properties.selector ?? CardSelector.For(properties);
@@ -83,22 +82,34 @@ namespace L5RGame
 
         private void ApplyDefaultProperties()
         {
-            properties.buttons = properties.buttons ?? new ButtonInfo[0];
-            properties.controls = properties.controls ?? GetDefaultControls();
-            properties.selectCard = properties.selectCard ?? true;
-            properties.cardCondition = properties.cardCondition ?? ((card, ctx) => true);
-            properties.onSelect = properties.onSelect ?? ((player, cards) => true);
-            properties.onMenuCommand = properties.onMenuCommand ?? ((player, arg) => true);
-            properties.onCancel = properties.onCancel ?? ((player) => true);
+            if (properties.buttons == null)
+                properties.buttons = new List<MenuOption>();
+            if (properties.controls == null)
+                properties.controls = GetDefaultControls().ToList<object>();
+            if (properties.selectCard == null)
+                properties.selectCard = (card) => { /* Default card selection */ };
+            if (properties.cardCondition == null)
+                properties.cardCondition = (card) => true;
+            if (properties.onSelect == null)
+                properties.onSelect = (player, card) => true;
+            if (properties.onMenuCommand == null)
+                properties.onMenuCommand = (player, arg) => true;
+            if (properties.onCancel == null)
+                properties.onCancel = () => true;
         }
 
         private PromptControl[] GetDefaultControls()
         {
-            var targets = context.targets?.Values.SelectMany(t => t).ToList() ?? new List<object>();
+            var targets = context.targets?.Values.ToList() ?? new List<object>();
             
-            if (targets.Count == 0 && context.eventArgs?.card != null)
+            if (targets.Count == 0 && context.eventArgs is { } eventArgs)
             {
-                targets = new List<object> { context.eventArgs.card };
+                // Try to get card property dynamically
+                var cardProp = eventArgs.GetType().GetProperty("card");
+                if (cardProp?.GetValue(eventArgs) is BaseCard card)
+                {
+                    targets = new List<object> { card };
+                }
             }
             
             return new PromptControl[]
@@ -106,11 +117,37 @@ namespace L5RGame
                 new PromptControl
                 {
                     type = "targeting",
-                    source = context.source.GetShortSummary(),
+                    source = GetSourceSummary(context.source),
                     targets = targets.OfType<BaseCard>()
-                        .Select(target => target.GetShortSummaryForControls(choosingPlayer)).ToArray()
+                        .Select(target => target.GetShortSummaryForControls(choosingPlayer)?.ToString() ?? "").ToArray()
                 }
             };
+        }
+
+        private string GetSourceSummary(object source)
+        {
+            if (source is BaseCard card)
+                return card.GetShortSummary()?.ToString() ?? "";
+            if (source is EffectSource effectSource)
+                return effectSource.GetShortSummary()?.ToString() ?? "";
+            if (source is Ring ring)
+            {
+                var ringSummary = ring.GetShortSummary();
+                return ringSummary?.ToString() ?? ring.name ?? "Unknown Ring";
+            }
+            if (source is Player player)
+            {
+                var playerSummary = player.GetShortSummary();
+                return playerSummary?.ToString() ?? player.name ?? "Unknown Player";
+            }
+            if (source is SelectChoice choice)
+                return choice.GetShortSummary()?.ToString() ?? "";
+            if (source is Spectator spectator)
+            {
+                var spectatorSummary = spectator.GetShortSummary();
+                return spectatorSummary?.ToString() ?? spectator.name ?? "Unknown Spectator";
+            }
+            return source?.ToString() ?? "Unknown";
         }
 
         private void SavePreviouslySelectedCards()
@@ -122,7 +159,7 @@ namespace L5RGame
 
         public override bool Continue()
         {
-            if (!IsComplete())
+            if (!IsComplete)
             {
                 HighlightSelectableCards();
             }
@@ -145,7 +182,7 @@ namespace L5RGame
 
         public override PromptInfo ActivePrompt()
         {
-            var buttons = properties.buttons?.ToList() ?? new List<ButtonInfo>();
+            var buttons = properties.buttons?.Select(m => new ButtonInfo { text = m.text, arg = m.arg, method = m.method, disabled = m.disabled }).ToList() ?? new List<ButtonInfo>();
             
             if (!selector.AutomaticFireOnSelect(context) && 
                 selector.HasEnoughSelected(selectedCards, context) || 
@@ -164,13 +201,13 @@ namespace L5RGame
 
             return new PromptInfo
             {
-                selectCard = properties.selectCard ?? false,
+                selectCard = true,
                 selectRing = true,
                 selectOrder = properties.ordered,
                 menuTitle = properties.activePromptTitle ?? selector.DefaultActivePromptTitle(context),
                 buttons = buttons.ToArray(),
                 promptTitle = properties.source?.name,
-                controls = properties.controls
+                controls = properties.controls?.OfType<PromptControl>().ToArray() ?? new PromptControl[0]
             };
         }
 
@@ -236,7 +273,7 @@ namespace L5RGame
             
             choosingPlayer.SetSelectedCards(selectedCards);
 
-            properties.onCardToggle?.Invoke(choosingPlayer, card);
+            properties.onCardToggle?.Invoke(card);
 
             return true;
         }
@@ -244,7 +281,8 @@ namespace L5RGame
         private bool FireOnSelect()
         {
             var cardParam = selector.FormatSelectParam(selectedCards);
-            if (properties.onSelect(choosingPlayer, cardParam))
+            List<BaseCard> cards = cardParam as List<BaseCard> ?? selectedCards;
+            if (properties.onSelectMultiple?.Invoke(choosingPlayer, cards) ?? true)
             {
                 Complete();
                 return true;
@@ -258,7 +296,7 @@ namespace L5RGame
         {
             if (arg == "cancel")
             {
-                properties.onCancel(player);
+                properties.onCancel();
                 Complete();
                 return true;
             }

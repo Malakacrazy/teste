@@ -38,7 +38,7 @@ namespace L5RGame
 
         public override bool Continue()
         {
-            if (!IsComplete())
+            if (!IsComplete)
             {
                 HighlightSelectableRings();
             }
@@ -67,7 +67,7 @@ namespace L5RGame
 
         public void HighlightSelectableRings()
         {
-            var selectableRings = game.rings.Where(ring => CheckRingCondition(ring)).ToList();
+            var selectableRings = game.rings.Values.Where(ring => CheckRingCondition(ring)).ToList();
             choosingPlayer.SetSelectableRings(selectableRings);
         }
 
@@ -89,15 +89,15 @@ namespace L5RGame
 
             if (conflict.ring == null)
             {
-                menuTitle = conflict.forcedDeclaredType ? 
+                menuTitle = !string.IsNullOrEmpty(conflict.forcedDeclaredType) ? 
                     "Choose an elemental ring" : 
                     "Choose an elemental ring\n(click the ring again to change conflict type)";
                 promptTitle = "Initiate Conflict";
             }
             else
             {
-                var conflictTypeStr = Conflict.capitalize[conflict.conflictType];
-                var elementStr = Conflict.capitalize[conflict.element];
+                var conflictTypeStr = capitalize[conflict.conflictType];
+                var elementStr = capitalize[conflict.element];
                 promptTitle = $"{conflictTypeStr} {elementStr} Conflict";
                 
                 if (conflict.conflictProvince == null && !conflict.isSinglePlayer)

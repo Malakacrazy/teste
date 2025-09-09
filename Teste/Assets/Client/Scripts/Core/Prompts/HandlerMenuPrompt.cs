@@ -8,22 +8,23 @@ namespace L5RGame
     public class HandlerMenuPrompt : UiPrompt
     {
         public Player player;
-        public PromptProperties properties;
+        public HandlerMenuPromptProperties properties;
         public Func<BaseCard, AbilityContext, bool> cardCondition;
         public AbilityContext context;
 
-        public HandlerMenuPrompt(Game game, Player player, PromptProperties properties) : base(game)
+        public HandlerMenuPrompt(Game game, Player player, HandlerMenuPromptProperties properties) : base(game)
         {
             this.player = player;
             
             // Handle source assignment
-            if (properties.source is string sourceStr)
+            if (properties.source == null && properties.context?.source != null)
             {
-                properties.source = new EffectSource(game, sourceStr);
+                properties.source = properties.context.source as EffectSource;
             }
-            else if (properties.context?.source != null)
+            else if (properties.source == null)
             {
-                properties.source = properties.context.source;
+                // Create default effect source
+                properties.source = EffectSource.CreateEffectSource(game);
             }
 
             if (properties.source != null && string.IsNullOrEmpty(properties.waitingPromptTitle))
@@ -82,17 +83,17 @@ namespace L5RGame
 
             if (properties.choices != null)
             {
-                for (int i = 0; i < properties.choices.Length; i++)
+                for (int i = 0; i < properties.choices.Count; i++)
                 {
                     buttons.Add(new ButtonInfo
                     {
-                        text = properties.choices[i],
-                        arg = i.ToString()
+                        text = properties.choices[i].text,
+                        arg = properties.choices[i].arg ?? i.ToString()
                     });
                 }
             }
 
-            if (game.manualMode && (properties.choices == null || !properties.choices.Contains("Cancel")))
+            if (game.manualMode && (properties.choices == null || !properties.choices.Any(c => c.text == "Cancel")))
             {
                 buttons.Add(new ButtonInfo { text = "Cancel Prompt", arg = "cancel" });
             }
@@ -108,7 +109,8 @@ namespace L5RGame
 
         public PromptControl[] GetAdditionalPromptControls()
         {
-            if (properties.controls?.type == "targeting")
+            var firstControl = properties.controls?.FirstOrDefault() as PromptControl;
+            if (firstControl?.type == "targeting")
             {
                 return new PromptControl[]
                 {
@@ -116,29 +118,31 @@ namespace L5RGame
                     {
                         type = "targeting",
                         source = properties.source.GetShortSummary(),
-                        targets = properties.controls.targets?.Select(target => 
-                            target.GetShortSummaryForControls(player)).ToArray()
+                        targets = firstControl.targets
                     }
                 };
             }
 
-            if (context.source.type == "")
+            if (context.source.GetType().Name == "")
             {
                 return new PromptControl[0];
             }
 
-            var targets = context.targets?.Values.SelectMany(t => t).ToList() ?? new List<object>();
+            var targets = context.targets?.Values.ToList() ?? new List<object>();
             
             if (properties.target != null)
             {
-                targets = properties.target is Array targetArray ? 
-                    targetArray.Cast<object>().ToList() : 
-                    new List<object> { properties.target };
+                targets = properties.target;
             }
 
-            if (targets.Count == 0 && context.eventArgs?.card != null)
+            if (targets.Count == 0 && context.eventArgs is { } eventArgs)
             {
-                targets = new List<object> { context.eventArgs.card };
+                // Try to get card property dynamically
+                var cardProp = eventArgs.GetType().GetProperty("card");
+                if (cardProp?.GetValue(eventArgs) is BaseCard card)
+                {
+                    targets = new List<object> { card };
+                }
             }
 
             return new PromptControl[]
@@ -146,11 +150,28 @@ namespace L5RGame
                 new PromptControl
                 {
                     type = "targeting",
-                    source = context.source.GetShortSummary(),
+                    source = GetSourceSummary(context.source)?.ToString(),
                     targets = targets.OfType<BaseCard>()
-                        .Select(target => target.GetShortSummaryForControls(player)).ToArray()
+                        .Select(target => target.GetShortSummaryForControls(player)?.ToString() ?? "").ToArray()
                 }
             };
+        }
+
+        private object GetSourceSummary(object source)
+        {
+            if (source is BaseCard card)
+                return card.GetShortSummary();
+            if (source is EffectSource effectSource)
+                return effectSource.GetShortSummary();
+            if (source is Ring ring)
+                return ring.GetShortSummary();
+            if (source is Player player)
+                return player.GetShortSummary();
+            if (source is SelectChoice choice)
+                return choice.GetShortSummary();
+            if (source is Spectator spectator)
+                return spectator.GetShortSummary();
+            return source?.ToString() ?? "Unknown";
         }
 
         public override PromptInfo WaitingPrompt()
@@ -179,14 +200,14 @@ namespace L5RGame
 
             if (int.TryParse(arg, out int choiceIndex))
             {
-                if (properties.choiceHandler != null)
+                if (properties.choiceHandler != null && choiceIndex < properties.choices.Count)
                 {
-                    properties.choiceHandler(properties.choices[choiceIndex]);
+                    properties.choiceHandler(properties.choices[choiceIndex].arg ?? arg);
                     Complete();
                     return true;
                 }
 
-                if (properties.handlers != null && choiceIndex < properties.handlers.Length)
+                if (properties.handlers != null && choiceIndex < properties.handlers.Count)
                 {
                     properties.handlers[choiceIndex]?.Invoke();
                     Complete();

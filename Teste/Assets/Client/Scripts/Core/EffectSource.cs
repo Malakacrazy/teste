@@ -11,6 +11,55 @@ namespace L5RGame
     /// </summary>
     public class EffectSource : MonoBehaviour
     {
+        /// <summary>
+        /// Constructor for creating effect sources
+        /// </summary>
+        public EffectSource() : base()
+        {
+            activeEffects = new List<object>();
+        }
+        
+        /// <summary>
+        /// Constructor with Game and source name
+        /// </summary>
+        public EffectSource(Game gameInstance, string sourceName = "Framework effect") : base()
+        {
+            game = gameInstance;
+            name = sourceName;
+            activeEffects = new List<object>();
+        }
+        
+        /// <summary>
+        /// Constructor with just source name
+        /// </summary>
+        public EffectSource(string sourceName) : base()
+        {
+            name = sourceName;
+            activeEffects = new List<object>();
+        }
+        
+        /// <summary>
+        /// Static factory method to create EffectSource with game and source name
+        /// </summary>
+        public static EffectSource CreateEffectSource(Game gameInstance, string sourceName = "Framework effect")
+        {
+            var go = new UnityEngine.GameObject(sourceName);
+            var effectSource = go.AddComponent<EffectSource>();
+            effectSource.Initialize(gameInstance, sourceName);
+            return effectSource;
+        }
+        
+        /// <summary>
+        /// Static factory method to create EffectSource with just source name
+        /// </summary>
+        public static EffectSource CreateEffectSource(string sourceName = "Framework effect")
+        {
+            var go = new UnityEngine.GameObject(sourceName);
+            var effectSource = go.AddComponent<EffectSource>();
+            effectSource.name = sourceName;
+            effectSource.activeEffects = new List<object>();
+            return effectSource;
+        }
         [Header("Effect Source")]
         public List<object> activeEffects = new List<object>();
         [System.NonSerialized]
@@ -277,6 +326,15 @@ namespace L5RGame
         {
             return activeEffects.Count;
         }
+        
+        /// <summary>
+        /// Gets a short summary of this effect source for display purposes
+        /// </summary>
+        /// <returns>Short summary string</returns>
+        public string GetShortSummary()
+        {
+            return name ?? "Unknown Effect Source";
+        }
 
         /// <summary>
         /// Creates a temporary effect that lasts for a specific number of rounds
@@ -451,5 +509,15 @@ namespace L5RGame
         public const string OnGameStateChanged = "onGameStateChanged";
         public const string OnPassPriority = "onPassPriority";
         public const string OnDuelEnded = "onDuelEnded";
+        public const string OnHonorDialsRevealed = "onHonorDialsRevealed";
+    }
+    
+    /// <summary>
+    /// Effect names for various game effects
+    /// </summary>
+    public static partial class EffectNames
+    {
+        public const string MustBeDeclaredAsAttacker = "mustBeDeclaredAsAttacker";
+        public const string MustBeDeclaredAsDefender = "mustBeDeclaredAsDefender";
     }
 }

@@ -18,6 +18,7 @@ namespace L5RGame
         {
             public int amount = 1;
             public Player source;
+            public bool afterBid = false;
             
             public TakeHonorProperties() : base() { }
             

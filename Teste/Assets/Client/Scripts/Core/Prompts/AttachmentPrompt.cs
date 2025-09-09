@@ -17,18 +17,21 @@ namespace L5RGame
 
         public override bool Continue()
         {
-            game.PromptForSelect(player, new PromptProperties
+            game.PromptForSelect(player, new SelectCardPromptProperties
             {
                 source = new EffectSource(game, "Play Attachment"),
                 activePromptTitle = "Select target for attachment",
                 controller = Players.Self,
-                gameAction = GameActions.Attach(new AttachProperties { attachment = attachmentCard }),
-                onSelect = (selectPlayer, card) =>
+                gameAction = GameActions.Attach(new AttachAction.AttachActionProperties { attachment = attachmentCard as DrawCard }),
+                onSelectAction = (selectPlayer, cards) =>
                 {
-                    var context = new AbilityContext(game, selectPlayer, card);
-                    GameActions.Attach(new AttachProperties { attachment = attachmentCard })
-                        .Resolve(card, context);
-                    return true;
+                    if (cards.Count > 0)
+                    {
+                        var card = cards[0];
+                        var context = new AbilityContext(game, selectPlayer, card);
+                        GameActions.Attach(new AttachAction.AttachActionProperties { attachment = attachmentCard as DrawCard })
+                            .Resolve(card, context);
+                    }
                 }
             });
             return true;

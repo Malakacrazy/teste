@@ -9,9 +9,18 @@ namespace L5RGame
         int Value { get; set; }
     }
 
-    public class SetDialProperties : PlayerActionProperties, ISetDialProperties
+    public class SetDialProperties : PlayerAction.PlayerActionProperties, ISetDialProperties
     {
         public int Value { get; set; }
+        
+        // IGameActionProperties implementation
+        public List<object> Target { get; set; } = new List<object>();
+        public bool CannotBeCancelled { get; set; }
+        public bool Optional { get; set; }
+        public GameAction ParentAction { get; set; }
+        
+        // IPlayerActionProperties implementation
+        public Player PlayerTarget { get; set; }
     }
 
     public partial class SetDialAction : PlayerAction

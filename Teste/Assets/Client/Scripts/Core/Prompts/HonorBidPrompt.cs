@@ -40,24 +40,25 @@ namespace L5RGame
 
             if (completed)
             {
-                game.RaiseEvent(EventNames.OnHonorDialsRevealed, new { duel = this.duel }, () =>
+                game.RaiseEvent(EventNames.OnHonorDialsRevealed, new Dictionary<string, object> { { "duel", this.duel } }, () =>
                 {
                     foreach (var player in game.GetPlayers())
                     {
                         player.honorBidModifier = 0;
                         var context = game.GetFrameworkContext();
-                        GameActions.SetHonorDial(new SetDialProperties { value = bid[player.uuid] })
+                        GameActions.SetHonorDial(new SetDialProperties { Value = bid[player.uuid] })
                             .Resolve(player, context);
                     }
+                    return true;
                 });
 
                 if (costHandler != null)
                 {
-                    game.QueueSimpleStep(() => costHandler(this));
+                    game.QueueSimpleStep(() => { costHandler(this); return true; });
                 }
                 else
                 {
-                    game.QueueSimpleStep(() => TransferHonorAfterBid());
+                    game.QueueSimpleStep(() => { TransferHonorAfterBid(); return true; });
                 }
             }
 
@@ -77,13 +78,13 @@ namespace L5RGame
             if (difference > 0)
             {
                 game.AddMessage($"{firstPlayer} gives {firstPlayer.opponent} {difference} honor");
-                GameActions.TakeHonor(new TakeHonorProperties { amount = difference, afterBid = true })
+                GameActions.TakeHonor(new TakeHonorAction.TakeHonorProperties { amount = difference, afterBid = true })
                     .Resolve(firstPlayer, context);
             }
             else if (difference < 0)
             {
                 game.AddMessage($"{firstPlayer.opponent} gives {firstPlayer} {-difference} honor");
-                GameActions.TakeHonor(new TakeHonorProperties { amount = -difference, afterBid = true })
+                GameActions.TakeHonor(new TakeHonorAction.TakeHonorProperties { amount = -difference, afterBid = true })
                     .Resolve(firstPlayer.opponent, context);
             }
         }

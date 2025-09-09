@@ -98,6 +98,7 @@ namespace L5RGame
         public Player choosingPlayerOverride = null;
         public List<GameAction> gameActionsResolutionChain = new List<GameAction>();
         public string playType;
+        public object eventArgs; // Add eventArgs property for prompt compatibility
         
         // Property aliases with capital letters for API compatibility
         public Player Player => player;
@@ -141,6 +142,17 @@ namespace L5RGame
         {
             Awake();
             Initialize(properties);
+        }
+        
+        /// <summary>
+        /// Constructor with game, player, and source parameters
+        /// </summary>
+        public AbilityContext(Game gameInstance, Player playerInstance, object sourceInstance)
+        {
+            Awake();
+            game = gameInstance;
+            player = playerInstance;
+            source = sourceInstance;
         }
 
         /// <summary>

@@ -58,6 +58,17 @@ namespace L5RGame
         public string uuid => GetInstanceID().ToString();
         public string conflictType => ConflictType;
         public List<string> elements => Elements;
+        
+        // Additional properties needed for prompts
+        public string element => ring?.name ?? "";
+        public BaseCard province => conflictProvince;
+        public int maxAllowedDefenders => 5; // Default max defenders
+        
+        /// <summary>
+        /// Capitalizes the element name for display
+        /// </summary>
+        public string capitalize => !string.IsNullOrEmpty(element) ? 
+            char.ToUpper(element[0]) + element.Substring(1).ToLower() : "";
 
         /// <summary>
         /// Initialize the conflict with attacking and defending players
@@ -228,6 +239,16 @@ namespace L5RGame
                 card.inConflict = false;
                 Debug.Log($"🏃 {card.name} removed from conflict");
             }
+        }
+        
+        /// <summary>
+        /// Mark that defenders have been chosen for this conflict
+        /// </summary>
+        /// <param name="chosen">Whether defenders have been chosen</param>
+        public void SetDefendersChosen(bool chosen = true)
+        {
+            defendersChosen = chosen;
+            Debug.Log($"⚔️ Defenders chosen status: {chosen}");
         }
 
         /// <summary>

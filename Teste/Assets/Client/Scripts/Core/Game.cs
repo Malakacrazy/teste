@@ -1146,7 +1146,26 @@ def on_trigger(card, event_name, event_data):
 
         public void PromptForHonorBid(string activePromptTitle, System.Action<int> costHandler, List<int> prohibitedBids, string additionalParam, Duel duel = null)
         {
-            QueueStep(new HonorBidPrompt(this, activePromptTitle, costHandler, prohibitedBids, duel));
+            // Convert Action<int> to Action<HonorBidPrompt>
+            System.Action<HonorBidPrompt> promptHandler = (prompt) => {
+                // Get the highest bid from all players
+                var maxBid = prompt.bid.Values.Any() ? prompt.bid.Values.Max() : 1;
+                costHandler?.Invoke(maxBid);
+            };
+            
+            // Convert List<int> to Dictionary<string, List<string>>
+            Dictionary<string, List<string>> convertedBids = null;
+            if (prohibitedBids != null)
+            {
+                convertedBids = new Dictionary<string, List<string>>();
+                // Add prohibited bids for all players (simplified conversion)
+                foreach (var player in GetPlayers())
+                {
+                    convertedBids[player.uuid] = prohibitedBids.Select(bid => bid.ToString()).ToList();
+                }
+            }
+            
+            QueueStep(new HonorBidPrompt(this, activePromptTitle, promptHandler, convertedBids, duel));
         }
 
         public bool MenuButton(string playerName, string arg, string uuid, string method, string additionalParam)

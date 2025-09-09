@@ -24,6 +24,11 @@ namespace L5RGame
         public static GainHonorAction CreateGainHonorAction(Player player, int amount) => new GainHonorAction(player, amount);
         public static GameAction CreateTakeHonorAction(Player player, Player target, int amount) => new TakeHonorAction(player, target, amount);
         
+        // Add missing static methods for prompts
+        public static AttachAction Attach(AttachAction.AttachActionProperties properties = null) => new AttachAction(properties);
+        public static SetDialAction SetHonorDial(SetDialProperties properties = null) => new SetDialAction(properties);
+        public static TakeHonorAction TakeHonor(TakeHonorAction.TakeHonorProperties properties = null) => new TakeHonorAction(properties);
+        
         // Additional missing GameAction methods
         public static GameAction CreateReadyAction(BaseCard card)
         {
@@ -241,5 +246,6 @@ namespace L5RGame
             }
         }
     }
+
 
 }

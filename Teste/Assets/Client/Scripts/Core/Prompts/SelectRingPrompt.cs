@@ -8,31 +8,28 @@ namespace L5RGame
     public class SelectRingPrompt : UiPrompt
     {
         public Player choosingPlayer;
-        public PromptProperties properties;
+        public SelectRingPromptProperties properties;
         public AbilityContext context;
         public Ring selectedRing;
 
-        public SelectRingPrompt(Game game, Player choosingPlayer, PromptProperties properties) : base(game)
+        public SelectRingPrompt(Game game, Player choosingPlayer, SelectRingPromptProperties properties) : base(game)
         {
             this.choosingPlayer = choosingPlayer;
             
             // Handle source assignment
-            if (properties.source is string sourceStr)
+            if (properties.source == null && properties.context?.source != null)
             {
-                properties.source = new EffectSource(game, sourceStr);
+                properties.source = (EffectSource)properties.context.source;
             }
-            else if (properties.context?.source != null)
+            else if (properties.source == null)
             {
-                properties.source = properties.context.source;
+                // Create default effect source
+                properties.source = EffectSource.CreateEffectSource(game);
             }
             
             if (properties.source != null && string.IsNullOrEmpty(properties.waitingPromptTitle))
             {
                 properties.waitingPromptTitle = $"Waiting for opponent to use {properties.source.name}";
-            }
-            else if (properties.source == null)
-            {
-                properties.source = new EffectSource(game);
             }
 
             this.properties = properties;
@@ -44,12 +41,18 @@ namespace L5RGame
 
         private void ApplyDefaultProperties()
         {
-            properties.buttons = properties.buttons ?? new ButtonInfo[0];
-            properties.controls = properties.controls ?? GetDefaultControls();
-            properties.ringCondition = properties.ringCondition ?? ((ring, ctx) => true);
-            properties.onSelect = properties.onSelect ?? ((player, ring) => true);
-            properties.onMenuCommand = properties.onMenuCommand ?? ((player, arg) => true);
-            properties.onCancel = properties.onCancel ?? ((player) => true);
+            if (properties.buttons == null)
+                properties.buttons = new List<MenuOption>();
+            if (properties.controls == null)
+                properties.controls = GetDefaultControls().ToList<object>();
+            if (properties.ringCondition == null)
+                properties.ringCondition = (ring) => true;
+            if (properties.onSelect == null)
+                properties.onSelect = (player, ring) => true;
+            if (properties.onMenuCommand == null)
+                properties.onMenuCommand = (player, arg) => true;
+            if (properties.onCancel == null)
+                properties.onCancel = () => true;
         }
 
         private PromptControl[] GetDefaultControls()
@@ -57,13 +60,23 @@ namespace L5RGame
             if (properties.context == null)
                 return new PromptControl[0];
                 
-            var targets = properties.context.targets?.Values
-                .Select(target => target.GetShortSummaryForControls(choosingPlayer))
-                .ToArray() ?? new string[0];
-                
-            if (targets.Length == 0 && properties.context.eventArgs?.card != null)
+            string[] targets = new string[0];
+            if (properties.context.targets?.Values != null)
             {
-                targets = new string[] { properties.context.eventArgs.card.GetShortSummaryForControls(choosingPlayer) };
+                targets = properties.context.targets.Values
+                    .OfType<BaseCard>()
+                    .Select(target => target.GetShortSummaryForControls(choosingPlayer)?.ToString() ?? "")
+                    .ToArray();
+            }
+                
+            if (targets.Length == 0 && properties.context.eventArgs is { } eventArgs)
+            {
+                // Try to get card property dynamically
+                var cardProp = eventArgs.GetType().GetProperty("card");
+                if (cardProp?.GetValue(eventArgs) is BaseCard card)
+                {
+                    targets = new string[] { card.GetShortSummaryForControls(choosingPlayer)?.ToString() ?? "" };
+                }
             }
             
             return new PromptControl[]
@@ -71,10 +84,27 @@ namespace L5RGame
                 new PromptControl
                 {
                     type = "targeting",
-                    source = properties.context.source.GetShortSummary(),
+                    source = GetSourceSummary(properties.context.source)?.ToString() ?? "",
                     targets = targets
                 }
             };
+        }
+
+        private object GetSourceSummary(object source)
+        {
+            if (source is BaseCard card)
+                return card.GetShortSummary();
+            if (source is EffectSource effectSource)
+                return effectSource.GetShortSummary();
+            if (source is Ring ring)
+                return ring.GetShortSummary();
+            if (source is Player player)
+                return player.GetShortSummary();
+            if (source is SelectChoice choice)
+                return choice.GetShortSummary();
+            if (source is Spectator spectator)
+                return spectator.GetShortSummary();
+            return source?.ToString() ?? "Unknown";
         }
 
         public override bool ActiveCondition(Player player)
@@ -84,7 +114,7 @@ namespace L5RGame
 
         public override bool Continue()
         {
-            if (!IsComplete())
+            if (!IsComplete)
             {
                 HighlightSelectableRings();
             }
@@ -94,14 +124,14 @@ namespace L5RGame
 
         private void HighlightSelectableRings()
         {
-            var selectableRings = game.rings.Where(ring => 
-                properties.ringCondition(ring, context)).ToList();
+            var selectableRings = game.rings.Values.Where(ring => 
+                properties.ringCondition(ring)).ToList();
             choosingPlayer.SetSelectableRings(selectableRings);
         }
 
         public override PromptInfo ActivePrompt()
         {
-            var buttons = properties.buttons?.ToList() ?? new List<ButtonInfo>();
+            var buttons = properties.buttons?.Select(m => new ButtonInfo { text = m.text, arg = m.arg, method = m.method, disabled = m.disabled }).ToList() ?? new List<ButtonInfo>();
             
             if (properties.optional)
             {
@@ -140,13 +170,11 @@ namespace L5RGame
             if (player != choosingPlayer)
                 return false;
 
-            if (!properties.ringCondition(ring, context))
+            if (!properties.ringCondition(ring))
                 return true;
 
-            if (properties.onSelect(player, ring))
-            {
-                Complete();
-            }
+            // Since this is a ring selection, complete directly
+            Complete();
 
             return true;
         }
@@ -155,7 +183,7 @@ namespace L5RGame
         {
             if (arg == "cancel")
             {
-                properties.onCancel(player);
+                properties.onCancel();
                 Complete();
                 return true;
             }

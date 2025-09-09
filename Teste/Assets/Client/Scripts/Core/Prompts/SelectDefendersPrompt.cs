@@ -6,6 +6,17 @@ namespace L5RGame
 {
     public class SelectDefendersPrompt : UiPrompt
     {
+        private static readonly Dictionary<string, string> capitalize = new Dictionary<string, string>
+        {
+            {"military", "Military"},
+            {"political", "Political"},
+            {"air", "Air"},
+            {"water", "Water"},
+            {"earth", "Earth"},
+            {"fire", "Fire"},
+            {"void", "Void"}
+        };
+
         public Player player;
         public Conflict conflict;
 
@@ -36,8 +47,8 @@ namespace L5RGame
 
         public override PromptInfo ActivePrompt()
         {
-            var conflictTypeStr = Conflict.capitalize[conflict.conflictType];
-            var elementStr = Conflict.capitalize[conflict.element];
+            var conflictTypeStr = capitalize[conflict.conflictType];
+            var elementStr = capitalize[conflict.element];
             string promptTitle = $"{conflictTypeStr} {elementStr} Conflict: " +
                                $"{conflict.attackerSkill} vs {conflict.defenderSkill}";
             
@@ -76,7 +87,7 @@ namespace L5RGame
             
             return card.GetCardType() == CardTypes.Character &&
                    card.controller == player &&
-                   card.CanDeclareAsDefender(conflict.conflictType);
+                   card.CanDeclareAsDefender(conflict);
         }
 
         private bool SelectCard(BaseCard card)

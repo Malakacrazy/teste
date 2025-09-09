@@ -268,6 +268,23 @@ namespace L5RGame
             return type == CardTypes.Character && IsInPlay() && !bowed && ready;
         }
 
+        // Additional overloads for CanDeclareAsAttacker
+        public virtual bool CanDeclareAsAttacker(string conflictType, Ring ring)
+        {
+            if (!CanDeclareAsAttacker())
+                return false;
+            // Additional checks for specific conflict type and ring could go here
+            return true;
+        }
+
+        public virtual bool CanDeclareAsAttacker(string conflictType, Ring ring, BaseCard province)
+        {
+            if (!CanDeclareAsAttacker(conflictType, ring))
+                return false;
+            // Additional checks for specific province could go here
+            return true;
+        }
+
         /// <summary>
         /// Get contribution to imperial favor for this card
         /// </summary>
@@ -1111,5 +1128,19 @@ namespace L5RGame
         /// Get the fate cost of this card
         /// </summary>
         public virtual int FateCost => Cost;
+        
+        /// <summary>
+        /// Check if this card can be declared as a defender in a conflict
+        /// </summary>
+        /// <param name="conflict">The conflict being defended</param>
+        /// <returns>True if the card can defend</returns>
+        public virtual bool CanDeclareAsDefender(Conflict conflict)
+        {
+            // Basic conditions for defending
+            return location == Locations.PlayArea && 
+                   !bowed && 
+                   controller == conflict?.defendingPlayer &&
+                   !inConflict;
+        }
     }
 }
