@@ -1,7 +1,0 @@
-Failed to load script air_ring_effect: Could not find file "C:\Users\tete_\Documents\GitHub\Teste\Teste\air_ring_effect"
-UnityEngine.Debug:LogError (object)
-L5RGame.PythonManager:LoadScript (string) (at Assets/Client/Scripts/Core/PythonCardScript.cs:969)
-L5RGame.AirRingEffectBridge:LoadPythonScript () (at Assets/Client/Scripts/Core/Rings/AirRingEffectBridge.cs:150)
-L5RGame.AirRingEffectBridge:InitializePythonIntegration () (at Assets/Client/Scripts/Core/Rings/AirRingEffectBridge.cs:135)
-L5RGame.AirRingEffectBridge:.ctor (bool) (at Assets/Client/Scripts/Core/Rings/AirRingEffectBridge.cs:67)
-L5RGame.AirRingEffectBridge:.ctor () (at Assets/Client/Scripts/Core/Rings/AirRingEffectBridge.cs:62)
