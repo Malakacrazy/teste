@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 #if UNITY_EDITOR || UNITY_STANDALONE
 using IronPython.Runtime;
@@ -17,41 +18,29 @@ namespace L5RGame
     public class EarthRingEffectBridge : EarthRingEffect
     {
         #region Fields
-        
+
         [Header("Python Integration")]
         [SerializeField] private bool preferPythonImplementation = true;
         [SerializeField] private bool fallbackToCSharp = true;
         [SerializeField] private string pythonScriptName = "earth_ring_effect";
-        
+
         [Header("AI Integration")]
         [SerializeField] private bool enableStrategicAnalysis = true;
         [SerializeField] private float strategicValueThreshold = 6.0f;
-        
+
         private bool pythonScriptLoaded = false;
         private bool pythonExecutionFailed = false;
-        
+
         #endregion
-        
-        #region Constructor
-        
-        public EarthRingEffectBridge() : this(true) { }
-        
-        public EarthRingEffectBridge(bool optional) : base(optional)
-        {
-            // Initialize Python integration if available
-            InitializePythonIntegration();
-        }
-        
-        #endregion
-        
+
         #region BaseAbility Override
-        
+
         public override void Initialize(BaseCard sourceCard, Game gameInstance)
         {
             base.Initialize(sourceCard, gameInstance);
             InitializePythonIntegration();
         }
-        
+
         public override bool CanExecute(AbilityContext context)
         {
             // Try Python implementation first
@@ -66,11 +55,11 @@ namespace L5RGame
                     HandlePythonError("CanExecute", e);
                 }
             }
-            
+
             // Fallback to C# implementation
             return base.CanExecute(context);
         }
-        
+
         public override void ExecuteAbility(AbilityContext context)
         {
             // Try Python implementation first
@@ -86,15 +75,15 @@ namespace L5RGame
                     HandlePythonError("ExecuteAbility", e);
                 }
             }
-            
+
             // Fallback to C# implementation
             base.ExecuteAbility(context);
         }
-        
+
         #endregion
-        
+
         #region Python Integration
-        
+
         /// <summary>
         /// Initialize Python integration
         /// </summary>
@@ -104,7 +93,7 @@ namespace L5RGame
             {
                 return;
             }
-            
+
             try
             {
                 LoadPythonScript();
@@ -115,14 +104,16 @@ namespace L5RGame
                 pythonExecutionFailed = true;
             }
         }
-        
+
         /// <summary>
         /// Load the Python script
         /// </summary>
         private void LoadPythonScript()
         {
 #if UNITY_EDITOR || UNITY_STANDALONE
-            if (PythonManager.Instance.LoadScript(pythonScriptName))
+        string scriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings", pythonScriptName + ".py");
+        
+            if (PythonManager.Instance.LoadScript(scriptPath))
             {
                 pythonScriptLoaded = true;
                 
@@ -137,19 +128,19 @@ namespace L5RGame
             }
 #endif
         }
-        
+
         /// <summary>
         /// Check if Python implementation should be used
         /// </summary>
         /// <returns>True if Python should be used</returns>
         private bool ShouldUsePythonImplementation()
         {
-            return preferPythonImplementation && 
-                   pythonScriptLoaded && 
-                   !pythonExecutionFailed && 
+            return preferPythonImplementation &&
+                   pythonScriptLoaded &&
+                   !pythonExecutionFailed &&
                    PythonManager.Instance.IsEnabled;
         }
-        
+
         /// <summary>
         /// Execute Python CanExecute method
         /// </summary>
@@ -175,7 +166,7 @@ namespace L5RGame
             return true;
 #endif
         }
-        
+
         /// <summary>
         /// Execute Python ability implementation
         /// </summary>
@@ -190,7 +181,7 @@ namespace L5RGame
             );
 #endif
         }
-        
+
         /// <summary>
         /// Get available choices from Python script
         /// </summary>
@@ -199,7 +190,7 @@ namespace L5RGame
         public List<ChoiceData> GetPythonChoices(AbilityContext context)
         {
             var choices = new List<ChoiceData>();
-            
+
 #if UNITY_EDITOR || UNITY_STANDALONE
             if (!ShouldUsePythonImplementation())
             {
@@ -238,10 +229,10 @@ namespace L5RGame
                 HandlePythonError("GetPythonChoices", e);
             }
 #endif
-            
+
             return choices;
         }
-        
+
         /// <summary>
         /// Handle Python execution errors
         /// </summary>
@@ -250,7 +241,7 @@ namespace L5RGame
         private void HandlePythonError(string method, Exception exception)
         {
             Debug.LogError($"❌ Python execution failed in {method}: {exception.Message}");
-            
+
             if (fallbackToCSharp)
             {
                 Debug.Log("🔄 Falling back to C# implementation");
@@ -261,11 +252,11 @@ namespace L5RGame
                 throw exception;
             }
         }
-        
+
         #endregion
-        
+
         #region Strategic Analysis
-        
+
         /// <summary>
         /// Get strategic value of executing this ability
         /// </summary>
@@ -275,7 +266,7 @@ namespace L5RGame
         {
             if (!enableStrategicAnalysis)
                 return 5.0f; // Default neutral value
-                
+
             // Try Python implementation first
             if (ShouldUsePythonImplementation())
             {
@@ -288,11 +279,11 @@ namespace L5RGame
                     HandlePythonError("GetStrategicValue", e);
                 }
             }
-            
+
             // Fallback to C# strategic analysis
             return CalculateStrategicValueCSharp(context);
         }
-        
+
         /// <summary>
         /// Get strategic value from Python script
         /// </summary>
@@ -317,7 +308,7 @@ namespace L5RGame
             return 5.0f;
 #endif
         }
-        
+
         /// <summary>
         /// Calculate strategic value using C# logic
         /// </summary>
@@ -326,38 +317,38 @@ namespace L5RGame
         private float CalculateStrategicValueCSharp(AbilityContext context)
         {
             float value = 0;
-            
+
             // Base value for drawing cards
             if (context.Player.Deck.Count > 0)
             {
                 value += 3.0f; // Drawing is always beneficial
             }
-            
+
             // Additional value if opponent has cards to discard
             if (context.Player.Opponent != null && context.Player.Opponent.Hand.Count > 0)
             {
                 value += 4.0f; // Opponent discard is very valuable
-                
+
                 // Extra value if opponent has many cards
                 if (context.Player.Opponent.Hand.Count >= 5)
                 {
                     value += 2.0f;
                 }
             }
-            
+
             // Penalty if player hand is already full
             if (context.Player.Hand.Count >= 6)
             {
                 value -= 1.0f;
             }
-            
+
             // Bonus for card advantage
             int expectedAdvantage = GetExpectedCardAdvantage(context);
             value += expectedAdvantage * 0.5f;
-            
+
             return Mathf.Clamp(value, 0f, 10f);
         }
-        
+
         /// <summary>
         /// Check if the ability should be auto-executed based on strategic value
         /// </summary>
@@ -367,15 +358,15 @@ namespace L5RGame
         {
             if (!enableStrategicAnalysis)
                 return false;
-                
+
             float strategicValue = GetStrategicValue(context);
             return strategicValue >= strategicValueThreshold;
         }
-        
+
         #endregion
-        
+
         #region Enhanced Analytics
-        
+
         /// <summary>
         /// Get detailed effect preview for UI
         /// </summary>
@@ -390,10 +381,10 @@ namespace L5RGame
                 CardAdvantage = GetExpectedCardAdvantage(context),
                 WillHaveFullImpact = WillHaveFullImpact(context)
             };
-            
+
             // Player effects
             preview.PlayerEffects.Add($"Draw {cardsToDrawPlayer} card(s)");
-            
+
             // Opponent effects
             if (context.Player.Opponent != null && context.Player.Opponent.Hand.Count > 0)
             {
@@ -404,10 +395,10 @@ namespace L5RGame
             {
                 preview.OpponentEffects.Add("No discard (no opponent or empty hand)");
             }
-            
+
             return preview;
         }
-        
+
         /// <summary>
         /// Log enhanced analytics for the effect
         /// </summary>
@@ -427,20 +418,20 @@ namespace L5RGame
                 { "player_deck_size", context.Player.Deck.Count },
                 { "implementation_used", ShouldUsePythonImplementation() ? "python" : "csharp" }
             };
-            
+
             if (context.Player.Opponent != null)
             {
                 analyticsData.Add("opponent_id", context.Player.Opponent.PlayerId);
                 analyticsData.Add("opponent_hand_size", context.Player.Opponent.Hand.Count);
             }
-            
+
             Game.Analytics.LogEvent("earth_ring_effect_executed", analyticsData);
         }
-        
+
         #endregion
-        
+
         #region Hot Reload Support
-        
+
         /// <summary>
         /// Reload Python script for hot reload during development
         /// </summary>
@@ -452,20 +443,20 @@ namespace L5RGame
                 Debug.LogWarning("Python script reload only available during play mode");
                 return;
             }
-            
+
             pythonScriptLoaded = false;
             pythonExecutionFailed = false;
-            
+
             try
             {
                 // Execute reload function in Python
 #if UNITY_EDITOR || UNITY_STANDALONE
                 PythonManager.Instance.ExecuteFunction(pythonScriptName, "reload_script");
 #endif
-                
+
                 // Reinitialize
                 InitializePythonIntegration();
-                
+
                 Debug.Log("🔄 Python script reloaded successfully");
             }
             catch (Exception e)
@@ -473,11 +464,11 @@ namespace L5RGame
                 Debug.LogError($"❌ Failed to reload Python script: {e.Message}");
             }
         }
-        
+
         #endregion
-        
+
         #region Unity Inspector
-        
+
 #if UNITY_EDITOR
         /// <summary>
         /// Custom inspector validation
@@ -506,10 +497,10 @@ namespace L5RGame
             Debug.Log(Game.TurnManager.GetImplementationStatus());
         }
 #endif
-        
+
         #endregion
     }
-    
+
     /// <summary>
     /// Data structure for effect preview information
     /// </summary>
@@ -522,7 +513,7 @@ namespace L5RGame
         public bool WillHaveFullImpact;
         public List<string> PlayerEffects = new List<string>();
         public List<string> OpponentEffects = new List<string>();
-        
+
         public override string ToString()
         {
             return $"{Title} - Strategic Value: {StrategicValue:F1}, Card Advantage: +{CardAdvantage}";

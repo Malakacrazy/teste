@@ -32,6 +32,7 @@ namespace L5RGame
         [Header("Script Directories")]
         public string cardScriptsPath = "StreamingAssets/Scripts/Cards";
         public string phaseScriptsPath = "StreamingAssets/Scripts/Phases";
+        public string ringScriptsPath = "StreamingAssets/Scripts/Rings";
         public string utilityScriptsPath = "StreamingAssets/Scripts/Utilities";
         public string gameActionsPath = "StreamingAssets/Scripts/GameActions";
 
@@ -57,6 +58,7 @@ namespace L5RGame
         // Hot reload
         private FileSystemWatcher cardScriptWatcher;
         private FileSystemWatcher phaseScriptWatcher;
+        private FileSystemWatcher ringScriptWatcher;
         private HashSet<string> scriptsToReload = new HashSet<string>();
 
         // Game context
@@ -245,6 +247,7 @@ def get_card(card_id):
             {
                 cardScriptsPath,
                 phaseScriptsPath,
+                ringScriptsPath,
                 utilityScriptsPath,
                 gameActionsPath
             };
@@ -266,6 +269,7 @@ def get_card(card_id):
         {
             CreateExampleCardScript();
             CreateExamplePhaseScript();
+            CreateExampleRingScript();
             CreateExampleUtilityScript();
         }
 
@@ -391,10 +395,22 @@ def on_dynasty_phase_end():
             }
         }
 
+private void CreateExampleRingScript()
+        {
+            var ringScriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings", "example_ring_effect.py");
+            
+            if (!File.Exists(ringScriptPath))
+            {
+                string exampleScript = @"# Example Ring Script";
+                File.WriteAllText(ringScriptPath, exampleScript);
+                LogDebug("Created example ring script");
+            }
+        }
+
         private void CreateExampleUtilityScript()
         {
             var utilityScriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Utilities", "game_helpers.py");
-            
+
             if (!File.Exists(utilityScriptPath))
             {
                 string exampleScript = @"# Game Helper Utilities
@@ -487,6 +503,7 @@ def get_cheapest_card_in_hand(player):
             {
                 var cardScriptsFullPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Cards");
                 var phaseScriptsFullPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Phases");
+                var ringScriptsFullPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings");
 
                 if (Directory.Exists(cardScriptsFullPath))
                 {
@@ -502,6 +519,14 @@ def get_cheapest_card_in_hand(player):
                     phaseScriptWatcher.Changed += OnScriptFileChanged;
                     phaseScriptWatcher.Created += OnScriptFileChanged;
                     phaseScriptWatcher.EnableRaisingEvents = true;
+                }
+
+                if (Directory.Exists(ringScriptsFullPath))
+                {
+                    ringScriptWatcher = new FileSystemWatcher(ringScriptsFullPath, "*.py");
+                    ringScriptWatcher.Changed += OnScriptFileChanged;
+                    ringScriptWatcher.Created += OnScriptFileChanged;
+                    ringScriptWatcher.EnableRaisingEvents = true;
                 }
 
                 LogDebug("File watchers setup for hot reload");
@@ -700,13 +725,23 @@ def get_cheapest_card_in_hand(player):
             return ExecuteScriptMethod(scriptPath, scriptName, methodName, parameters);
         }
 
+        public bool ExecuteRingScript(string ringName, string methodName, params object[] parameters)
+        {
+            if (!enablePythonScripting) return false;
+
+            var scriptName = $"{ringName}.py";
+            var scriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings", scriptName);
+            
+            return ExecuteScriptMethod(scriptPath, scriptName, methodName, parameters);
+        }
+
         public T ExecuteCardFunction<T>(string cardId, string functionName, params object[] parameters)
         {
             if (!enablePythonScripting) return default(T);
 
             var scriptName = $"{cardId}.py";
             var scriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Cards", scriptName);
-            
+
             return ExecuteScriptFunction<T>(scriptPath, scriptName, functionName, parameters);
         }
 
@@ -720,6 +755,16 @@ def get_cheapest_card_in_hand(player):
             return ExecuteScriptFunction<T>(scriptPath, scriptName, functionName, parameters);
         }
 
+        public T ExecuteRingFunction<T>(string ringName, string functionName, params object[] parameters)
+        {
+            if (!enablePythonScripting) return default(T);
+
+            var scriptName = $"{ringName}.py";
+            var scriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings", scriptName);
+            
+            return ExecuteScriptFunction<T>(scriptPath, scriptName, functionName, parameters);
+        }
+
         private bool ExecuteScriptMethod(string scriptPath, string scriptName, string methodName, params object[] parameters)
         {
             if (!File.Exists(scriptPath)) return false;
@@ -727,12 +772,12 @@ def get_cheapest_card_in_hand(player):
             try
             {
                 var scope = GetOrCreateScriptScope(scriptName, scriptPath);
-                
+
                 if (scope.ContainsVariable(methodName))
                 {
                     var method = scope.GetVariable(methodName);
                     var operation = pythonEngine.Operations;
-                    
+
                     StartCoroutine(ExecuteWithTimeout(() => operation.Invoke(method, parameters)));
                     return true;
                 }
@@ -937,6 +982,13 @@ def get_cheapest_card_in_hand(player):
                     phaseScriptWatcher.Dispose();
                     phaseScriptWatcher = null;
                 }
+
+                if (ringScriptWatcher != null)
+                {
+                    ringScriptWatcher.EnableRaisingEvents = false;
+                    ringScriptWatcher.Dispose();
+                    ringScriptWatcher = null;
+                }
                 
                 LogDebug("File watchers cleaned up");
             }
@@ -1000,8 +1052,9 @@ def get_cheapest_card_in_hand(player):
         {
             var cardScriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Cards", scriptName);
             var phaseScriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Phases", scriptName);
+            var ringScriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings", scriptName);
             
-            return File.Exists(cardScriptPath) || File.Exists(phaseScriptPath);
+            return File.Exists(cardScriptPath) || File.Exists(phaseScriptPath) || File.Exists(ringScriptPath);
         }
 
         public List<string> GetAvailableCardScripts()
@@ -1024,13 +1077,22 @@ def get_cheapest_card_in_hand(player):
                            .ToList();
         }
 
+        public List<string> GetAvailableRingScripts()
+        {
+            var ringScriptsPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings");
+            if (!Directory.Exists(ringScriptsPath)) return new List<string>();
+            
+            return Directory.GetFiles(ringScriptsPath, "*.py")
+                           .Select(Path.GetFileName)
+                           .ToList();
+        }
         public Dictionary<string, object> GetScriptVariables(string scriptName)
         {
             if (!scriptScopes.ContainsKey(scriptName)) return new Dictionary<string, object>();
-            
+
             var variables = new Dictionary<string, object>();
             var scope = scriptScopes[scriptName];
-            
+
             foreach (var variableName in scope.GetVariableNames())
             {
                 try
@@ -1042,7 +1104,7 @@ def get_cheapest_card_in_hand(player):
                     LogDebug($"Could not get variable {variableName}: {ex.Message}");
                 }
             }
-            
+
             return variables;
         }
 
@@ -1375,7 +1437,8 @@ def has_role_ability(card, ability_name):
                      $"Cached Scripts: {compiledScriptCache.Count}\n" +
                      $"Script Scopes: {scriptScopes.Count}\n" +
                      $"Available Card Scripts: {GetAvailableCardScripts().Count}\n" +
-                     $"Available Phase Scripts: {GetAvailablePhaseScripts().Count}");
+                     $"Available Phase Scripts: {GetAvailablePhaseScripts().Count}\n" +
+                     $"Available Ring Scripts: {GetAvailableRingScripts().Count}");
         }
 
         public void LogCacheStatus()
@@ -1398,15 +1461,18 @@ def has_role_ability(card, ability_name):
             // Check directories
             var cardDir = Path.Combine(Application.streamingAssetsPath, "Scripts", "Cards");
             var phaseDir = Path.Combine(Application.streamingAssetsPath, "Scripts", "Phases");
+            var ringDir = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings");
             var utilityDir = Path.Combine(Application.streamingAssetsPath, "Scripts", "Utilities");
             
             Debug.Log($"Card Scripts Directory: {(Directory.Exists(cardDir) ? "OK" : "MISSING")}");
             Debug.Log($"Phase Scripts Directory: {(Directory.Exists(phaseDir) ? "OK" : "MISSING")}");
+            Debug.Log($"Ring Scripts Directory: {(Directory.Exists(ringDir) ? "OK" : "MISSING")}");
             Debug.Log($"Utility Scripts Directory: {(Directory.Exists(utilityDir) ? "OK" : "MISSING")}");
             
             // Check file watchers
             Debug.Log($"Card Script Watcher: {(cardScriptWatcher != null ? "OK" : "NULL")}");
             Debug.Log($"Phase Script Watcher: {(phaseScriptWatcher != null ? "OK" : "NULL")}");
+            Debug.Log($"Ring Script Watcher: {(ringScriptWatcher != null ? "OK" : "NULL")}");
             
             // Test basic Python execution
             try

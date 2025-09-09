@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.IO;
 
 #if UNITY_EDITOR || UNITY_STANDALONE
 using IronPython.Runtime;
@@ -18,51 +19,39 @@ namespace L5RGame
     public class VoidRingEffectBridge : VoidRingEffect
     {
         #region Fields
-        
+
         [Header("Python Integration")]
         [SerializeField] private bool preferPythonImplementation = true;
         [SerializeField] private bool fallbackToCSharp = true;
         [SerializeField] private string pythonScriptName = "void_ring_effect";
-        
+
         [Header("AI Integration")]
         [SerializeField] private bool enableAIRecommendations = true;
         [SerializeField] private bool showStrategicValues = true;
         [SerializeField] private float autoExecuteThreshold = 7.0f;
         [SerializeField] private bool highlightCharactersLeaving = true;
-        
+
         [Header("Advanced Analytics")]
         [SerializeField] private bool enableOutcomeSimulation = true;
         [SerializeField] private bool logDetailedAnalytics = true;
         [SerializeField] private bool trackFateEconomy = true;
         [SerializeField] private bool enableThreatAssessment = true;
-        
+
         private bool pythonScriptLoaded = false;
         private bool pythonExecutionFailed = false;
         private VoidRingRecommendation currentRecommendation;
         private List<EffectOutcome> simulatedOutcomes;
-        
+
         #endregion
-        
-        #region Constructor
-        
-        public VoidRingEffectBridge() : this(true) { }
-        
-        public VoidRingEffectBridge(bool optional) : base(optional)
-        {
-            // Initialize Python integration if available
-            InitializePythonIntegration();
-        }
-        
-        #endregion
-        
+
         #region BaseAbility Override
-        
+
         public override void Initialize(BaseCard sourceCard, Game gameInstance)
         {
             base.Initialize(sourceCard, gameInstance);
             InitializePythonIntegration();
         }
-        
+
         public override bool CanExecute(AbilityContext context)
         {
             // Try Python implementation first
@@ -77,11 +66,11 @@ namespace L5RGame
                     HandlePythonError("CanExecute", e);
                 }
             }
-            
+
             // Fallback to C# implementation
             return base.CanExecute(context);
         }
-        
+
         public override void ExecuteAbility(AbilityContext context)
         {
             // Generate AI recommendation if enabled
@@ -89,13 +78,13 @@ namespace L5RGame
             {
                 GenerateAIRecommendation(context);
             }
-            
+
             // Simulate outcomes if enabled
             if (enableOutcomeSimulation)
             {
                 SimulateEffectOutcomes(context);
             }
-            
+
             // Try Python implementation first
             if (ShouldUsePythonImplementation())
             {
@@ -109,15 +98,15 @@ namespace L5RGame
                     HandlePythonError("ExecuteAbility", e);
                 }
             }
-            
+
             // Fallback to C# implementation
             base.ExecuteAbility(context);
         }
-        
+
         #endregion
-        
+
         #region Python Integration
-        
+
         /// <summary>
         /// Initialize Python integration
         /// </summary>
@@ -127,7 +116,7 @@ namespace L5RGame
             {
                 return;
             }
-            
+
             try
             {
                 LoadPythonScript();
@@ -138,14 +127,16 @@ namespace L5RGame
                 pythonExecutionFailed = true;
             }
         }
-        
+
         /// <summary>
         /// Load the Python script
         /// </summary>
         private void LoadPythonScript()
         {
 #if UNITY_EDITOR || UNITY_STANDALONE
-            if (PythonManager.Instance.LoadScript(pythonScriptName))
+        string scriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings", pythonScriptName + ".py");
+
+            if (PythonManager.Instance.LoadScript(scriptPath))
             {
                 pythonScriptLoaded = true;
                 
@@ -160,19 +151,19 @@ namespace L5RGame
             }
 #endif
         }
-        
+
         /// <summary>
         /// Check if Python implementation should be used
         /// </summary>
         /// <returns>True if Python should be used</returns>
         private bool ShouldUsePythonImplementation()
         {
-            return preferPythonImplementation && 
-                   pythonScriptLoaded && 
-                   !pythonExecutionFailed && 
+            return preferPythonImplementation &&
+                   pythonScriptLoaded &&
+                   !pythonExecutionFailed &&
                    PythonManager.Instance.IsEnabled;
         }
-        
+
         /// <summary>
         /// Execute Python CanExecute method
         /// </summary>
@@ -197,7 +188,7 @@ namespace L5RGame
             return true;
 #endif
         }
-        
+
         /// <summary>
         /// Execute Python ability implementation
         /// </summary>
@@ -212,7 +203,7 @@ namespace L5RGame
             );
 #endif
         }
-        
+
         /// <summary>
         /// Get valid targets from Python script
         /// </summary>
@@ -221,7 +212,7 @@ namespace L5RGame
         public List<BaseCard> GetPythonValidTargets(AbilityContext context)
         {
             var targets = new List<BaseCard>();
-            
+
 #if UNITY_EDITOR || UNITY_STANDALONE
             if (!ShouldUsePythonImplementation())
             {
@@ -252,10 +243,10 @@ namespace L5RGame
                 HandlePythonError("GetPythonValidTargets", e);
             }
 #endif
-            
+
             return targets;
         }
-        
+
         /// <summary>
         /// Handle Python execution errors
         /// </summary>
@@ -264,7 +255,7 @@ namespace L5RGame
         private void HandlePythonError(string method, Exception exception)
         {
             Debug.LogError($"❌ Python execution failed in {method}: {exception.Message}");
-            
+
             if (fallbackToCSharp)
             {
                 Debug.Log("🔄 Falling back to C# implementation");
@@ -275,11 +266,11 @@ namespace L5RGame
                 throw exception;
             }
         }
-        
+
         #endregion
-        
+
         #region AI Recommendations
-        
+
         /// <summary>
         /// Generate AI recommendation for target selection
         /// </summary>
@@ -289,7 +280,7 @@ namespace L5RGame
             try
             {
                 currentRecommendation = GetAIRecommendation(context);
-                
+
                 if (currentRecommendation != null && showStrategicValues)
                 {
                     Debug.Log($"🤖 AI Recommendation: Target {currentRecommendation.Target.Name} " +
@@ -302,7 +293,7 @@ namespace L5RGame
                 Debug.LogWarning($"Failed to generate AI recommendation: {e.Message}");
             }
         }
-        
+
         /// <summary>
         /// Get AI recommendation from Python or C# implementation
         /// </summary>
@@ -322,11 +313,11 @@ namespace L5RGame
                     HandlePythonError("GetAIRecommendation", e);
                 }
             }
-            
+
             // Fallback to C# implementation
             return GenerateAIRecommendationCSharp(context);
         }
-        
+
         /// <summary>
         /// Get AI recommendation from Python script
         /// </summary>
@@ -360,10 +351,10 @@ namespace L5RGame
                 }
             }
 #endif
-            
+
             return null;
         }
-        
+
         /// <summary>
         /// Generate AI recommendation using C# logic
         /// </summary>
@@ -376,10 +367,10 @@ namespace L5RGame
             {
                 return null;
             }
-            
+
             var strategicValue = GetTargetStrategicValue(bestTarget, context);
             var reasoning = GenerateReasoningCSharp(bestTarget, context);
-            
+
             return new VoidRingRecommendation
             {
                 Target = bestTarget,
@@ -389,7 +380,7 @@ namespace L5RGame
                 Source = "C# AI"
             };
         }
-        
+
         /// <summary>
         /// Generate reasoning for C# recommendation
         /// </summary>
@@ -399,11 +390,11 @@ namespace L5RGame
         private string GenerateReasoningCSharp(BaseCard target, AbilityContext context)
         {
             var reasons = new List<string>();
-            
+
             if (target.Owner != context.Player)
             {
                 reasons.Add("opponent's character");
-                
+
                 if (target.FateTokens <= fateToRemove)
                 {
                     reasons.Add("will remove from play");
@@ -421,20 +412,20 @@ namespace L5RGame
                     reasons.Add("triggers beneficial leave-play effects");
                 }
             }
-            
+
             if (target.Power >= 4)
             {
                 reasons.Add($"powerful ({target.Power} power)");
             }
-            
+
             if (target.IsParticipatingInConflict)
             {
                 reasons.Add("participating in conflict");
             }
-            
+
             return string.Join(", ", reasons);
         }
-        
+
         /// <summary>
         /// Check if the ability should be auto-executed based on recommendation
         /// </summary>
@@ -444,14 +435,14 @@ namespace L5RGame
         {
             if (!enableAIRecommendations || currentRecommendation == null)
                 return false;
-                
+
             return currentRecommendation.StrategicValue >= autoExecuteThreshold;
         }
-        
+
         #endregion
-        
+
         #region Outcome Simulation
-        
+
         /// <summary>
         /// Simulate all possible effect outcomes
         /// </summary>
@@ -470,11 +461,11 @@ namespace L5RGame
                     // Fallback to C# simulation
                     simulatedOutcomes = SimulateOutcomesCSharp(context);
                 }
-                
+
                 if (simulatedOutcomes != null && simulatedOutcomes.Count > 0)
                 {
                     Debug.Log($"📊 Simulated {simulatedOutcomes.Count} possible outcomes");
-                    
+
                     // Log top outcomes
                     var topOutcomes = simulatedOutcomes.OrderByDescending(o => o.StrategicValue).Take(3);
                     foreach (var outcome in topOutcomes)
@@ -489,7 +480,7 @@ namespace L5RGame
                 Debug.LogWarning($"Failed to simulate outcomes: {e.Message}");
             }
         }
-        
+
         /// <summary>
         /// Get simulated outcomes from Python script
         /// </summary>
@@ -498,7 +489,7 @@ namespace L5RGame
         private List<EffectOutcome> GetPythonSimulatedOutcomes(AbilityContext context)
         {
             var outcomes = new List<EffectOutcome>();
-            
+
 #if UNITY_EDITOR || UNITY_STANDALONE
             try
             {
@@ -536,10 +527,10 @@ namespace L5RGame
                 HandlePythonError("GetPythonSimulatedOutcomes", e);
             }
 #endif
-            
+
             return outcomes;
         }
-        
+
         /// <summary>
         /// Simulate outcomes using C# logic
         /// </summary>
@@ -549,14 +540,14 @@ namespace L5RGame
         {
             var validTargets = GetValidCharacterTargets(context);
             var outcomes = new List<EffectOutcome>();
-            
+
             foreach (var target in validTargets)
             {
                 var fateBefore = target.FateTokens;
                 var fateAfter = Mathf.Max(0, fateBefore - fateToRemove);
                 var willLeave = fateAfter <= 0;
                 var strategicValue = GetTargetStrategicValue(target, context);
-                
+
                 outcomes.Add(new EffectOutcome
                 {
                     Target = target,
@@ -567,13 +558,13 @@ namespace L5RGame
                     OwnerType = target.Owner == context.Player ? "player" : "opponent"
                 });
             }
-            
+
             // Sort by strategic value
             outcomes = outcomes.OrderByDescending(o => o.StrategicValue).ToList();
-            
+
             return outcomes;
         }
-        
+
         /// <summary>
         /// Get comprehensive effect analysis
         /// </summary>
@@ -585,7 +576,7 @@ namespace L5RGame
             var charactersLeaving = GetCharactersThatWouldLeave(context);
             var recommendation = currentRecommendation;
             var outcomes = simulatedOutcomes ?? SimulateOutcomesCSharp(context);
-            
+
             var analysis = new EffectAnalysis
             {
                 ValidTargetsCount = validTargets.Count,
@@ -597,10 +588,10 @@ namespace L5RGame
                 ThreatLevel = CalculateThreatLevel(context, validTargets),
                 FateEconomyImpact = CalculateFateEconomyImpact(context, validTargets)
             };
-            
+
             return analysis;
         }
-        
+
         /// <summary>
         /// Calculate threat level of opponent characters
         /// </summary>
@@ -611,34 +602,34 @@ namespace L5RGame
         {
             if (!enableThreatAssessment)
                 return 0f;
-                
+
             float threatLevel = 0f;
             var opponentTargets = validTargets.Where(t => t.Owner != context.Player).ToList();
-            
+
             foreach (var target in opponentTargets)
             {
                 // Base threat from power
                 threatLevel += target.Power * 0.5f;
-                
+
                 // Extra threat from fate (sustainability)
                 threatLevel += target.FateTokens * 0.3f;
-                
+
                 // Extra threat from special abilities
                 if (target.HasSpecialAbilities)
                 {
                     threatLevel += 1.0f;
                 }
-                
+
                 // Extra threat if participating in conflict
                 if (target.IsParticipatingInConflict)
                 {
                     threatLevel += 2.0f;
                 }
             }
-            
+
             return Mathf.Clamp(threatLevel, 0f, 10f);
         }
-        
+
         /// <summary>
         /// Calculate fate economy impact
         /// </summary>
@@ -649,18 +640,18 @@ namespace L5RGame
         {
             if (!trackFateEconomy)
                 return 0f;
-                
+
             float economyImpact = 0f;
-            
+
             foreach (var target in validTargets)
             {
                 var fateValue = Mathf.Min(target.FateTokens, fateToRemove);
-                
+
                 if (target.Owner != context.Player)
                 {
                     // Positive impact - removing opponent's fate
                     economyImpact += fateValue;
-                    
+
                     // Extra value if it causes character to leave
                     if (target.FateTokens <= fateToRemove)
                     {
@@ -673,14 +664,14 @@ namespace L5RGame
                     economyImpact -= fateValue;
                 }
             }
-            
+
             return economyImpact;
         }
-        
+
         #endregion
-        
+
         #region Enhanced UI Integration
-        
+
         /// <summary>
         /// Get enhanced target data with comprehensive information
         /// </summary>
@@ -690,7 +681,7 @@ namespace L5RGame
         {
             var targets = GetValidCharacterTargets(context);
             var enhancedData = new List<EnhancedVoidTargetData>();
-            
+
             foreach (var target in targets)
             {
                 var data = new EnhancedVoidTargetData
@@ -705,22 +696,22 @@ namespace L5RGame
                     Power = target.Power,
                     Cost = target.Cost
                 };
-                
+
                 // Generate description
                 data.Description = GenerateEnhancedTargetDescription(data);
-                
+
                 enhancedData.Add(data);
             }
-            
+
             // Sort by strategic value and highlight leaving characters
             enhancedData = enhancedData
                 .OrderByDescending(d => d.WillLeavePlay ? 1 : 0)
                 .ThenByDescending(d => d.StrategicValue)
                 .ToList();
-            
+
             return enhancedData;
         }
-        
+
         /// <summary>
         /// Generate enhanced description for target data
         /// </summary>
@@ -729,29 +720,29 @@ namespace L5RGame
         private string GenerateEnhancedTargetDescription(EnhancedVoidTargetData data)
         {
             var description = $"{data.OwnerType}'s character ({data.Power} power, {data.FateTokens} fate)";
-            
+
             if (data.WillLeavePlay && highlightCharactersLeaving)
             {
                 description += " ⚠️ WILL LEAVE PLAY";
             }
-            
+
             if (showStrategicValues)
             {
                 description += $" | Value: {data.StrategicValue:F1}/10";
             }
-            
+
             if (data.IsRecommended)
             {
                 description += " | ⭐ AI Recommended";
             }
-            
+
             return description;
         }
-        
+
         #endregion
-        
+
         #region Enhanced Analytics
-        
+
         /// <summary>
         /// Log enhanced analytics with comprehensive data
         /// </summary>
@@ -762,9 +753,9 @@ namespace L5RGame
         {
             if (!logDetailedAnalytics)
                 return;
-                
+
             var analysis = GetEffectAnalysis(context);
-            
+
             var analyticsData = new Dictionary<string, object>
             {
                 { "ability_id", AbilityId.VoidRing },
@@ -779,7 +770,7 @@ namespace L5RGame
                 { "threat_level", analysis.ThreatLevel },
                 { "fate_economy_impact", analysis.FateEconomyImpact }
             };
-            
+
             if (selectedTarget != null)
             {
                 analyticsData.Add("target_fate_before", selectedTarget.FateTokens + fateToRemove);
@@ -789,7 +780,7 @@ namespace L5RGame
                 analyticsData.Add("target_cost", selectedTarget.Cost);
                 analyticsData.Add("target_owner", selectedTarget.Owner == context.Player ? "player" : "opponent");
             }
-            
+
             if (currentRecommendation != null)
             {
                 analyticsData.Add("ai_recommended_target", currentRecommendation.Target.CardId);
@@ -797,14 +788,14 @@ namespace L5RGame
                 analyticsData.Add("ai_reasoning", currentRecommendation.Reasoning);
                 analyticsData.Add("player_followed_recommendation", wasRecommended);
             }
-            
+
             Game.Analytics.LogEvent("void_ring_effect_enhanced", analyticsData);
         }
-        
+
         #endregion
-        
+
         #region Hot Reload Support
-        
+
         /// <summary>
         /// Reload Python script for hot reload during development
         /// </summary>
@@ -816,22 +807,22 @@ namespace L5RGame
                 Debug.LogWarning("Python script reload only available during play mode");
                 return;
             }
-            
+
             pythonScriptLoaded = false;
             pythonExecutionFailed = false;
             currentRecommendation = null;
             simulatedOutcomes = null;
-            
+
             try
             {
                 // Execute reload function in Python
 #if UNITY_EDITOR || UNITY_STANDALONE
                 PythonManager.Instance.ExecuteFunction(pythonScriptName, "reload_script");
 #endif
-                
+
                 // Reinitialize
                 InitializePythonIntegration();
-                
+
                 Debug.Log("🔄 Python script reloaded successfully");
             }
             catch (Exception e)
@@ -839,7 +830,7 @@ namespace L5RGame
                 Debug.LogError($"❌ Failed to reload Python script: {e.Message}");
             }
         }
-        
+
         /// <summary>
         /// Configure Python fate amount at runtime
         /// </summary>
@@ -852,7 +843,7 @@ namespace L5RGame
                 Debug.LogWarning("Python implementation not available");
                 return;
             }
-            
+
             try
             {
 #if UNITY_EDITOR || UNITY_STANDALONE
@@ -865,11 +856,11 @@ namespace L5RGame
                 Debug.LogError($"❌ Failed to configure Python fate amount: {e.Message}");
             }
         }
-        
+
         #endregion
-        
+
         #region Unity Inspector
-        
+
 #if UNITY_EDITOR
         /// <summary>
         /// Custom inspector validation
@@ -914,10 +905,10 @@ namespace L5RGame
                      $"Fate Economy Impact: {analysis.FateEconomyImpact:F1}");
         }
 #endif
-        
+
         #endregion
     }
-    
+
     /// <summary>
     /// Data structure for Void Ring AI recommendations
     /// </summary>
@@ -929,13 +920,13 @@ namespace L5RGame
         public string Reasoning;
         public bool WillCauseLeaving;
         public string Source;
-        
+
         public override string ToString()
         {
             return $"Target {Target?.Name} (Value: {StrategicValue:F1}) - {Reasoning}";
         }
     }
-    
+
     /// <summary>
     /// Data structure for effect outcomes
     /// </summary>
@@ -948,13 +939,13 @@ namespace L5RGame
         public bool WillLeavePlay;
         public float StrategicValue;
         public string OwnerType;
-        
+
         public override string ToString()
         {
             return $"{Target?.Name}: {FateBefore} → {FateAfter} fate (Value: {StrategicValue:F1}, Leaves: {WillLeavePlay})";
         }
     }
-    
+
     /// <summary>
     /// Enhanced target data with comprehensive information
     /// </summary>
@@ -971,7 +962,7 @@ namespace L5RGame
         public string OwnerType;
         public int Power;
         public int Cost;
-        
+
         public override string ToString()
         {
             var leaving = WillLeavePlay ? " (Leaving)" : "";
@@ -979,7 +970,7 @@ namespace L5RGame
             return $"{DisplayName} - {FateTokens} fate, Value: {StrategicValue:F1}{leaving}{recommended}";
         }
     }
-    
+
     /// <summary>
     /// Comprehensive effect analysis data
     /// </summary>
@@ -994,7 +985,7 @@ namespace L5RGame
         public VoidRingRecommendation Recommendation;
         public float ThreatLevel;
         public float FateEconomyImpact;
-        
+
         public override string ToString()
         {
             return $"Void Ring Analysis: {ValidTargetsCount} targets, {CharactersLeavingCount} leaving, " +

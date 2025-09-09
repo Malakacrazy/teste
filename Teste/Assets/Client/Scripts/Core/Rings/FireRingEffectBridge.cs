@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.IO;
 
 #if UNITY_EDITOR || UNITY_STANDALONE
 using IronPython.Runtime;
@@ -111,18 +112,6 @@ namespace L5RGame
 
         #endregion
 
-        #region Constructor
-
-        public FireRingEffectBridge() : this(true) { }
-
-        public FireRingEffectBridge(bool optional) : base(optional)
-        {
-            // Initialize Python integration if available
-            InitializePythonIntegration();
-        }
-
-        #endregion
-
         #region BaseAbility Override
 
         public override void Initialize(BaseCard sourceCard, Game gameInstance)
@@ -207,7 +196,9 @@ namespace L5RGame
         private void LoadPythonScript()
         {
 #if UNITY_EDITOR || UNITY_STANDALONE
-            if (PythonManager.Instance.LoadScript(pythonScriptName))
+        string scriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings", pythonScriptName + ".py");
+
+            if (PythonManager.Instance.LoadScript(scriptPath))
             {
                 pythonScriptLoaded = true;
                 

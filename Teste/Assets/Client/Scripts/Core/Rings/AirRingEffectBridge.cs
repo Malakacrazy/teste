@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 #if UNITY_EDITOR || UNITY_STANDALONE
 using IronPython.Runtime;
@@ -54,18 +55,6 @@ namespace L5RGame
 
         private bool pythonScriptLoaded = false;
         private bool pythonExecutionFailed = false;
-
-        #endregion
-
-        #region Constructor
-
-        public AirRingEffectBridge() : this(true) { }
-
-        public AirRingEffectBridge(bool optional) : base(optional)
-        {
-            // Initialize Python integration if available
-            InitializePythonIntegration();
-        }
 
         #endregion
 
@@ -147,7 +136,9 @@ namespace L5RGame
         private void LoadPythonScript()
         {
 #if UNITY_EDITOR || UNITY_STANDALONE
-            if (PythonManager.Instance.LoadScript(pythonScriptName))
+        string scriptPath = Path.Combine(Application.streamingAssetsPath, "Scripts", "Rings", pythonScriptName + ".py");
+
+            if (PythonManager.Instance.LoadScript(scriptPath))
             {
                 pythonScriptLoaded = true;
                 
