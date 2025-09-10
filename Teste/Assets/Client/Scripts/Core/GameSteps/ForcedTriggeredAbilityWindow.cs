@@ -34,7 +34,8 @@ namespace L5RGame
 
         public override bool Continue()
         {
-            game.currentAbilityWindow = this;
+            // Note: ForcedTriggeredAbilityWindow doesn't inherit from AbilityWindow
+            // game.currentAbilityWindow = this as AbilityWindow;
             
             if (eventWindow != null)
             {
@@ -70,7 +71,7 @@ namespace L5RGame
                 return true;
             }
 
-            if (choices.Count == 1 || !currentPlayer.optionSettings.orderForcedAbilities)
+            if (choices.Count == 1 || !(currentPlayer.optionSettings.ContainsKey("orderForcedAbilities") && (bool)currentPlayer.optionSettings["orderForcedAbilities"]))
             {
                 ResolveAbility(choices[0]);
                 return false;
@@ -95,7 +96,7 @@ namespace L5RGame
             {
                 activePromptTitle = GetPromptTitle(),
                 waitingPromptTitle = "Waiting for opponent",
-                source = "Triggered Abilities",
+                source = EffectSource.CreateEffectSource(game, "Triggered Abilities"),
                 cardCondition = card => choices.Any(context => context.source == card),
                 onSelect = (player, card) =>
                 {
@@ -133,7 +134,7 @@ namespace L5RGame
             {
                 activePromptTitle = "Which ability would you like to use?",
                 waitingPromptTitle = "Waiting for opponent",
-                source = "Triggered Abilities", 
+                source = EffectSource.CreateEffectSource(game, "Triggered Abilities"), 
                 choices = menuChoices.Select(choice => new MenuOption { text = choice }).ToList(),
                 handlers = handlers
             });
@@ -158,7 +159,7 @@ namespace L5RGame
             {
                 activePromptTitle = "Select a card to affect",
                 waitingPromptTitle = "Waiting for opponent",
-                source = "Triggered Abilities",
+                source = EffectSource.CreateEffectSource(game, "Triggered Abilities"),
                 cardCondition = card => choices.Any(context => context.GetEvent()?.card == card),
                 buttons = addBackButton ? new List<MenuOption> { new MenuOption { text = "Back", arg = "back" } } : new List<MenuOption>(),
                 onSelect = (player, card) =>
@@ -202,7 +203,7 @@ namespace L5RGame
             {
                 activePromptTitle = "Choose an event to respond to",
                 waitingPromptTitle = "Waiting for opponent",
-                source = "Triggered Abilities",
+                source = EffectSource.CreateEffectSource(game, "Triggered Abilities"),
                 choices = menuChoices.Select(choice => new MenuOption { text = choice }).ToList(),
                 handlers = handlers
             });
@@ -233,7 +234,7 @@ namespace L5RGame
         protected virtual void EmitEvents()
         {
             choices.Clear();
-            events = eventWindow.events.Except(eventsToExclude).ToList();
+            events = eventWindow.Events.Except(eventsToExclude).ToList();
             
             foreach (var gameEvent in events)
             {
@@ -264,6 +265,18 @@ namespace L5RGame
         public virtual void Close()
         {
             OnWindowClosed?.Invoke(this);
+        }
+
+        /// <summary>
+        /// Get base prompt properties for select operations
+        /// </summary>
+        protected virtual Dictionary<string, object> GetPromptForSelectProperties()
+        {
+            return new Dictionary<string, object>
+            {
+                { "source", "Triggered Abilities" },
+                { "waitingPromptTitle", "Waiting for opponent" }
+            };
         }
 
         public override string GetDebugInfo()

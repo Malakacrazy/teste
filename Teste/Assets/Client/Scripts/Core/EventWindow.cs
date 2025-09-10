@@ -206,7 +206,7 @@ namespace L5RGame
             }
             else
             {
-                QueueStep(new TriggeredAbilityWindow(game, abilityType, this));
+                QueueStep(new TriggeredAbilityWindow(game, abilityType, Events.Cast<object>().ToList()));
             }
             
             return true;
@@ -231,7 +231,7 @@ namespace L5RGame
                 // Exclude current events from the new window, we just want to give players 
                 // opportunities to respond to the contingent events
                 var currentEvents = events.Cast<object>().ToList(); // Copy current events
-                QueueStep(new TriggeredAbilityWindow(game, AbilityTypes.WouldInterrupt, this, currentEvents));
+                QueueStep(new TriggeredAbilityWindow(game, AbilityTypes.WouldInterrupt, Events.Cast<object>().ToList(), currentEvents));
                 
                 // Add contingent events to this window
                 foreach (var contingentEvent in contingentEvents)

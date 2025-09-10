@@ -8,6 +8,8 @@ namespace L5RGame
     /// </summary>
     public class DynastyActionWindow : ActionWindow
     {
+        public event System.Action OnActionWindowComplete;
+
         public DynastyActionWindow(Game game) : base(game, "Play cards from provinces")
         {
             this.windowType = "dynasty";
@@ -38,10 +40,9 @@ namespace L5RGame
                         { "player", currentPlayer }, 
                         { "firstToPass", true } 
                     }, 
-                    (eventData) => 
+                    () => 
                     {
-                        var player = eventData["player"] as Player;
-                        player?.ModifyFate(1);
+                        currentPlayer?.ModifyFate(1);
                         return true;
                     });
             }
@@ -59,6 +60,7 @@ namespace L5RGame
             if (currentPlayer.opponent == null || currentPlayer.opponent.passedDynasty)
             {
                 Complete();
+                OnActionWindowComplete?.Invoke();
             }
             else
             {
@@ -73,6 +75,11 @@ namespace L5RGame
             {
                 currentPlayer = otherPlayer;
             }
+        }
+
+        public bool IsActive()
+        {
+            return !isComplete;
         }
 
         public new string GetDebugInfo()

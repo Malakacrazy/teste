@@ -658,6 +658,22 @@ namespace L5RGame
         }
 
         /// <summary>
+        /// Gets the event object associated with this context
+        /// </summary>
+        /// <returns>The event object or null if none</returns>
+        public GameEvent GetEvent()
+        {
+            // Return the event object if available, otherwise try to cast eventObj
+            if (eventObject != null)
+                return eventObject;
+                
+            if (eventObj is GameEvent gameEvent)
+                return gameEvent;
+                
+            return null;
+        }
+
+        /// <summary>
         /// Gets a string representation of the context for debugging
         /// </summary>
         /// <returns>String representation</returns>

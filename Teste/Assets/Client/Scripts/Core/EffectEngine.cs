@@ -15,7 +15,7 @@ namespace L5RGame
         public string id;
         public string duration;
         public EffectSource source;
-        public List<GameObject> targets = new List<GameObject>();
+        public List<EffectSource> targets = new List<EffectSource>();
         public GameObject match;
 
         [Header("Effect Properties")]
@@ -38,12 +38,12 @@ namespace L5RGame
         /// <param name="effectTargets">Target objects</param>
         /// <param name="effectProperties">Effect properties</param>
         public void Initialize(EffectSource effectSource, string effectDuration, 
-                             List<GameObject> effectTargets, object effectProperties)
+                             List<EffectSource> effectTargets, object effectProperties)
         {
             id = Guid.NewGuid().ToString();
             source = effectSource;
             duration = effectDuration;
-            targets = effectTargets ?? new List<GameObject>();
+            targets = effectTargets ?? new List<EffectSource>();
             effect = effectProperties;
             appliedAt = DateTime.Now;
             isActive = true;
@@ -92,7 +92,7 @@ namespace L5RGame
         /// </summary>
         /// <param name="target">Target to validate</param>
         /// <returns>True if target is valid</returns>
-        private bool IsValidTarget(GameObject target)
+        private bool IsValidTarget(EffectSource target)
         {
             // Basic validation - target exists and meets match criteria
             if (target == null) return false;
@@ -365,7 +365,7 @@ namespace L5RGame
                 string title = $"{(context.source as EffectSource)?.name ?? "Unknown"}'s effect";
                 if (targets.Count == 1)
                 {
-                    title += $" on {targets[0].objectName}";
+                    title += $" on {targets[0].name}";
                 }
 
                 return new EffectChoice
@@ -885,7 +885,7 @@ namespace L5RGame
         /// <param name="effectProperties">Effect properties</param>
         /// <returns>Created effect</returns>
         public static GameEffect AddSimpleEffect(this EffectEngine engine, EffectSource source, 
-                                                string duration, List<GameObject> targets, object effectProperties)
+                                                string duration, List<EffectSource> targets, object effectProperties)
         {
             var effect = new GameEffect();
             effect.Initialize(source, duration, targets, effectProperties);

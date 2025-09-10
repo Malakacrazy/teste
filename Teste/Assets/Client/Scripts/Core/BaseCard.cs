@@ -1156,7 +1156,14 @@ namespace L5RGame
                 foreach (var effect in persistentEffects)
                 {
                     // Apply effects through the game's effect engine
-                    game?.EffectEngine?.RegisterPersistentEffect(this, effect);
+                    var gameEffect = new GameEffect
+                    {
+                        duration = "persistent",
+                        source = this,
+                        effect = effect,
+                        targets = new List<EffectSource> { this }
+                    };
+                    game?.EffectEngine?.Add(gameEffect);
                 }
             }
         }

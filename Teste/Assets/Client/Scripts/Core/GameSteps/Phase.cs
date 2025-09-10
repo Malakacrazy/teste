@@ -14,6 +14,7 @@ namespace L5RGame
         [SerializeField] private string phaseName;
         
         private List<BaseStep> phaseSteps = new List<BaseStep>();
+        private List<IGameStep> allPhaseSteps = new List<IGameStep>();
 
         public Phase(Game game, string name) : base(game, name)
         {
@@ -24,16 +25,27 @@ namespace L5RGame
         /// Initialize phase with its constituent steps
         /// </summary>
         /// <param name="steps">Steps that make up this phase</param>
-        public virtual void InitializePhase(List<BaseStep> steps)
+        public virtual void InitializePhase(List<IGameStep> steps)
         {
             pipeline.Initialize(new List<IGameStep> { new SimpleStep(game, CreatePhase) });
             
             var startStep = new SimpleStep(game, StartPhase);
             var endStep = new SimpleStep(game, EndPhase);
             
+            // Store all steps for queuing
+            allPhaseSteps.Clear();
+            allPhaseSteps.Add(startStep);
+            allPhaseSteps.AddRange(steps ?? new List<IGameStep>());
+            allPhaseSteps.Add(endStep);
+            
+            // Store BaseStep subset for tracking
             phaseSteps.Clear();
             phaseSteps.Add(startStep);
-            phaseSteps.AddRange(steps ?? new List<BaseStep>());
+            foreach (var step in steps ?? new List<IGameStep>())
+            {
+                if (step is BaseStep baseStep)
+                    phaseSteps.Add(baseStep);
+            }
             phaseSteps.Add(endStep);
         }
 
@@ -44,9 +56,9 @@ namespace L5RGame
         {
             game.RaiseEvent(EventNames.OnPhaseCreated, 
                 new Dictionary<string, object> { { "phase", phaseName } }, 
-                (eventData) =>
+                () =>
                 {
-                    foreach (var step in phaseSteps)
+                    foreach (var step in allPhaseSteps)
                     {
                         game.QueueStep(step);
                     }
@@ -63,7 +75,7 @@ namespace L5RGame
         {
             game.RaiseEvent(EventNames.OnPhaseStarted, 
                 new Dictionary<string, object> { { "phase", phaseName } }, 
-                (eventData) =>
+                () =>
                 {
                     game.currentPhase = phaseName;
                     

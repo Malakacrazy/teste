@@ -160,51 +160,6 @@ namespace L5RGame
             }
             return "Unknown";
         }
-
-        /// <summary>
-        /// Get event name from event object (instance method for TriggeredAbilityWindow)
-        /// </summary>
-        private string GetEventName(object eventObj)
-        {
-            if (eventObj is IGameEvent gameEvent)
-            {
-                return gameEvent.Name;
-            }
-            return eventObj?.ToString() ?? "Unknown Event";
-        }
-
-        /// <summary>
-        /// Get event context from event object
-        /// </summary>
-        private AbilityContext GetEventContext(object eventObj)
-        {
-            if (eventObj is IGameEvent gameEvent)
-            {
-                return gameEvent.Context;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Get prompt controls for the current window
-        /// </summary>
-        protected virtual List<object> GetPromptControls()
-        {
-            // Placeholder implementation
-            return new List<object>();
-        }
-
-        /// <summary>
-        /// Get base prompt properties for select operations
-        /// </summary>
-        protected virtual Dictionary<string, object> GetPromptForSelectProperties()
-        {
-            return new Dictionary<string, object>
-            {
-                { "source", "Triggered Abilities" },
-                { "waitingPromptTitle", "Waiting for opponent" }
-            };
-        }
     }
 
     // ForcedTriggeredAbilityWindow is now defined in separate file: GameSteps\ForcedTriggeredAbilityWindow.cs
@@ -261,7 +216,7 @@ namespace L5RGame
                 { "waitingPromptTitle", "Waiting for opponent" },
                 { "activePrompt", new Dictionary<string, object>
                     {
-                        { "promptTitle", TriggeredAbilityWindowTitles.GetTitle(abilityType, events) },
+                        { "promptTitle", TriggeredAbilityWindowTitles.GetTitle(abilityType, events.Cast<object>().ToList()) },
                         { "controls", GetPromptControls() },
                         { "buttons", new List<object>
                             {
@@ -360,11 +315,44 @@ namespace L5RGame
             Continue();
         }
         
-        public void Close()
+        public new void Close()
         {
-            OnWindowClosed?.Invoke(this);
+            base.Close();
         }
         
+        /// <summary>
+        /// Get prompt controls for the current window
+        /// </summary>
+        protected virtual List<object> GetPromptControls()
+        {
+            // Return empty list - controls will be added by specific implementations
+            return new List<object>();
+        }
+
+        /// <summary>
+        /// Get event name from event object
+        /// </summary>
+        private string GetEventName(object eventObj)
+        {
+            if (eventObj is IGameEvent gameEvent)
+            {
+                return gameEvent.Name;
+            }
+            return eventObj?.ToString() ?? "Unknown Event";
+        }
+
+        /// <summary>
+        /// Get event context from event object
+        /// </summary>
+        private AbilityContext GetEventContext(object eventObj)
+        {
+            if (eventObj is IGameEvent gameEvent)
+            {
+                return gameEvent.Context;
+            }
+            return null;
+        }
+
         /// <summary>
         /// Get enhanced prompt properties for triggered abilities
         /// </summary>

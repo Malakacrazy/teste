@@ -20,7 +20,7 @@ namespace L5RGame
     {
         public RegroupPhase(Game game) : base(game, GamePhases.Regroup)
         {
-            InitializePhase(new List<BaseStep>
+            InitializePhase(new List<IGameStep>
             {
                 new ActionWindow(this.game, "Action Window"),
                 new SimpleStep(game, ReadyCards),
@@ -43,7 +43,7 @@ namespace L5RGame
 
             if (cardsToReady.Count > 0)
             {
-                var readyAction = game.actions.Ready(cardsToReady);
+                var readyAction = GameActions.Ready();
                 readyAction.Resolve(cardsToReady, game.GetFrameworkContext());
             }
 
@@ -103,22 +103,22 @@ namespace L5RGame
             {
                 game.PromptForSelect(player, new SelectCardPromptProperties
                 {
-                    source = "Discard Dynasty Cards",
+                    source = EffectSource.CreateEffectSource(game, "Discard Dynasty Cards"),
                     numCards = 0,
                     multiSelect = true,
                     optional = true,
                     activePromptTitle = "Select dynasty cards to discard",
                     waitingPromptTitle = "Waiting for opponent to discard dynasty cards",
-                    cardType = CardTypes.Dynasty,
+                    // No specific card type filter - dynasty cards can be characters, holdings, etc.
                     controller = Players.Self,
                     cardCondition = card => cardsOnUnbrokenProvinces.Contains(card),
-                    onSelect = (selectedPlayer, cards) =>
+                    onSelectMultiple = (selectedPlayer, cards) =>
                     {
                         cardsToDiscard.AddRange(cards);
                         FinishDiscardingCards(player, cardsToDiscard);
                         return true;
                     },
-                    onCancel = (selectedPlayer) =>
+                    onCancel = () =>
                     {
                         FinishDiscardingCards(player, cardsToDiscard);
                         return true;
@@ -165,7 +165,7 @@ namespace L5RGame
                 game.AddMessage("{0} discards {1} from their provinces", 
                                player.name, string.Join(", ", cardsToDiscard.Select(c => c.name)));
                 
-                var discardAction = game.actions.DiscardCard(cardsToDiscard);
+                var discardAction = game.actions.DiscardCard();
                 discardAction.Resolve(cardsToDiscard, game.GetFrameworkContext());
             }
         }
@@ -175,10 +175,10 @@ namespace L5RGame
         /// </summary>
         protected virtual bool ReturnRings()
         {
-            var claimedRings = game.rings.Where(ring => ring.claimed).ToList();
+            var claimedRings = game.rings.Values.Where(ring => ring.claimed).ToList();
             if (claimedRings.Count > 0)
             {
-                var returnRingAction = game.actions.ReturnRing(claimedRings);
+                var returnRingAction = game.actions.ReturnRing();
                 returnRingAction.Resolve(claimedRings, game.GetFrameworkContext());
             }
             return true;
@@ -196,7 +196,7 @@ namespace L5RGame
             {
                 game.RaiseEvent(EventNames.OnPassFirstPlayer, 
                     new Dictionary<string, object> { { "player", otherPlayer } },
-                    (eventData) =>
+                    () =>
                     {
                         game.SetFirstPlayer(otherPlayer);
                         return true;

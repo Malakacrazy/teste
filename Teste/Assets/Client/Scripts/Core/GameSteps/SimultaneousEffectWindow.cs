@@ -34,7 +34,7 @@ namespace L5RGame
                 return true;
             }
             
-            if (validChoices.Count == 1 || !currentPlayer.optionSettings.orderForcedAbilities)
+            if (validChoices.Count == 1 || !(currentPlayer.optionSettings.ContainsKey("orderForcedAbilities") && (bool)currentPlayer.optionSettings["orderForcedAbilities"]))
             {
                 ResolveEffect(validChoices[0]);
             }
@@ -55,7 +55,7 @@ namespace L5RGame
             {
                 activePromptTitle = "Choose an effect to be resolved",
                 waitingPromptTitle = "Waiting for opponent",
-                source = "Order Simultaneous effects",
+                source = EffectSource.CreateEffectSource(game, "Order Simultaneous effects"),
                 choices = menuChoices.Select(choice => new MenuOption { text = choice }).ToList(),
                 handlers = handlers
             });

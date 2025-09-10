@@ -57,7 +57,7 @@ namespace L5RGame
                 game.PromptWithHandlerMenu(firstPlayer, new HandlerMenuPromptProperties
                 {
                     activePromptTitle = "You won the flip. Do you want to be:",
-                    source = "Choose First Player",
+                    source = EffectSource.CreateEffectSource(game, "Choose First Player"),
                     choices = new List<MenuOption>
                     {
                         new MenuOption { text = "First Player", arg = "first" },
