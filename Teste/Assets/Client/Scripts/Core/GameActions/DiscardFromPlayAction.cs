@@ -210,7 +210,7 @@ namespace L5RGame
             }
             
             var options = gameEvent.GetProperty("options") as Dictionary<string, object>;
-            card.owner.MoveCard(card, destination, options?.ToCardMoveOptions());
+            card.owner.MoveCard(card, destination, options != null ? new CardMoveOptions(options) : null);
             
             var isSacrifice = gameEvent.GetProperty("isSacrifice", false);
             LogExecution("{0} {1}", isSacrifice ? "Sacrificed" : "Discarded", card.name);

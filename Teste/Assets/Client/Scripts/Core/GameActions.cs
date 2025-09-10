@@ -117,6 +117,22 @@ namespace L5RGame
         {
             return new ResolveConflictRingAction { ring = ring, player = player };
         }
+
+        /// <summary>
+        /// Return rings to unclaimed pool
+        /// </summary>
+        public ReturnRingAction ReturnRing()
+        {
+            return new ReturnRingAction();
+        }
+
+        /// <summary>
+        /// Discard cards from play or hand
+        /// </summary>
+        public DiscardCardAction DiscardCard()
+        {
+            return new DiscardCardAction();
+        }
         
         /// <summary>
         /// Creates a duel action

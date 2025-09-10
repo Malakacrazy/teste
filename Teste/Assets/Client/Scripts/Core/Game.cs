@@ -1416,7 +1416,7 @@ def on_trigger(card, event_name, event_data):
 
         private void RoundEnded()
         {
-            RaiseEvent(GameEvents.OnRoundEnded);
+            RaiseEvent(EventNames.OnRoundEnded);
         }
 
         // Pipeline management
@@ -1985,37 +1985,13 @@ def on_trigger(card, event_name, event_data):
         }
     }
 
-    // Supporting classes and enums
-    public static class GamePhases
-    {
-        public const string Setup = "setup";
-        public const string Dynasty = "dynasty";
-        public const string Draw = "draw";
-        public const string Conflict = "conflict";
-        public const string Fate = "fate";
-    }
+    // GamePhases is now defined in GameConstants.cs
 
     public static class GameEvents
     {
         public const string OnBeginRound = "onBeginRound";
-        public const string OnRoundEnded = "onRoundEnded";
     }
 
-    public static partial class EventNames
-    {
-        public const string Unnamed = "unnamed";
-        public const string OnCardAbilityInitiated = "onCardAbilityInitiated";
-        public const string OnCardPlayed = "onCardPlayed";
-        public const string OnCardAbilityTriggered = "onCardAbilityTriggered";
-        public const string OnDefendersDeclared = "onDefendersDeclared";
-        public const string AfterConflict = "afterConflict";
-        public const string OnCovertResolved = "onCovertResolved";
-        public const string OnClaimRing = "onClaimRing";
-        public const string OnReturnHome = "onReturnHome";
-        public const string OnParticipantsReturnHome = "onParticipantsReturnHome";
-        public const string OnPhaseCreated = "onPhaseCreated";
-        public const string OnPhaseStarted = "onPhaseStarted";
-    }
 
     [Serializable]
     public class GameState

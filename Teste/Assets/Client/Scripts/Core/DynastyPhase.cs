@@ -534,34 +534,6 @@ namespace L5RGame
         }
     }
 
-    // Dynasty-specific action window with special purchasing rules
-    public class DynastyActionWindow : ActionWindow
-    {
-        public System.Action OnActionWindowComplete;
-
-        public DynastyActionWindow(Game game) : base(game)
-        {
-        }
-
-        public new void Execute()
-        {
-            game.OpenDynastyActionWindow(() => 
-            {
-                isComplete = true;
-                OnActionWindowComplete?.Invoke();
-            });
-        }
-
-        public bool IsActive()
-        {
-            return !isComplete;
-        }
-
-        public new void Cleanup()
-        {
-            base.Cleanup();
-            OnActionWindowComplete = null;
-        }
-    }
+    // DynastyActionWindow is now defined in separate file: GameSteps\DynastyActionWindow.cs
     #endregion
 }

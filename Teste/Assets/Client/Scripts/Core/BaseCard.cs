@@ -423,7 +423,7 @@ namespace L5RGame
         public virtual void UpdateEffectContexts()
         {
             // Update any persistent effects that depend on this card's state
-            game?.effectEngine?.CheckEffects(true);
+            game?.EffectEngine?.CheckEffects(true);
         }
 
         /// <summary>
@@ -498,7 +498,7 @@ namespace L5RGame
         public virtual bool HasEffect(string effectName)
         {
             // This would check the game's effect engine for effects on this card
-            return game?.effectEngine != null && GetEffects(effectName).Count > 0;
+            return game?.EffectEngine != null && GetEffects(effectName).Count > 0;
         }
 
         /// <summary>
@@ -1141,6 +1141,24 @@ namespace L5RGame
                    !bowed && 
                    controller == conflict?.defendingPlayer &&
                    !inConflict;
+        }
+
+        /// <summary>
+        /// Apply any location-based persistent effects for this card
+        /// </summary>
+        public virtual void ApplyAnyLocationPersistentEffects()
+        {
+            // Apply persistent effects that depend on card location
+            // This is a placeholder implementation that would typically register 
+            // the card's persistent effects with the game's effect engine
+            if (persistentEffects != null)
+            {
+                foreach (var effect in persistentEffects)
+                {
+                    // Apply effects through the game's effect engine
+                    game?.EffectEngine?.RegisterPersistentEffect(this, effect);
+                }
+            }
         }
     }
 }

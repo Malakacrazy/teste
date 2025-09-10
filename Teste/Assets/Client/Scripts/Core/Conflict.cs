@@ -270,7 +270,7 @@ namespace L5RGame
         /// <returns>True if game state changed</returns>
         public bool CalculateSkill(bool prevStateChanged = false)
         {
-            bool stateChanged = game?.effectEngine?.CheckEffects(prevStateChanged) ?? false;
+            bool stateChanged = game?.EffectEngine?.CheckEffects(prevStateChanged) ?? false;
 
             if (winnerDetermined) return stateChanged;
 

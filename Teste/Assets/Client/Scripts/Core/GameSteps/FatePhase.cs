@@ -743,7 +743,7 @@ namespace L5RGame
     {
         public Ring targetRing;
 
-        public ReturnRingAction(Ring ring) : base(new RingActionProperties { target = new List<object> { ring } })
+        public ReturnRingAction(Ring ring) : base(new RingActionProperties { Target = new List<object> { ring } })
         {
             targetRing = ring;
         }

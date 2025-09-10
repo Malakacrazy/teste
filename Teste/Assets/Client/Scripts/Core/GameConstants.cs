@@ -264,6 +264,34 @@ namespace L5RGame
     }
 
     /// <summary>
+    /// Card location constants - alias for Locations for backward compatibility
+    /// </summary>
+    public static class CardLocations
+    {
+        public const string Any = Locations.Any;
+        public const string Hand = Locations.Hand;
+        public const string PlayArea = Locations.PlayArea;
+        public const string DynastyDiscardPile = Locations.DynastyDiscardPile;
+        public const string ConflictDiscardPile = Locations.ConflictDiscardPile;
+        public const string ProvinceOne = Locations.ProvinceOne;
+        public const string ProvinceTwo = Locations.ProvinceTwo;
+        public const string ProvinceThree = Locations.ProvinceThree;
+        public const string ProvinceFour = Locations.ProvinceFour;
+        public const string StrongholdProvince = Locations.StrongholdProvince;
+        public const string RemovedFromGame = Locations.RemovedFromGame;
+        public const string Provinces = Locations.Provinces;
+        public const string Role = Locations.Role;
+        public const string BeingPlayed = Locations.BeingPlayed;
+        public const string ConflictDeck = Locations.ConflictDeck;
+        public const string DynastyDeck = Locations.DynastyDeck;
+        public const string ProvinceDeck = Locations.ProvinceDeck;
+        public const string UnderneathStronghold = Locations.UnderneathStronghold;
+        public const string Limbo = Locations.Limbo;
+        public const string None = Locations.None;
+        public const string Dynasty = "dynasty"; // Additional constant for dynasty cards
+    }
+
+    /// <summary>
     /// Player references for card conditions
     /// </summary>
     public static class Players
@@ -277,6 +305,19 @@ namespace L5RGame
     {
         public const string Military = "military";
         public const string Political = "political";
+    }
+
+    /// <summary>
+    /// Game phase constants
+    /// </summary>
+    public static class GamePhases
+    {
+        public const string Dynasty = "dynasty";
+        public const string Draw = "draw";
+        public const string Conflict = "conflict";
+        public const string Fate = "fate";
+        public const string Regroup = "regroup";
+        public const string Setup = "setup";
     }
 
     /// <summary>

@@ -780,34 +780,7 @@ namespace L5RGame
     /// Prompt for selecting defenders
     /// </summary>
 
-    /// <summary>
-    /// Conflict action window for playing cards and abilities during conflicts
-    /// </summary>
-    public class ConflictActionWindow : BaseStep
-    {
-        private string windowName;
-        private Conflict conflict;
-
-        public ConflictActionWindow(Game game, string windowName, Conflict conflict) : base(game)
-        {
-            this.windowName = windowName;
-            this.conflict = conflict;
-        }
-
-        public override bool Continue()
-        {
-            // Implementation for conflict action window
-            // This would handle the back-and-forth of playing cards and abilities during conflicts
-            
-            // Priority starts with defending player
-            var currentPlayer = conflict.defendingPlayer;
-            
-            // Open ability/action window
-            game.OpenActionWindow(windowName, currentPlayer);
-            
-            return true;
-        }
-    }
+    // ConflictActionWindow is now defined in separate file: GameSteps\ConflictActionWindow.cs
 
     /// <summary>
     /// Extension methods for conflict flow integration

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace L5RGame
@@ -68,6 +69,18 @@ namespace L5RGame
             actionTaken = true;
         }
         
+        /// <summary>
+        /// Switch to next player (virtual for derived classes to override)
+        /// </summary>
+        public virtual void NextPlayer()
+        {
+            // Default implementation - switch to opponent
+            if (currentPlayer?.opponent != null)
+            {
+                currentPlayer = currentPlayer.opponent;
+            }
+        }
+        
         public bool CancelStep() 
         { 
             isComplete = true; 
@@ -87,6 +100,19 @@ namespace L5RGame
 
         // Property aliases for API compatibility
         public string WindowName => windowName;
+        
+        /// <summary>
+        /// Get the active prompt data for this action window
+        /// </summary>
+        public virtual Dictionary<string, object> GetActivePrompt()
+        {
+            return new Dictionary<string, object>
+            {
+                { "buttons", new List<object>() },
+                { "promptTitle", windowName ?? "Action Window" },
+                { "menuTitle", "Select an action" }
+            };
+        }
         
         public string GetDebugInfo()
         {

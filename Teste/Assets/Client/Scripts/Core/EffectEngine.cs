@@ -859,16 +859,6 @@ namespace L5RGame
         public const string DelayedEffect = "delayedEffect";
     }
 
-    /// <summary>
-    /// Additional event names for the effect engine
-    /// </summary>
-    public static partial class EventNames
-    {
-        public const string OnConflictFinished = "onConflictFinished";
-        public const string OnRoundEnded = "onRoundEnded";
-        public const string OnDuelFinished = "onDuelFinished";
-        public const string OnPassActionPhasePriority = "onPassActionPhasePriority";
-    }
 
     /// <summary>
     /// Trigger that fires when a conflict finishes

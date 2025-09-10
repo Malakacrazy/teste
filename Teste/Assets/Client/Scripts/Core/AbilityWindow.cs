@@ -333,7 +333,18 @@ namespace L5RGame
             }
             else if (windowType == typeof(ForcedTriggeredAbilityWindow))
             {
-                return new ForcedTriggeredAbilityWindow(game, abilityType, events, eventsToExclude);
+                // Convert object lists to GameEvent lists for ForcedTriggeredAbilityWindow
+                var gameEvents = events?.Cast<GameEvent>().ToList();
+                var excludedGameEvents = eventsToExclude?.Cast<GameEvent>().ToList();
+                
+                // Create an EventWindow if we have events
+                EventWindow eventWindow = null;
+                if (gameEvents != null && gameEvents.Count > 0)
+                {
+                    eventWindow = new EventWindow(game, gameEvents);
+                }
+                
+                return new ForcedTriggeredAbilityWindow(game, abilityType, eventWindow, excludedGameEvents);
             }
 
             return null;

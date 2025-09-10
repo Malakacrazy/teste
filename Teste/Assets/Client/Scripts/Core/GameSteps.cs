@@ -35,41 +35,6 @@ namespace L5RGame
 
 
 
-    public class SetupPhase : BaseStepWithPipeline, IGameStep
-    {
-        public SetupPhase(Game game) : base(game) { }
-
-        public override string GetDebugInfo()
-        {
-            return "SetupPhase - Game setup";
-        }
-    }
-
-    public class SimultaneousEffectWindow : BaseStep, IGameStep
-    {
-        private List<EffectChoice> choices = new List<EffectChoice>();
-
-        public SimultaneousEffectWindow(Game game) : base(game) { }
-
-        public void AddChoice(EffectChoice choice)
-        {
-            choices.Add(choice);
-        }
-
-        public override bool Continue()
-        {
-            // Process all choices and complete
-            foreach (var choice in choices)
-            {
-                choice.Execute();
-            }
-            return true;
-        }
-
-        public override string GetDebugInfo()
-        {
-            return $"SimultaneousEffectWindow - Choices: {choices.Count}";
-        }
-    }
+    // SetupPhase and SimultaneousEffectWindow are now defined in separate files in GameSteps directory
 
 }

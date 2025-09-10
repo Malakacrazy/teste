@@ -54,5 +54,29 @@ namespace L5RGame
         public const string OnTakeRing = "onTakeRing";
         public const string OnTransferHonor = "onTransferHonor";
         public const string OnPhaseEnded = "onPhaseEnded";
+        public const string OnPhaseCreated = "onPhaseCreated";
+        public const string OnPhaseStarted = "onPhaseStarted";
+        public const string OnPassDuringDynasty = "onPassDuringDynasty";
+        public const string OnPassFirstPlayer = "onPassFirstPlayer";
+        public const string OnRoundEnded = "onRoundEnded";
+        // Additional event names from Game.cs partial class
+        public const string Unnamed = "unnamed";
+        public const string OnCardAbilityInitiated = "onCardAbilityInitiated";
+        public const string OnCardPlayed = "onCardPlayed";
+        public const string OnCardAbilityTriggered = "onCardAbilityTriggered";
+        public const string OnDefendersDeclared = "onDefendersDeclared";
+        public const string AfterConflict = "afterConflict";
+        public const string OnCovertResolved = "onCovertResolved";
+        public const string OnClaimRing = "onClaimRing";
+        public const string OnReturnHome = "onReturnHome";
+        public const string OnParticipantsReturnHome = "onParticipantsReturnHome";
+        // Additional event names from EffectEngine.cs partial class
+        public const string OnConflictFinished = "onConflictFinished";
+        public const string OnDuelFinished = "onDuelFinished";
+        public const string OnPassActionPhasePriority = "onPassActionPhasePriority";
+        // Additional missing event names found in errors
+        public const string OnHonorDialsRevealed = "onHonorDialsRevealed";
+        public const string AfterDuel = "afterDuel";
+        public const string OnDuelResolution = "onDuelResolution";
     }
 }

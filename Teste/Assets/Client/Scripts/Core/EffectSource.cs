@@ -200,14 +200,14 @@ namespace L5RGame
                 addedEffects = effectList.Select(factory =>
                 {
                     var effectInstance = CreateEffectInstance(factory, effectProperties);
-                    return (object)game.effectEngine.Add(effectInstance as GameEffect);
+                    return (object)game.EffectEngine.Add(effectInstance as GameEffect);
                 }).ToList();
             }
             else
             {
                 // Handle single effect
                 var effectInstance = CreateEffectInstance(effect, effectProperties);
-                addedEffects = new List<object> { game.effectEngine.Add(effectInstance as GameEffect) };
+                addedEffects = new List<object> { game.EffectEngine.Add(effectInstance as GameEffect) };
             }
 
             // Track active effects for cleanup
@@ -268,7 +268,7 @@ namespace L5RGame
         {
             if (effectArray == null || effectArray.Count == 0) return;
 
-            game.effectEngine.UnapplyAndRemove((System.Func<GameEffect, bool>)(effect => effectArray.Contains(effect)));
+            game.EffectEngine.UnapplyAndRemove((System.Func<GameEffect, bool>)(effect => effectArray.Contains(effect)));
             
             // Remove from our active effects tracking
             foreach (var effect in effectArray)
@@ -282,9 +282,9 @@ namespace L5RGame
         /// </summary>
         public void RemoveLastingEffects()
         {
-            if (game?.effectEngine != null)
+            if (game?.EffectEngine != null)
             {
-                game.effectEngine.RemoveLastingEffects(this);
+                game.EffectEngine.RemoveLastingEffects(this);
             }
             
             // Clear our tracking list since all effects from this source are removed
@@ -509,7 +509,7 @@ namespace L5RGame
         public const string OnGameStateChanged = "onGameStateChanged";
         public const string OnPassPriority = "onPassPriority";
         public const string OnDuelEnded = "onDuelEnded";
-        public const string OnHonorDialsRevealed = "onHonorDialsRevealed";
+        // OnHonorDialsRevealed is now defined in EventNames.cs
     }
     
     /// <summary>
