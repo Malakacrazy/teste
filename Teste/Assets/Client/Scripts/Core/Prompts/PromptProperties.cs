@@ -143,4 +143,118 @@ namespace L5RGame
         public bool disabled = false;
     }
 
+    /// <summary>
+    /// Helper methods for creating prompt properties
+    /// </summary>
+    public static class PromptPropertiesHelper
+    {
+        /// <summary>
+        /// Create a simple card selection prompt
+        /// </summary>
+        public static SelectCardPromptProperties CreateSelectCard(string title, Func<BaseCard, bool> cardCondition, Func<Player, BaseCard, bool> onSelect)
+        {
+            return new SelectCardPromptProperties
+            {
+                activePromptTitle = title,
+                cardCondition = cardCondition,
+                onSelect = onSelect
+            };
+        }
+
+        /// <summary>
+        /// Create a simple ring selection prompt
+        /// </summary>
+        public static SelectRingPromptProperties CreateSelectRing(string title, Func<Ring, bool> ringCondition, Func<Player, Ring, bool> onSelect)
+        {
+            return new SelectRingPromptProperties
+            {
+                activePromptTitle = title,
+                ringCondition = ringCondition,
+                onSelect = onSelect
+            };
+        }
+
+        /// <summary>
+        /// Create a simple menu prompt
+        /// </summary>
+        public static HandlerMenuPromptProperties CreateMenu(string title, List<MenuOption> choices, List<Action> handlers)
+        {
+            return new HandlerMenuPromptProperties
+            {
+                activePromptTitle = title,
+                choices = choices ?? new List<MenuOption>(),
+                handlers = handlers ?? new List<Action>()
+            };
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for prompt properties
+    /// </summary>
+    public static class PromptPropertiesExtensions
+    {
+        /// <summary>
+        /// Set the source for a prompt
+        /// </summary>
+        public static T WithSource<T>(this T properties, EffectSource source) where T : PromptProperties
+        {
+            properties.source = source;
+            return properties;
+        }
+
+        /// <summary>
+        /// Set the context for a prompt
+        /// </summary>
+        public static T WithContext<T>(this T properties, AbilityContext context) where T : PromptProperties
+        {
+            properties.context = context;
+            return properties;
+        }
+
+        /// <summary>
+        /// Set whether the prompt allows cancellation
+        /// </summary>
+        public static T WithCancellation<T>(this T properties, bool canCancel) where T : PromptProperties
+        {
+            properties.canCancel = canCancel;
+            return properties;
+        }
+
+        /// <summary>
+        /// Make a card selection prompt optional
+        /// </summary>
+        public static SelectCardPromptProperties WithOptional(this SelectCardPromptProperties properties, bool optional = true)
+        {
+            properties.optional = optional;
+            return properties;
+        }
+
+        /// <summary>
+        /// Set the number of cards to select
+        /// </summary>
+        public static SelectCardPromptProperties WithNumCards(this SelectCardPromptProperties properties, int numCards)
+        {
+            properties.numCards = numCards;
+            return properties;
+        }
+
+        /// <summary>
+        /// Enable multi-select for card selection
+        /// </summary>
+        public static SelectCardPromptProperties WithMultiSelect(this SelectCardPromptProperties properties, bool multiSelect = true)
+        {
+            properties.multiSelect = multiSelect;
+            return properties;
+        }
+
+        /// <summary>
+        /// Set the card type filter
+        /// </summary>
+        public static SelectCardPromptProperties WithCardType(this SelectCardPromptProperties properties, string cardType)
+        {
+            properties.cardType = cardType;
+            return properties;
+        }
+    }
+
 }

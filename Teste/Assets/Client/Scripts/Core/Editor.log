@@ -1,1 +1,0 @@
-Assets\Client\Scripts\Core\EffectEngine.cs(368,48): error CS1061: 'EffectSource' does not contain a definition for 'objectName' and no accessible extension method 'objectName' accepting a first argument of type 'EffectSource' could be found (are you missing a using directive or an assembly reference?)
