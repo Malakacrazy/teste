@@ -6,13 +6,6 @@ using System.Collections;
 
 namespace L5RGame
 {
-    // Note: Constants moved to GameConstants.cs to avoid duplicates
-
-    // Note: EffectNames moved to GameConstants.cs
-
-    // Note: EventNames and AbilityTypes are in GameConstants.cs
-
-
     [System.Serializable]
     public class PlayerSettings
     {
