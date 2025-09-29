@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -91,7 +92,7 @@ namespace L5RGame
         /// <returns>New triggered ability context with modified properties</returns>
         public new TriggeredAbilityContext Copy(Dictionary<string, object> newProps = null)
         {
-            var copyGO = new GameObject("TriggeredAbilityContext_Copy");
+            var copyGO = new UnityEngine.GameObject("TriggeredAbilityContext_Copy");
             var copy = copyGO.AddComponent<TriggeredAbilityContext>();
             
             // Copy base properties
@@ -237,9 +238,9 @@ namespace L5RGame
         /// <returns>Event data value or null</returns>
         public virtual object GetEventData(string key)
         {
-            if (triggerEvent?.data != null && triggerEvent.data.ContainsKey(key))
+            if (triggerEvent?.Parameters != null && triggerEvent.Parameters.ContainsKey(key))
             {
-                return triggerEvent.data[key];
+                return triggerEvent.Parameters[key];
             }
             return null;
         }
@@ -265,7 +266,7 @@ namespace L5RGame
         /// <returns>True if event has the data</returns>
         public virtual bool HasEventData(string key)
         {
-            return triggerEvent?.data?.ContainsKey(key) ?? false;
+            return triggerEvent?.Parameters?.ContainsKey(key) ?? false;
         }
 
         /// <summary>
@@ -361,7 +362,7 @@ namespace L5RGame
         /// <returns>Framework triggered ability context</returns>
         public static TriggeredAbilityContext CreateFrameworkTriggeredContext(Game gameInstance, Player contextPlayer, GameEvent triggeringEvent)
         {
-            var contextGO = new GameObject("FrameworkTriggeredContext");
+            var contextGO = new UnityEngine.GameObject("FrameworkTriggeredContext");
             var context = contextGO.AddComponent<TriggeredAbilityContext>();
             
             var properties = new TriggeredAbilityContextProperties
@@ -390,7 +391,7 @@ namespace L5RGame
         /// <returns>Triggered ability context</returns>
         public static TriggeredAbilityContext CreateTriggeredContext(BaseAbility ability, Player contextPlayer, GameEvent triggeringEvent)
         {
-            var contextGO = new GameObject("TriggeredAbilityContext");
+            var contextGO = new UnityEngine.GameObject("TriggeredAbilityContext");
             var context = contextGO.AddComponent<TriggeredAbilityContext>();
             
             var properties = new TriggeredAbilityContextProperties
@@ -470,7 +471,7 @@ namespace L5RGame
         /// <returns>New triggered ability context</returns>
         public static TriggeredAbilityContext ToTriggeredContext(this AbilityContext baseContext, GameEvent triggerEvent)
         {
-            var contextGO = new GameObject("TriggeredAbilityContext_Converted");
+            var contextGO = new UnityEngine.GameObject("TriggeredAbilityContext_Converted");
             var triggeredContext = contextGO.AddComponent<TriggeredAbilityContext>();
             
             var properties = new TriggeredAbilityContextProperties

@@ -137,24 +137,20 @@ namespace L5RGame
                     effectProperties["until"] = properties.until;
                 }
                 
-                // Apply the lasting effect based on duration
-                switch (properties.duration)
+                // Create and execute the lasting effect
+                var lastingEffect = new LastingEffectCardAction(new LastingEffectCardProperties
                 {
-                    case Durations.UntilEndOfTurn:
-                        context.source.UntilEndOfTurn(() => effectProperties);
-                        break;
-                    case Durations.UntilEndOfPhase:
-                        context.source.UntilEndOfPhase(() => effectProperties);
-                        break;
-                    case Durations.UntilEndOfConflict:
-                        context.source.UntilEndOfConflict(() => effectProperties);
-                        break;
-                    case Durations.Custom:
-                        context.source.CustomDuration(() => effectProperties);
-                        break;
-                    case Durations.Persistent:
-                        context.source.PersistentEffect(() => effectProperties);
-                        break;
+                    target = new List<object> { card },
+                    Duration = properties.duration,
+                    Effect = properties.effect
+                });
+                
+                // Add the effect to the game's effect engine
+                if (context.game?.EffectEngine != null)
+                {
+                    var effectEvents = new List<GameEvent>();
+                    lastingEffect.AddEventsToArray(effectEvents, context);
+                    context.game.OpenEventWindow(effectEvents);
                 }
                 
                 LogExecution("{0} took control of {1}", context.player.name, card.name);

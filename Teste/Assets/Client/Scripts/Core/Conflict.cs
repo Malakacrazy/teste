@@ -594,14 +594,7 @@ namespace L5RGame
     }
 
     /// <summary>
-    /// Conflict-specific event names
+    /// Conflict-specific event names (moved to EventNames.cs to avoid duplicates)
     /// </summary>
-    public static partial class EventNames
-    {
-        public const string OnConflictPass = "onConflictPass";
-        public const string OnConflictDeclared = "onConflictDeclared";
-        public const string OnAttackersChosen = "onAttackersChosen";
-        public const string OnDefendersChosen = "onDefendersChosen";
-        public const string OnConflictResolved = "onConflictResolved";
-    }
+    // EventNames constants moved to EventNames.cs to avoid CS0102 duplicate definition errors
 }

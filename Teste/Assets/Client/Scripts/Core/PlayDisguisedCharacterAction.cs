@@ -65,10 +65,17 @@ namespace L5RGame
             });
         }
 
-        public void Pay(AbilityContext context, CostResults results)
+        public void Pay(AbilityContext context)
         {
             // Cost is paid through selection - no additional payment needed
-            results.success = true;
+            // The actual selection is handled in Resolve method
+        }
+
+        public string GetCostDescription()
+        {
+            return intoConflictOnly 
+                ? "Choose a character in the conflict to replace" 
+                : "Choose a character to replace";
         }
 
         public bool IsOptional => false;
@@ -101,7 +108,7 @@ namespace L5RGame
                 }
             }
 
-            var minCost = Math.Max(context.player.GetMinimumCost(context.playType, context) - maxCharacterCost, 0);
+            var minCost = Math.Max(context.player.GetMinimumCost(context.playType, context, sourceCard as BaseCard) - maxCharacterCost, 0);
             return context.player.fate >= minCost &&
                    (minCost == 0 || context.player.CheckRestrictions("spendFate", context));
         }
@@ -217,7 +224,7 @@ namespace L5RGame
                     ["context"] = context,
                     ["originalLocation"] = sourceCard.location,
                     ["playType"] = context.playType
-                })
+                }, () => true)
             };
 
             var replacedCharacter = context.GetCost("chooseDisguisedCharacter") as BaseCard;
@@ -232,11 +239,15 @@ namespace L5RGame
             // If replaced character is in conflict and we have a choice, prompt for location
             if (replacedCharacter.inConflict && !this.intoConflictOnly)
             {
-                context.game.PromptWithHandlerMenu(context.player, new MenuPromptProperties
+                context.game.PromptWithHandlerMenu(context.player, new HandlerMenuPromptProperties
                 {
                     activePromptTitle = "Where do you wish to play this character?",
                     source = sourceCard,
-                    choices = new List<string> { "Conflict", "Home" },
+                    choices = new List<MenuOption> 
+                    { 
+                        new MenuOption { text = "Conflict", arg = "conflict" },
+                        new MenuOption { text = "Home", arg = "home" }
+                    },
                     handlers = new List<System.Action>
                     {
                         () => intoConflict = true,
@@ -256,11 +267,11 @@ namespace L5RGame
                 GameAction putIntoPlayAction;
                 if (intoConflict)
                 {
-                    putIntoPlayAction = context.game.actions.PutIntoConflict(sourceCard, extraFate);
+                    putIntoPlayAction = PutIntoPlayAction.IntoConflict(sourceCard as DrawCard, extraFate);
                 }
                 else
                 {
-                    putIntoPlayAction = context.game.actions.PutIntoPlay(sourceCard, extraFate);
+                    putIntoPlayAction = PutIntoPlayAction.OutOfConflict(sourceCard as DrawCard, extraFate);
                 }
 
                 putIntoPlayAction.AddEventsToArray(events, context);
@@ -273,32 +284,40 @@ namespace L5RGame
                     // Transfer fate from replaced character
                     if (replacedCharacter.fate > 0)
                     {
-                        var placeFateAction = context.game.actions.PlaceFate(sourceCard, replacedCharacter.fate, replacedCharacter);
+                        var placeFateAction = PlaceFateAction.FromOrigin(replacedCharacter.fate, replacedCharacter, sourceCard as DrawCard);
                         placeFateAction.AddEventsToArray(moveEvents, context);
                     }
 
                     // Transfer attachments
                     foreach (var attachment in replacedCharacter.attachments.ToList())
                     {
-                        var attachAction = context.game.actions.Attach(sourceCard, attachment);
+                        var attachAction = AttachAction.Attachment(attachment as DrawCard, sourceCard as DrawCard);
                         attachAction.AddEventsToArray(moveEvents, context);
                     }
 
                     // Transfer personal honor status token
                     if (replacedCharacter.personalHonor != null)
                     {
-                        var moveStatusAction = context.game.actions.MoveStatusToken(replacedCharacter.personalHonor, sourceCard);
+                        var moveStatusAction = new MoveTokenAction(new MoveTokenProperties 
+                        { 
+                            target = new List<object> { replacedCharacter.personalHonor }, 
+                            Recipient = sourceCard as DrawCard 
+                        });
                         moveStatusAction.AddEventsToArray(moveEvents, context);
                     }
 
                     // Discard the replaced character
                     moveEvents.Add(context.game.GetEvent(EventNames.Unnamed, new Dictionary<string, object>(), () =>
                     {
-                        var discardAction = context.game.actions.DiscardFromPlay(replacedCharacter, true);
-                        context.game.OpenThenEventWindow(discardAction.GetEvent(replacedCharacter, context));
+                        var discardAction = DiscardFromPlayAction.Card(replacedCharacter);
+                        var discardEvents = new List<GameEvent>();
+                        discardAction.AddEventsToArray(discardEvents, context);
+                        context.game.OpenThenEventWindow(discardEvents);
+                        return true;
                     }));
 
                     context.game.OpenThenEventWindow(moveEvents);
+                    return true;
                 }));
 
                 context.game.OpenThenEventWindow(events);

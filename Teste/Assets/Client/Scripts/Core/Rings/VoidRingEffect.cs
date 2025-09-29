@@ -290,7 +290,7 @@ namespace L5RGame
             // Check for fate-based triggers
             if (target.HasAbilities)
             {
-                var fateRemovedTriggers = target.GetAbilitiesWithTrigger(AbilityTrigger.FateRemoved);
+                var fateRemovedTriggers = target.GetAbilitiesWithTrigger(EventNames.OnFateLost);
                 foreach (var trigger in fateRemovedTriggers)
                 {
                     trigger.TryExecute(context);

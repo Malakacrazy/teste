@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
@@ -110,10 +111,10 @@ namespace L5RGame
         {
             return (game, source, properties) => 
             {
-                return new PersistentEffect
+                return (object)new PersistentEffect
                 {
                     match = card,
-                    effect = (context) => 
+                    effect = (System.Action<AbilityContext>)((context) => 
                     {
                         if (context.source == card)
                         {
@@ -122,8 +123,8 @@ namespace L5RGame
                             // Apply political skill modification
                             card.AddStatModifier("political", modifier);
                         }
-                    },
-                    condition = (context) => card != null && card.IsInPlay()
+                    }),
+                    condition = (System.Func<AbilityContext, bool>)((context) => card != null && card.IsInPlay())
                 };
             };
         }
@@ -289,9 +290,9 @@ namespace L5RGame
                     ["fromCard"] = oldCard,
                     ["toCard"] = targetCard,
                     ["context"] = context
-                });
+                }, () => true);
 
-                game.OpenSimpleEventWindow(moveEvent);
+                game.OpenEventWindow(new List<GameEvent> { moveEvent });
             }
 
             return true;
@@ -322,9 +323,9 @@ namespace L5RGame
                     ["token"] = this,
                     ["fromCard"] = removedFromCard,
                     ["context"] = context
-                });
+                }, () => true);
 
-                game.OpenSimpleEventWindow(removeEvent);
+                game.OpenEventWindow(new List<GameEvent> { removeEvent });
             }
 
             Debug.Log($"🎭 {name} removed from {removedFromCard.printedName}");
@@ -517,12 +518,7 @@ namespace L5RGame
     }
 
     /// <summary>
-    /// Additional event names for status tokens
+    /// Additional event names for status tokens (moved to EventNames.cs to avoid duplicates)
     /// </summary>
-    public static partial class EventNames
-    {
-        public const string OnStatusTokenMoved = "onStatusTokenMoved";
-        public const string OnStatusTokenRemoved = "onStatusTokenRemoved";
-        public const string OnStatusTokenAdded = "onStatusTokenAdded";
-    }
+    // EventNames constants moved to EventNames.cs to avoid CS0102 duplicate definition errors
 }

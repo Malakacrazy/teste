@@ -657,21 +657,6 @@ namespace L5RGame
         }
     }
 
-    /// <summary>
-    /// Constants for effect durations
-    /// </summary>
-    public static partial class Durations
-    {
-        public const string Persistent = "persistent";
-        public const string UntilEndOfConflict = "untilEndOfConflict";
-        public const string UntilEndOfPhase = "untilEndOfPhase";
-        public const string UntilEndOfRound = "untilEndOfRound";
-        public const string UntilEndOfDuel = "untilEndOfDuel";
-        public const string UntilPassPriority = "untilPassPriority";
-        public const string UntilOpponentPassPriority = "untilOpponentPassPriority";
-        public const string UntilNextPassPriority = "untilNextPassPriority";
-        public const string Custom = "custom";
-    }
 
     /// <summary>
     /// Simple effect implementation for basic effects

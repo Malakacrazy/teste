@@ -502,22 +502,12 @@ namespace L5RGame
 
 
     /// <summary>
-    /// Additional event names for EffectSource
+    /// Additional event names for EffectSource (moved to EventNames.cs to avoid duplicates)
     /// </summary>
-    public static partial class EventNames
-    {
-        public const string OnGameStateChanged = "onGameStateChanged";
-        public const string OnPassPriority = "onPassPriority";
-        public const string OnDuelEnded = "onDuelEnded";
-        // OnHonorDialsRevealed is now defined in EventNames.cs
-    }
+    // EventNames constants moved to EventNames.cs to avoid CS0102 duplicate definition errors
     
     /// <summary>
-    /// Effect names for various game effects
+    /// Effect names for various game effects (moved to Constants.cs to avoid duplicates)
     /// </summary>
-    public static partial class EffectNames
-    {
-        public const string MustBeDeclaredAsAttacker = "mustBeDeclaredAsAttacker";
-        public const string MustBeDeclaredAsDefender = "mustBeDeclaredAsDefender";
-    }
+    // EffectNames constants moved to Constants.cs to avoid CS0102 duplicate definition errors
 }

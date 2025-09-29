@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using L5RGame.Events;
 
@@ -78,7 +79,7 @@ namespace L5RGame
                 Mode = TargetModes.Select,
                 ActivePromptTitle = "Choose an effect to resolve",
                 Source = "Earth Ring",
-                Choices = GetAvailableChoices(),
+                Choices = GetAvailableChoices().Keys.Cast<object>().ToList(),
                 AllowCancel = isOptional
             };
             

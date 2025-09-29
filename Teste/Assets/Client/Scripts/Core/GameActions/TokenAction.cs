@@ -52,12 +52,7 @@ namespace L5RGame
             var sourceCard = context.Source as BaseCard;
             if (sourceCard?.PersonalHonor > 0)
             {
-                var honorToken = new StatusToken("honor", sourceCard.PersonalHonor, sourceCard.controller)
-                {
-                    Card = sourceCard,
-                    Honored = sourceCard.PersonalHonor > 0,
-                    Type = "token"
-                };
+                var honorToken = new StatusToken(context.game, sourceCard, sourceCard.PersonalHonor > 0);
                 return new List<StatusToken> { honorToken };
             }
             return new List<StatusToken>();

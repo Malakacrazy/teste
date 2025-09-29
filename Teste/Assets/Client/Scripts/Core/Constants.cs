@@ -98,6 +98,9 @@ namespace L5RGame
         public const string Persistent = "persistent";
         public const string RingEffect = "ringeffect";
         public const string Keyword = "keyword";
+        public const string WouldInterrupt = "wouldinterrupt";
+        public const string CancelInterrupt = "cancelinterrupt";
+        public const string OtherEffects = "othereffects";
     }
 
     /// <summary>
@@ -157,6 +160,45 @@ namespace L5RGame
         public const string CannotLeavePlay = "cannotLeavePlay";
         public const string CannotPlay = "cannotPlay";
         public const string DelayedEffect = "delayedEffect";
+        
+        // Missing effect names from compilation errors
+        public const string AdditionalTriggerCost = "additionalTriggerCost";
+        public const string AdditionalPlayCost = "additionalPlayCost";
+        public const string ModifyConflictElementsToResolve = "modifyConflictElementsToResolve";
+        public const string RestrictNumberOfDefenders = "restrictNumberOfDefenders";
+        public const string SetConflictTotalSkill = "setConflictTotalSkill";
+        public const string ChangeConflictSkillFunction = "changeConflictSkillFunction";
+        public const string CannotContribute = "cannotContribute";
+        public const string MustBeChosen = "mustBeChosen";
+        public const string CanBeSeenWhenFacedown = "canBeSeenWhenFacedown";
+        public const string CannotParticipateAsAttacker = "cannotParticipateAsAttacker";
+        public const string CannotParticipateAsDefender = "cannotParticipateAsDefender";
+        public const string AbilityRestrictions = "abilityRestrictions";
+        public const string DoesNotBow = "doesNotBow";
+        public const string DoesNotReady = "doesNotReady";
+        public const string ShowTopConflictCard = "showTopConflictCard";
+        public const string ModifyBaseMilitarySkillMultiplier = "modifyBaseMilitarySkillMultiplier";
+        public const string ModifyMilitarySkillMultiplier = "modifyMilitarySkillMultiplier";
+        public const string ModifyBasePoliticalSkillMultiplier = "modifyBasePoliticalSkillMultiplier";
+        public const string ModifyPoliticalSkillMultiplier = "modifyPoliticalSkillMultiplier";
+        public const string SetBaseMilitarySkill = "setBaseMilitarySkill";
+        public const string SetBasePoliticalSkill = "setBasePoliticalSkill";
+        public const string SetGlory = "setGlory";
+        public const string SetMilitarySkill = "setMilitarySkill";
+        public const string SetPoliticalSkill = "setPoliticalSkill";
+        public const string ModifyFateCollectedInDynastyPhase = "modifyFateCollectedInDynastyPhase";
+        public const string ModifyFateCollectionMultiplier = "modifyFateCollectionMultiplier";
+        public const string HonorStatusDoesNotModifySkill = "honorStatusDoesNotModifySkill";
+        public const string HonorStatusReverseModifySkill = "honorStatusReverseModifySkill";
+        public const string CannotApplyLastingEffects = "cannotApplyLastingEffects";
+        
+        // Missing effect names from compilation errors
+        public const string RestrictHonorBid = "restrictHonorBid";
+        public const string AddHonorBidOption = "addHonorBidOption";
+        public const string EventsCannotBeCancelled = "eventsCannotBeCancelled";
+        public const string ShowTopDynastyCard = "showTopDynastyCard";
+        public const string ModifyCardsDrawnInDrawPhase = "modifyCardsDrawnInDrawPhase";
+        public const string MaxCardsDrawnInDrawPhase = "maxCardsDrawnInDrawPhase";
     }
 
     /// <summary>
@@ -167,7 +209,7 @@ namespace L5RGame
         public const string OnCardPlayed = "onCardPlayed";
         public const string OnCardEntersPlay = "onCardEntersPlay";
         public const string OnCardLeavesPlay = "onCardLeavesPlay";
-        public const string OnConflictDeclared = "onConflictDeclared";
+        // OnConflictDeclared moved to EventNames.cs to avoid duplicate definition
         public const string OnConflictInitiated = "onConflictInitiated";
         public const string OnConflictFinished = "onConflictFinished";
         public const string OnHonorDialsRevealed = "onHonorDialsRevealed";
@@ -190,7 +232,7 @@ namespace L5RGame
         public const string OnCharacterEntersConflict = "onCharacterEntersConflict";
         public const string OnCharacterLeavesConflict = "onCharacterLeavesConflict";
         public const string OnMovementPhaseEnd = "onMovementPhaseEnd";
-        public const string OnPassPriority = "onPassPriority";
+        // OnPassPriority moved to EventNames.cs to avoid duplicate definition
         public const string OnPassActionPhasePriority = "onPassActionPhasePriority";
         public const string OnDefendersDeclared = "onDefendersDeclared";
         public const string OnCovertResolved = "onCovertResolved";
@@ -199,6 +241,11 @@ namespace L5RGame
         public const string OnParticipantsReturnHome = "onParticipantsReturnHome";
         public const string AfterConflict = "afterConflict";
         public const string Unnamed = "unnamed";
+        
+        // Missing event names from compilation errors
+        public const string OnTakeControl = "onTakeControl";
+        public const string OnStatusTokenMoved = "onStatusTokenMoved";
+        public const string OnStatusTokenRemoved = "onStatusTokenRemoved";
     }
 
     /// <summary>
@@ -230,16 +277,18 @@ namespace L5RGame
         public const string MaxStat = "maxStat";
         public const string Single = "single";
         public const string Unlimited = "unlimited";
+        public const string AutoSingle = "autoSingle";
     }
 
     /// <summary>
     /// Duration types for effects
     /// </summary>
-    public static class Durations
+    public static partial class Durations
     {
         public const string UntilEndOfConflict = "untilEndOfConflict";
         public const string UntilEndOfPhase = "untilEndOfPhase";
         public const string UntilEndOfRound = "untilEndOfRound";
+        public const string UntilEndOfTurn = "untilEndOfTurn";
         public const string UntilEndOfDuel = "untilEndOfDuel";
         public const string UntilPassPriority = "untilPassPriority";
         public const string UntilOpponentPassPriority = "untilOpponentPassPriority";
@@ -315,7 +364,7 @@ namespace L5RGame
         public const string ModifyStats = "modifyStats";
         public const string ResolveAbility = "resolveAbility";
         public const string LastingEffect = "lastingEffect";
-        public const string DelayedEffect = "delayedEffect";
+        // DelayedEffect moved to EffectNames to avoid duplicate - it's more appropriately an effect than an action
         public const string CardMenuCommand = "cardMenuCommand";
         public const string SelectCard = "selectCard";
         public const string ChooseAction = "chooseAction";
@@ -468,4 +517,85 @@ namespace L5RGame
             return conflictType == ConflictTypes.Military ? ConflictTypes.Political : ConflictTypes.Military;
         }
     }
+
+    /// <summary>
+    /// Game phases enumeration
+    /// </summary>
+    public static class GamePhases
+    {
+        public const string Setup = "setup";
+        public const string Dynasty = "dynasty";
+        public const string Draw = "draw";
+        public const string Conflict = "conflict";
+        public const string Fate = "fate";
+        public const string Regroup = "regroup";
+    }
+
+    /// <summary>
+    /// Token types enumeration
+    /// </summary>
+    public static class TokenTypes
+    {
+        public const string Honor = "honor";
+        public const string Dishonor = "dishonor";
+        public const string Fate = "fate";
+        public const string Taint = "taint";
+        public const string Poison = "poison";
+        public const string Bond = "bond";
+        public const string Character = "character";
+        public const string Attachment = "attachment";
+    }
+
+    /// <summary>
+    /// Ability identifier class
+    /// </summary>
+    public class AbilityId
+    {
+        public string Value { get; set; }
+        
+        // Ring effect constants
+        public static readonly AbilityId EarthRing = new AbilityId("earth-ring");
+        public static readonly AbilityId FireRing = new AbilityId("fire-ring");
+        public static readonly AbilityId WaterRing = new AbilityId("water-ring");
+        public static readonly AbilityId VoidRing = new AbilityId("void-ring");
+        public static readonly AbilityId AirRing = new AbilityId("air-ring");
+        
+        public AbilityId(string value)
+        {
+            Value = value;
+        }
+        
+        public override string ToString()
+        {
+            return Value;
+        }
+        
+        public static implicit operator string(AbilityId abilityId)
+        {
+            return abilityId?.Value;
+        }
+        
+        public static implicit operator AbilityId(string value)
+        {
+            return new AbilityId(value);
+        }
+    }
+
+    /// <summary>
+    /// Ability trigger configuration
+    /// </summary>
+    public class AbilityTrigger
+    {
+        public string Event { get; set; }
+        public object Condition { get; set; }
+        public string Cost { get; set; }
+        public string Target { get; set; }
+        public bool FateRemoved { get; set; }
+        
+        public AbilityTrigger(string eventName)
+        {
+            Event = eventName;
+        }
+    }
+
 }

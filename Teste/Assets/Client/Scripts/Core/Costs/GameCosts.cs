@@ -270,7 +270,7 @@ namespace L5RGame
             return "fate";
         }
         
-        public int GetReducedCost(AbilityContext context)
+        public virtual int GetReducedCost(AbilityContext context)
         {
             // Apply cost modifications here
             int reducedCost = baseCost;

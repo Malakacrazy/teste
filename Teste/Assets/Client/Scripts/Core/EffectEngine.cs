@@ -852,12 +852,9 @@ namespace L5RGame
     }
 
     /// <summary>
-    /// Additional effect names for the effect engine
+    /// Additional effect names for the effect engine (moved to Constants.cs to avoid duplicates)
     /// </summary>
-    public static partial class EffectNames
-    {
-        public const string DelayedEffect = "delayedEffect";
-    }
+    // EffectNames constants moved to Constants.cs to avoid CS0102 duplicate definition errors
 
 
     /// <summary>

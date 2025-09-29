@@ -8,6 +8,24 @@ using L5RGame.EventSystem;
 namespace L5RGame
 {
     /// <summary>
+    /// Configuration for targeting abilities
+    /// </summary>
+    public class TargetConfiguration
+    {
+        public string Mode { get; set; }
+        public string ActivePromptTitle { get; set; }
+        public object Source { get; set; }
+        public string CardTypeFilter { get; set; }
+        public bool AllowCancel { get; set; } = true;
+        public int MaxTargets { get; set; } = 1;
+        public int MinTargets { get; set; } = 1;
+        public string LocationFilter { get; set; }
+        public string ControllerFilter { get; set; }
+        public string TargetingType { get; set; }
+        public List<object> Choices { get; set; } = new List<object>();
+        public Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
+    }
+    /// <summary>
     /// Base ability class for card abilities
     /// </summary>
     public partial class BaseAbility : MonoBehaviour
@@ -74,7 +92,8 @@ namespace L5RGame
                 ["MinTargets"] = config.MinTargets,
                 ["LocationFilter"] = config.LocationFilter,
                 ["ControllerFilter"] = config.ControllerFilter,
-                ["TargetingType"] = config.TargetingType
+                ["TargetingType"] = config.TargetingType,
+                ["Choices"] = config.Choices
             };
             
             // Add custom properties
@@ -359,9 +378,20 @@ namespace L5RGame
         }
         
         // Utility methods
-        public string GetTitle()
+        public virtual string GetTitle()
         {
             return !string.IsNullOrEmpty(title) ? title : "Untitled Ability";
+        }
+        
+        /// <summary>
+        /// Checks if this ability meets all requirements for execution
+        /// </summary>
+        /// <param name="context">Ability context</param>
+        /// <returns>Empty string if requirements are met, error string otherwise</returns>
+        public virtual string MeetsRequirements(AbilityContext context)
+        {
+            // Base implementation - no requirements by default
+            return string.Empty;
         }
         
         /// <summary>

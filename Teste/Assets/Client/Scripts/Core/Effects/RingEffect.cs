@@ -1,34 +1,57 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace L5RGame
 {
-    public class RingEffect : Effect
+    /// <summary>
+    /// Effect that applies to rings
+    /// </summary>
+    [System.Serializable]
+    public class RingTargetEffect : Effect
     {
-        // Add missing properties and methods for compatibility
-        protected Func<object, AbilityContext, bool> MatchFunction => GetMatchFunction();
-        protected AbilityContext ContextValue => context;
-        protected Game GameInstance => game;
+        [Header("Ring Effect Properties")]
+        public Ring targetRing;
         
-        private Func<object, AbilityContext, bool> GetMatchFunction()
+        public RingTargetEffect(Game game, BaseCard sourceCard, EffectProperties properties, object effectImplementation) 
+            : base(game, sourceCard, properties, effectImplementation)
         {
-            // Return the match function from the base class or a default one
-            return (target, ctx) => target != null;
+            // Constructor implementation handled by base class
         }
         
-        public RingEffect(Game game, BaseCard source, EffectProperties properties, object effect) 
-            : base(game, source, properties, effect)
+        public RingTargetEffect() : base(null, null, new EffectProperties(), null)
         {
+            // Default constructor for serialization
         }
-
-        public override List<object> GetTargets()
+        
+        public override bool IsValidTarget(object target)
         {
-            return GameInstance.Rings.Values
-                .Where(ring => MatchFunction(ring, ContextValue))
-                .Cast<object>()
-                .ToList();
+            return target is Ring ring && (targetRing == null || ring == targetRing);
         }
+        
+        protected object GetTargetContext(object target)
+        {
+            if (target is Ring ring)
+            {
+                return new RingTargetEffectContext 
+                { 
+                    ring = ring, 
+                    game = game, 
+                    source = source 
+                };
+            }
+            // GetTargetContext is not available in base class, return null
+            return null;
+        }
+    }
+    
+    /// <summary>
+    /// Context for ring target effects
+    /// </summary>
+    [System.Serializable]
+    public class RingTargetEffectContext
+    {
+        public Ring ring;
+        public Game game;
+        public EffectSource source;
     }
 }

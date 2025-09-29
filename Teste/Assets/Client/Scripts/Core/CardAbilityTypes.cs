@@ -160,15 +160,7 @@ namespace L5RGame
     /// <summary>
     /// Placeholder action classes for different play types
     /// </summary>
-    public class PlayDisguisedCharacterAction : CustomPlayAction
-    {
-        public PlayDisguisedCharacterAction(BaseCard card) : base(new CustomPlayActionProperties
-        {
-            title = "Play as Disguised",
-            condition = (player, cardContext) => true,
-            effect = (player, cardContext, context) => { /* Implementation */ }
-        }) { }
-    }
+    // PlayDisguisedCharacterAction moved to PlayDisguisedCharacterAction.cs to avoid duplicate definition
 
     public class DynastyCardAction : CustomPlayAction
     {

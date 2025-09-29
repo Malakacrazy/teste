@@ -11,25 +11,25 @@ namespace L5RGame
         public const string OnCardBowed = "onCardBowed";
         public const string OnCardDishonored = "onCardDishonored";
         public const string OnCardHonored = "onCardHonored";
-        public const string OnCardLeavesPlay = "onCardLeavesPlay";
+        // OnCardLeavesPlay moved to Constants.cs to avoid duplicate definition
         public const string OnCardMoved = "onCardMoved";
         public const string OnCardReadied = "onCardReadied";
         public const string OnCardRevealed = "onCardRevealed";
-        public const string OnCardsDiscarded = "onCardsDiscarded";
+        // OnCardsDiscarded moved to Constants.cs to avoid duplicate definition
         public const string OnCardsDiscardedFromHand = "onCardsDiscardedFromHand";
-        public const string OnCardsDrawn = "onCardsDrawn";
+        // OnCardsDrawn moved to Constants.cs to avoid duplicate definition
         public const string OnCardTurnedFacedown = "onCardTurnedFacedown";
         public const string OnCharacterEntersPlay = "onCharacterEntersPlay";
         public const string OnChooseAction = "onChooseAction";
         public const string OnConditionalAction = "onConditionalAction";
-        public const string OnConflictInitiated = "onConflictInitiated";
+        // OnConflictInitiated moved to Constants.cs to avoid duplicate definition
         public const string OnCreateToken = "onCreateToken";
         public const string OnDeckSearch = "onDeckSearch";
         public const string OnDeckShuffled = "onDeckShuffled";
         public const string OnDiscardFavor = "onDiscardFavor";
-        public const string OnDuelInitiated = "onDuelInitiated";
+        // OnDuelInitiated moved to Constants.cs to avoid duplicate definition
         public const string OnDynastyCardTurnedFaceup = "onDynastyCardTurnedFaceup";
-        public const string OnEffectApplied = "onEffectApplied";
+        // OnEffectApplied moved to Constants.cs to avoid duplicate definition
         public const string OnHandlerAction = "onHandlerAction";
         public const string OnIfAbleAction = "onIfAbleAction";
         public const string OnJointAction = "onJointAction";
@@ -47,36 +47,49 @@ namespace L5RGame
         public const string OnSequentialAction = "onSequentialAction";
         public const string OnSetHonorDial = "onSetHonorDial";
         public const string OnStatusTokenDiscarded = "onStatusTokenDiscarded";
-        public const string OnStatusTokenMoved = "onStatusTokenMoved";
         public const string OnSwitchConflictElement = "onSwitchConflictElement";
         public const string OnSwitchConflictType = "onSwitchConflictType";
-        public const string OnTakeControl = "onTakeControl";
         public const string OnTakeRing = "onTakeRing";
         public const string OnTransferHonor = "onTransferHonor";
-        public const string OnPhaseEnded = "onPhaseEnded";
+        // OnPhaseEnded moved to Constants.cs to avoid duplicate definition
         public const string OnPhaseCreated = "onPhaseCreated";
-        public const string OnPhaseStarted = "onPhaseStarted";
+        // OnPhaseStarted moved to Constants.cs to avoid duplicate definition
         public const string OnPassDuringDynasty = "onPassDuringDynasty";
         public const string OnPassFirstPlayer = "onPassFirstPlayer";
-        public const string OnRoundEnded = "onRoundEnded";
+        // OnRoundEnded moved to Constants.cs to avoid duplicate definition
         // Additional event names from Game.cs partial class
-        public const string Unnamed = "unnamed";
+        // Unnamed moved to Constants.cs to avoid duplicate definition
         public const string OnCardAbilityInitiated = "onCardAbilityInitiated";
-        public const string OnCardPlayed = "onCardPlayed";
+        // OnCardPlayed moved to Constants.cs to avoid duplicate definition
         public const string OnCardAbilityTriggered = "onCardAbilityTriggered";
-        public const string OnDefendersDeclared = "onDefendersDeclared";
-        public const string AfterConflict = "afterConflict";
-        public const string OnCovertResolved = "onCovertResolved";
-        public const string OnClaimRing = "onClaimRing";
-        public const string OnReturnHome = "onReturnHome";
-        public const string OnParticipantsReturnHome = "onParticipantsReturnHome";
+        // OnDefendersDeclared moved to Constants.cs to avoid duplicate definition
+        // AfterConflict moved to Constants.cs to avoid duplicate definition
+        // OnCovertResolved moved to Constants.cs to avoid duplicate definition
+        // OnClaimRing moved to Constants.cs to avoid duplicate definition
+        // OnReturnHome moved to Constants.cs to avoid duplicate definition
+        // OnParticipantsReturnHome moved to Constants.cs to avoid duplicate definition
         // Additional event names from EffectEngine.cs partial class
-        public const string OnConflictFinished = "onConflictFinished";
-        public const string OnDuelFinished = "onDuelFinished";
-        public const string OnPassActionPhasePriority = "onPassActionPhasePriority";
+        // OnConflictFinished moved to Constants.cs to avoid duplicate definition
+        // OnDuelFinished moved to Constants.cs to avoid duplicate definition
+        // OnPassActionPhasePriority moved to Constants.cs to avoid duplicate definition
         // Additional missing event names found in errors
-        public const string OnHonorDialsRevealed = "onHonorDialsRevealed";
+        // OnHonorDialsRevealed moved to Constants.cs to avoid duplicate definition
         public const string AfterDuel = "afterDuel";
         public const string OnDuelResolution = "onDuelResolution";
+        
+        // Conflict-specific event names (moved from Conflict.cs and Constants.cs)
+        public const string OnConflictPass = "onConflictPass";
+        public const string OnConflictDeclared = "onConflictDeclared";
+        public const string OnAttackersChosen = "onAttackersChosen";
+        public const string OnDefendersChosen = "onDefendersChosen";
+        public const string OnConflictResolved = "onConflictResolved";
+        
+        // Additional event names (moved from EffectSource.cs)
+        public const string OnGameStateChanged = "onGameStateChanged";
+        public const string OnPassPriority = "onPassPriority";
+        public const string OnDuelEnded = "onDuelEnded";
+        
+        // Status token event names (moved from StatusToken.cs)
+        public const string OnStatusTokenAdded = "onStatusTokenAdded";
     }
 }

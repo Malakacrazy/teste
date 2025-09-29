@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using L5RGame.Types;
 
 namespace L5RGame
 {
@@ -12,7 +13,7 @@ namespace L5RGame
     public interface IBaseTarget
     {
         string ActivePromptTitle { get; set; }
-        Func<AbilityContext, Players> Player { get; set; }
+        Func<AbilityContext, PlayersEnum> Player { get; set; }
         List<GameAction> GameActions { get; set; }
     }
 
@@ -23,7 +24,7 @@ namespace L5RGame
     public abstract class BaseTarget : IBaseTarget
     {
         public string ActivePromptTitle { get; set; }
-        public Func<AbilityContext, Players> Player { get; set; }
+        public Func<AbilityContext, PlayersEnum> Player { get; set; }
         public List<GameAction> GameActions { get; set; } = new List<GameAction>();
     }
 
@@ -41,7 +42,7 @@ namespace L5RGame
     [Serializable]
     public class TargetSelect : BaseTarget, IChoicesInterface
     {
-        public TargetModes Mode { get; set; } = TargetModes.Select;
+        public TargetModesEnum Mode { get; set; } = TargetModesEnum.Select;
         public Dictionary<string, object> Choices { get; set; } = new Dictionary<string, object>();
         public bool Targets { get; set; }
     }
@@ -52,7 +53,7 @@ namespace L5RGame
     [Serializable]
     public class TargetRing : BaseTarget
     {
-        public TargetModes Mode { get; set; } = TargetModes.Ring;
+        public TargetModesEnum Mode { get; set; } = TargetModesEnum.Ring;
         public Func<Ring, AbilityContext, bool> RingCondition { get; set; }
     }
 
@@ -62,8 +63,8 @@ namespace L5RGame
     [Serializable]
     public class TargetAbility : BaseTarget
     {
-        public TargetModes Mode { get; set; } = TargetModes.Ability;
-        public List<CardTypes> CardTypes { get; set; } = new List<CardTypes>();
+        public TargetModesEnum Mode { get; set; } = TargetModesEnum.Ability;
+        public List<CardTypesEnum> CardTypes { get; set; } = new List<CardTypesEnum>();
         public Func<BaseCard, AbilityContext, bool> CardCondition { get; set; }
         public Func<BaseAbility, bool> AbilityCondition { get; set; }
     }
@@ -74,7 +75,7 @@ namespace L5RGame
     [Serializable]
     public class TargetToken : BaseTarget
     {
-        public TargetModes Mode { get; set; } = TargetModes.Token;
+        public TargetModesEnum Mode { get; set; } = TargetModesEnum.Token;
         public Func<BaseCard, AbilityContext, bool> CardCondition { get; set; }
     }
 
@@ -83,9 +84,9 @@ namespace L5RGame
     /// </summary>
     public interface IBaseTargetCard : IBaseTarget
     {
-        List<CardTypes> CardTypes { get; set; }
-        Players Controller { get; set; }
-        List<Locations> Locations { get; set; }
+        List<CardTypesEnum> CardTypes { get; set; }
+        PlayersEnum Controller { get; set; }
+        List<LocationsEnum> Locations { get; set; }
         bool Optional { get; set; }
     }
 
@@ -95,9 +96,9 @@ namespace L5RGame
     [Serializable]
     public abstract class BaseTargetCard : BaseTarget, IBaseTargetCard
     {
-        public List<CardTypes> CardTypes { get; set; } = new List<CardTypes>();
-        public Players Controller { get; set; }
-        public List<Locations> Locations { get; set; } = new List<Locations>();
+        public List<CardTypesEnum> CardTypes { get; set; } = new List<CardTypesEnum>();
+        public PlayersEnum Controller { get; set; }
+        public List<LocationsEnum> Locations { get; set; } = new List<LocationsEnum>();
         public bool Optional { get; set; }
     }
 
@@ -107,10 +108,10 @@ namespace L5RGame
     [Serializable]
     public class TargetCardExactlyUpTo : BaseTargetCard
     {
-        public TargetModes Mode { get; set; }
+        public TargetModesEnum Mode { get; set; }
         public int NumCards { get; set; }
 
-        public TargetCardExactlyUpTo(TargetModes mode, int numCards)
+        public TargetCardExactlyUpTo(TargetModesEnum mode, int numCards)
         {
             Mode = mode;
             NumCards = numCards;
@@ -123,10 +124,10 @@ namespace L5RGame
     [Serializable]
     public class TargetCardExactlyUpToVariable : BaseTargetCard
     {
-        public TargetModes Mode { get; set; }
+        public TargetModesEnum Mode { get; set; }
         public Func<AbilityContext, int> NumCardsFunc { get; set; }
 
-        public TargetCardExactlyUpToVariable(TargetModes mode, Func<AbilityContext, int> numCardsFunc)
+        public TargetCardExactlyUpToVariable(TargetModesEnum mode, Func<AbilityContext, int> numCardsFunc)
         {
             Mode = mode;
             NumCardsFunc = numCardsFunc;
@@ -139,7 +140,7 @@ namespace L5RGame
     [Serializable]
     public class TargetCardMaxStat : BaseTargetCard
     {
-        public TargetModes Mode { get; set; } = TargetModes.MaxStat;
+        public TargetModesEnum Mode { get; set; } = TargetModesEnum.MaxStat;
         public int NumCards { get; set; }
         public Func<BaseCard, int> CardStat { get; set; }
         public Func<int> MaxStat { get; set; }
@@ -151,7 +152,7 @@ namespace L5RGame
     [Serializable]
     public class TargetCardSingleUnlimited : BaseTargetCard
     {
-        public TargetModes Mode { get; set; } = TargetModes.Single;
+        public TargetModesEnum Mode { get; set; } = TargetModesEnum.Single;
     }
 
     /// <summary>
@@ -209,7 +210,7 @@ namespace L5RGame
     public interface IAbilityProps
     {
         string Title { get; set; }
-        List<Locations> Location { get; set; }
+        List<LocationsEnum> Location { get; set; }
         List<ICost> Cost { get; set; }
         AbilityLimit Limit { get; set; }
         int Max { get; set; }
@@ -233,7 +234,7 @@ namespace L5RGame
     public class AbilityProps : IAbilityProps
     {
         public string Title { get; set; }
-        public List<Locations> Location { get; set; } = new List<Locations>();
+        public List<LocationsEnum> Location { get; set; } = new List<LocationsEnum>();
         public List<ICost> Cost { get; set; } = new List<ICost>();
         public AbilityLimit Limit { get; set; }
         public int Max { get; set; }
@@ -295,11 +296,11 @@ namespace L5RGame
     /// When-type trigger conditions
     /// </summary>
     [Serializable]
-    public class WhenType : Dictionary<EventNames, Func<object, TriggeredAbilityContext, bool>>
+    public class WhenType : Dictionary<EventNamesEnum, Func<object, TriggeredAbilityContext, bool>>
     {
         public WhenType() : base() { }
         
-        public WhenType(Dictionary<EventNames, Func<object, TriggeredAbilityContext, bool>> conditions) : base(conditions) { }
+        public WhenType(Dictionary<EventNamesEnum, Func<object, TriggeredAbilityContext, bool>> conditions) : base(conditions) { }
     }
 
     /// <summary>
@@ -349,11 +350,11 @@ namespace L5RGame
     /// </summary>
     public interface IPersistentEffectProps
     {
-        List<Locations> Location { get; set; }
+        List<LocationsEnum> Location { get; set; }
         Func<AbilityContext, bool> Condition { get; set; }
         Func<BaseCard, AbilityContext, bool> Match { get; set; }
-        Players TargetController { get; set; }
-        Locations TargetLocation { get; set; }
+        PlayersEnum TargetController { get; set; }
+        LocationsEnum TargetLocation { get; set; }
         object Effect { get; set; }
     }
 
@@ -363,11 +364,11 @@ namespace L5RGame
     [Serializable]
     public class PersistentEffectProps : IPersistentEffectProps
     {
-        public List<Locations> Location { get; set; } = new List<Locations>();
+        public List<LocationsEnum> Location { get; set; } = new List<LocationsEnum>();
         public Func<AbilityContext, bool> Condition { get; set; }
         public Func<BaseCard, AbilityContext, bool> Match { get; set; }
-        public Players TargetController { get; set; }
-        public Locations TargetLocation { get; set; }
+        public PlayersEnum TargetController { get; set; }
+        public LocationsEnum TargetLocation { get; set; }
         public object Effect { get; set; }
     }
 
@@ -465,12 +466,20 @@ namespace L5RGame
 
     #endregion
 
-    #region Enumerations
+}
 
+namespace L5RGame.Types
+{
+    #region Enumerations
+    
+    // Enum types for type safety in method signatures and generics
+    // These are in a separate namespace (L5RGame.Types) to avoid conflicts with static classes
+    // The static string constants in Constants.cs remain for runtime string values
+    
     /// <summary>
-    /// Target modes for different targeting scenarios
+    /// Target modes enumeration for type-safe targeting specifications
     /// </summary>
-    public enum TargetModes
+    public enum TargetModesEnum
     {
         Select,
         Ring,
@@ -486,9 +495,9 @@ namespace L5RGame
     }
 
     /// <summary>
-    /// Player enumeration for targeting
+    /// Players enumeration for type-safe player targeting
     /// </summary>
-    public enum Players
+    public enum PlayersEnum
     {
         Self,
         Opponent,
@@ -499,9 +508,9 @@ namespace L5RGame
     }
 
     /// <summary>
-    /// Card types enumeration
+    /// Card types enumeration for type-safe card type specifications
     /// </summary>
-    public enum CardTypes
+    public enum CardTypesEnum
     {
         Character,
         Attachment,
@@ -513,9 +522,9 @@ namespace L5RGame
     }
 
     /// <summary>
-    /// Location enumeration
+    /// Locations enumeration for type-safe location specifications
     /// </summary>
-    public enum Locations
+    public enum LocationsEnum
     {
         Hand,
         ConflictDeck,
@@ -529,13 +538,20 @@ namespace L5RGame
         ProvinceFour,
         StrongholdProvince,
         RemovedFromGame,
-        Any
+        Limbo,
+        Any,
+        Provinces,
+        Role,
+        BeingPlayed,
+        ProvinceDeck,
+        UnderneathStronghold,
+        None
     }
 
     /// <summary>
-    /// Event names enumeration
+    /// Event names enumeration for type-safe event specifications
     /// </summary>
-    public enum EventNames
+    public enum EventNamesEnum
     {
         OnCardPlayed,
         OnCardEntersPlay,
@@ -564,13 +580,20 @@ namespace L5RGame
         OnCharacterLeavesConflict,
         OnMovementPhaseEnd,
         OnPassPriority,
+        OnPassActionPhasePriority,
+        OnDefendersDeclared,
+        OnCovertResolved,
+        OnClaimRing,
+        OnReturnHome,
+        OnParticipantsReturnHome,
+        AfterConflict,
         Unnamed
     }
 
     /// <summary>
-    /// Duration types for effects
+    /// Durations enumeration for type-safe duration specifications
     /// </summary>
-    public enum Durations
+    public enum DurationsEnum
     {
         UntilEndOfConflict,
         UntilEndOfPhase,
@@ -582,9 +605,12 @@ namespace L5RGame
         Persistent,
         Custom
     }
-
+    
     #endregion
+}
 
+namespace L5RGame
+{
     #region Extension Methods
 
     /// <summary>
@@ -607,19 +633,19 @@ namespace L5RGame
         /// </summary>
         /// <param name="target">Target to check</param>
         /// <returns>Target mode</returns>
-        public static TargetModes GetMode(this IBaseTarget target)
+        public static TargetModesEnum GetMode(this IBaseTarget target)
         {
             return target switch
             {
-                TargetSelect => TargetModes.Select,
-                TargetRing => TargetModes.Ring,
-                TargetAbility => TargetModes.Ability,
-                TargetToken => TargetModes.Token,
+                TargetSelect => TargetModesEnum.Select,
+                TargetRing => TargetModesEnum.Ring,
+                TargetAbility => TargetModesEnum.Ability,
+                TargetToken => TargetModesEnum.Token,
                 TargetCardExactlyUpTo exactUpTo => exactUpTo.Mode,
                 TargetCardExactlyUpToVariable variable => variable.Mode,
-                TargetCardMaxStat => TargetModes.MaxStat,
+                TargetCardMaxStat => TargetModesEnum.MaxStat,
                 TargetCardSingleUnlimited single => single.Mode,
-                _ => TargetModes.Single
+                _ => TargetModesEnum.Single
             };
         }
     }
@@ -635,7 +661,7 @@ namespace L5RGame
         /// <param name="props">Ability properties</param>
         /// <param name="location">Location to check</param>
         /// <returns>True if location is required</returns>
-        public static bool RequiresLocation(this IAbilityProps props, Locations location)
+        public static bool RequiresLocation(this IAbilityProps props, LocationsEnum location)
         {
             return props.Location != null && props.Location.Contains(location);
         }

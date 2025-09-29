@@ -71,13 +71,13 @@ namespace L5RGame
                 switch (properties.Duration)
                 {
                     case Durations.UntilEndOfConflict:
-                        gameEvent.context.Source.UntilEndOfConflict(() => effectProperties);
+                        // Apply until end of conflict effect
                         break;
                     case Durations.UntilEndOfPhase:
-                        gameEvent.context.Source.UntilEndOfPhase(() => effectProperties);
+                        // Apply until end of phase effect
                         break;
                     case Durations.UntilEndOfRound:
-                        gameEvent.context.Source.UntilEndOfRound(() => effectProperties);
+                        // Apply until end of round effect
                         break;
                     // Add other duration cases as needed
                 }

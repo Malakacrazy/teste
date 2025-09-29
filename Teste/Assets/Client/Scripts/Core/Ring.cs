@@ -680,16 +680,9 @@ namespace L5RGame
     }
 
     /// <summary>
-    /// Ring elements enumeration
+    /// Ring elements enumeration (moved to Constants.cs to avoid duplicate definition)
     /// </summary>
-    public static class RingElements
-    {
-        public const string Air = "air";
-        public const string Earth = "earth";
-        public const string Fire = "fire";
-        public const string Void = "void";
-        public const string Water = "water";
-    }
+    // RingElements class moved to Constants.cs to avoid CS0101 duplicate definition errors
 
     /// <summary>
     /// Ring-specific effect names

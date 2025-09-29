@@ -129,48 +129,7 @@ namespace L5RGame
     }
 
     /// <summary>
-    /// Enumerations for different game action types
+    /// Enumerations for different game action types (moved to Constants.cs to avoid duplicate definition)
     /// </summary>
-    public static class GameActionTypes
-    {
-        public const string MoveTo = "moveTo";
-        public const string Discard = "discard";
-        public const string Bow = "bow";
-        public const string Ready = "ready";
-        public const string GainHonor = "gainHonor";
-        public const string LoseHonor = "loseHonor";
-        public const string GainFate = "gainFate";
-        public const string SpendFate = "spendFate";
-        public const string PlayCard = "playCard";
-        public const string PutIntoPlay = "putIntoPlay";
-        public const string RemoveFromGame = "removeFromGame";
-        public const string Reveal = "reveal";
-        public const string LookAt = "lookAt";
-        public const string Shuffle = "shuffle";
-        public const string Search = "search";
-        public const string TakeControl = "takeControl";
-        public const string Attach = "attach";
-        public const string Detach = "detach";
-        public const string Honor = "honor";
-        public const string Dishonor = "dishonor";
-        public const string Break = "break";
-        public const string SendHome = "sendHome";
-        public const string FlipDynasty = "flipDynasty";
-        public const string CreateToken = "createToken";
-        public const string PlaceFate = "placeFate";
-        public const string RemoveFate = "removeFate";
-        public const string ModifyStats = "modifyStats";
-        public const string ResolveAbility = "resolveAbility";
-        public const string LastingEffect = "lastingEffect";
-        public const string DelayedEffect = "delayedEffect";
-        public const string CardMenuCommand = "cardMenuCommand";
-        public const string SelectCard = "selectCard";
-        public const string ChooseAction = "chooseAction";
-        public const string Duel = "duel";
-        public const string MoveToConflict = "moveToConflict";
-        public const string ReturnToHand = "returnToHand";
-        public const string ReturnToDeck = "returnToDeck";
-        public const string TurnFacedown = "turnFacedown";
-        public const string AttachToRing = "attachToRing";
-    }
+    // GameActionTypes class moved to Constants.cs to avoid CS0101 duplicate definition errors
 }

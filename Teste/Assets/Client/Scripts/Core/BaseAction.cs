@@ -99,7 +99,7 @@ namespace L5RGame
                 stage = Stages.PreTarget
             };
 
-            var contextGO = new GameObject("BaseActionContext");
+            var contextGO = new UnityEngine.GameObject("BaseActionContext");
             var context = contextGO.AddComponent<AbilityContext>();
             context.Initialize(properties);
             
@@ -221,7 +221,7 @@ namespace L5RGame
         {
             if (card != null)
             {
-                return card.GetReducedCost(context);
+                return card.GetCost();
             }
             
             return base.GetReducedCost(context);

@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using UnityEngine;
 
 namespace L5RGame
@@ -59,37 +60,66 @@ namespace L5RGame
             {
                 // Try to access context.source.name using reflection
                 var effectType = effect.GetType();
-                var contextProperty = effectType.GetProperty("context") ?? effectType.GetField("context");
+                var contextProperty = effectType.GetProperty("context");
+                var contextField = effectType.GetField("context");
                 
+                object contextValue = null;
                 if (contextProperty != null)
                 {
-                    var context = contextProperty.GetValue(effect);
+                    contextValue = contextProperty.GetValue(effect);
+                }
+                else if (contextField != null)
+                {
+                    contextValue = contextField.GetValue(effect);
+                }
+                
+                if (contextValue != null)
+                {
+                    var context = contextValue;
                     if (context != null)
                     {
                         var contextType = context.GetType();
-                        var sourceProperty = contextType.GetProperty("source") ?? contextType.GetField("source");
+                        var sourceProperty = contextType.GetProperty("source");
+                        var sourceField = contextType.GetField("source");
                         
+                        object source = null;
                         if (sourceProperty != null)
                         {
-                            var source = sourceProperty.GetValue(context);
-                            if (source != null)
+                            source = sourceProperty.GetValue(context);
+                        }
+                        else if (sourceField != null)
+                        {
+                            source = sourceField.GetValue(context);
+                        }
+                        
+                        if (source != null)
+                        {
+                            var sourceType = source.GetType();
+                            var nameProperty = sourceType.GetProperty("name");
+                            var nameField = sourceType.GetField("name");
+                            
+                            object nameValue = null;
+                            if (nameProperty != null)
                             {
-                                var sourceType = source.GetType();
-                                var nameProperty = sourceType.GetProperty("name") ?? sourceType.GetField("name");
-                                
-                                if (nameProperty != null)
-                                {
-                                    return nameProperty.GetValue(source)?.ToString() ?? "Unknown";
-                                }
-                                
-                                // Fallback to source object name
-                                if (source is UnityEngine.Object unityObj)
-                                    return unityObj.name;
+                                nameValue = nameProperty.GetValue(source);
                             }
+                            else if (nameField != null)
+                            {
+                                nameValue = nameField.GetValue(source);
+                            }
+                                
+                            if (nameValue != null)
+                            {
+                                return nameValue.ToString() ?? "Unknown";
+                            }
+                            
+                            // Fallback to source object name
+                            if (source is UnityEngine.Object unityObj)
+                                return unityObj.name;
                         }
                     }
                 }
-
+                
                 // Fallback to effect type name
                 return effectType.Name;
             }
@@ -114,33 +144,62 @@ namespace L5RGame
             {
                 // Try to access context.source.type using reflection
                 var effectType = effect.GetType();
-                var contextProperty = effectType.GetProperty("context") ?? effectType.GetField("context");
+                var contextProperty = effectType.GetProperty("context");
+                var contextField = effectType.GetField("context");
                 
+                object contextValue = null;
                 if (contextProperty != null)
                 {
-                    var context = contextProperty.GetValue(effect);
+                    contextValue = contextProperty.GetValue(effect);
+                }
+                else if (contextField != null)
+                {
+                    contextValue = contextField.GetValue(effect);
+                }
+                
+                if (contextValue != null)
+                {
+                    var context = contextValue;
                     if (context != null)
                     {
                         var contextType = context.GetType();
-                        var sourceProperty = contextType.GetProperty("source") ?? contextType.GetField("source");
+                        var sourceProperty = contextType.GetProperty("source");
+                        var sourceField = contextType.GetField("source");
                         
+                        object source = null;
                         if (sourceProperty != null)
                         {
-                            var source = sourceProperty.GetValue(context);
-                            if (source != null)
+                            source = sourceProperty.GetValue(context);
+                        }
+                        else if (sourceField != null)
+                        {
+                            source = sourceField.GetValue(context);
+                        }
+                        
+                        if (source != null)
+                        {
+                            var sourceType = source.GetType();
+                            var typeProperty = sourceType.GetProperty("type");
+                            var typeField = sourceType.GetField("type");
+                            
+                            object typeValue = null;
+                            if (typeProperty != null)
                             {
-                                var sourceType = source.GetType();
-                                var typeProperty = sourceType.GetProperty("type") ?? sourceType.GetField("type");
+                                typeValue = typeProperty.GetValue(source);
+                            }
+                            else if (typeField != null)
+                            {
+                                typeValue = typeField.GetValue(source);
+                            }
                                 
-                                if (typeProperty != null)
-                                {
-                                    return typeProperty.GetValue(source)?.ToString();
-                                }
+                            if (typeValue != null)
+                            {
+                                return typeValue.ToString();
                             }
                         }
                     }
                 }
-
+                
                 return null;
             }
             catch (Exception e)
@@ -163,11 +222,22 @@ namespace L5RGame
             try
             {
                 var cardType = card.GetType();
-                var typeProperty = cardType.GetProperty("type") ?? cardType.GetField("type");
+                var typeProperty = cardType.GetProperty("type");
+                var typeField = cardType.GetField("type");
                 
+                object typeValue = null;
                 if (typeProperty != null)
                 {
-                    return typeProperty.GetValue(card)?.ToString();
+                    typeValue = typeProperty.GetValue(card);
+                }
+                else if (typeField != null)
+                {
+                    typeValue = typeField.GetValue(card);
+                }
+                
+                if (typeValue != null)
+                {
+                    return typeValue.ToString();
                 }
 
                 // Check if it's a BaseCard
@@ -276,14 +346,32 @@ namespace L5RGame
 
                 // Try reflection for other card types
                 var cardType = card.GetType();
-                var nameProperty = cardType.GetProperty("name") ?? 
-                                  cardType.GetProperty("printedName") ?? 
-                                  cardType.GetField("name") ?? 
-                                  cardType.GetField("printedName");
+                var nameProperty = cardType.GetProperty("name");
+                var printedNameProperty = cardType.GetProperty("printedName");
+                var nameField = cardType.GetField("name");
+                var printedNameField = cardType.GetField("printedName");
                 
+                object nameValue = null;
                 if (nameProperty != null)
                 {
-                    return nameProperty.GetValue(card)?.ToString();
+                    nameValue = nameProperty.GetValue(card);
+                }
+                else if (printedNameProperty != null)
+                {
+                    nameValue = printedNameProperty.GetValue(card);
+                }
+                else if (nameField != null)
+                {
+                    nameValue = nameField.GetValue(card);
+                }
+                else if (printedNameField != null)
+                {
+                    nameValue = printedNameField.GetValue(card);
+                }
+                
+                if (nameValue != null)
+                {
+                    return nameValue.ToString();
                 }
 
                 return null;

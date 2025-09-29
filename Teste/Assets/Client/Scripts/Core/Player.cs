@@ -12,16 +12,6 @@ namespace L5RGame
 
     // Note: EventNames and AbilityTypes are in GameConstants.cs
 
-    public static class RingEffects
-    {
-        public static AbilityContext ContextFor(Player player, string element, bool optional)
-        {
-            var context = new UnityEngine.GameObject("AbilityContext").AddComponent<AbilityContext>();
-            context.game = player.game;
-            context.player = player;
-            return context;
-        }
-    }
 
     [System.Serializable]
     public class PlayerSettings

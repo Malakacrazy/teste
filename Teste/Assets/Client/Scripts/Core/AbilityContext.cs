@@ -6,26 +6,7 @@ using UnityEngine;
 namespace L5RGame
 {
     // Supporting classes and interfaces for AbilityContext
-    public class StatusToken
-    {
-        public string name;
-        public object value;
-        public Player owner;
-        
-        // Missing properties for compilation
-        public BaseCard Card { get; set; }
-        public bool Honored { get; set; }
-        public bool Dishonored { get; set; }
-        public string Type { get; set; }
-        
-        public StatusToken() { }
-        public StatusToken(string tokenName, object tokenValue, Player tokenOwner = null)
-        {
-            name = tokenName;
-            value = tokenValue;
-            owner = tokenOwner;
-        }
-    }
+    // StatusToken class moved to StatusToken.cs to avoid duplicate definition
 
     // AbilityLimit moved to separate AbilityLimit.cs file
 
@@ -33,14 +14,7 @@ namespace L5RGame
 
     // EffectSource moved to separate EffectSource.cs file
 
-    public static class Stages
-    {
-        public const string PreTarget = "pretarget";
-        public const string Target = "target";
-        public const string Cost = "cost";
-        public const string Effect = "effect";
-        public const string PostEffect = "posteffect";
-    }
+    // Stages class moved to Constants.cs to avoid duplicate definition
 
     /// <summary>
     /// Properties for creating an AbilityContext

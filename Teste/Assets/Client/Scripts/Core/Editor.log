@@ -1,0 +1,1 @@
+Assets\Client\Scripts\Core\Rings\VoidRingEffect.cs(293,74): error CS0234: The type or namespace name 'Constants' does not exist in the namespace 'L5RGame' (are you missing an assembly reference?)
